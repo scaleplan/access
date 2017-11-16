@@ -2,8 +2,6 @@
 
 namespace avtomon;
 
-require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
-
 use phpDocumentor\Reflection\DocBlockFactory;
 use Symfony\Component\Yaml\Yaml;
 
@@ -179,7 +177,3 @@ class Acless
         return array_merge($this->getControllerURLs(), $this->getFilesURLs(), $this->getPlainURLs());
     }
 }
-
-$acless = new Acless();
-
-print_r($acless->getAllURLs());
