@@ -4,7 +4,13 @@ controllers:
     namespace: app\controllers
 
 files:
-  - /var/www/payment_system/view/private/materials
+  - /var/www/payment_system/views/private/materials
 
 urls:
   - /var/www/payment_system/composer.json
+
+roles:
+  - Администратор
+  - Преподаватель
+  - Слушатель
+  - Гость

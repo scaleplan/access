@@ -17,7 +17,12 @@ class Acless
     public function __construct()
     {
         $this->docBlockFactory = DocBlockFactory::createInstance();
-        $this->config = Yaml::parse(file_get_contents('config.yml'));
+        $this->config = Yaml::parse(file_get_contents(__DIR__ . '/config.yml'));
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
     }
 
     /**
@@ -55,23 +60,25 @@ class Acless
 
         $urls = [];
         foreach ($refClass->getMethods() as $method) {
-            $url = [];
+            $url = [
+                'text' => '/' .
+                strtolower(str_replace('Controller', '', $controller)) .
+                '/' .
+                self::camel2dashed(str_replace('action', '', $method->getName())),
+                'name' => null,
+                'filter' => null,
+                'filter_reference' => null
+            ];
             if ($method->getDocComment()) {
                 $docBlock = $this->docBlockFactory->create($method->getDocComment());
                 $url['name'] = $docBlock->getSummary();
-                foreach ($docBlock->getTags() as $param) {
-                    if ($param->getName() === 'param' && preg_match('/\(acless_filter:\s*([\w\d_\-\.]+)\)\s*\-\s*(.+)/i', $param->getDescription()->render(), $mathches)) {
-                        $url['filter'] = $param->getVariableName();
-                        $url['filter_reference'] = $mathches[1];
-                        $url['filter_name'] = $mathches[2];
-                    }
+                $acless = $docBlock->getTagsByName('acless');
+                $pr = '[\w\d_\-\.]+';
+                if (end($acless) && preg_match("/^\\\$($pr)\s*\->\s*($pr\.$pr\.$pr)$/i", end($acless)->getDescription()->render(), $mathches)) {
+                    $url['filter'] = $mathches[1];
+                    $url['filter_reference'] = $mathches[2];
                 }
             }
-
-            $url['text'] = '/' .
-                strtolower(str_replace('Controller', '', $controller)) .
-                '/' .
-                self::camel2dashed(str_replace('action', '', $method->getName()));
 
             array_push($urls, $url);
         }
@@ -88,18 +95,22 @@ class Acless
      */
     private function getRecursivePaths(string $dir): array
     {
+        $dir = rtrim($dir, '/\ ');
         $paths = scandir($dir);
         unset($paths[0], $paths[1]);
-        $result = $paths;
+        $result = [];
 
-        foreach ($paths as $index => $path) {
-            if (is_dir($path)) {
-                unset($result[$index]);
-                $result = array_merge($result, array_map(function ($item) use ($path) {
-                    return "$path\\$item";
-                }, $this->getRecursivePaths(trim($dir, '/\ ') . '\\' . $path)));
+        foreach ($paths as &$path) {
+            if (is_dir("$dir/$path")) {
+                $result = array_merge($result, array_map(function ($item) use ($path, $dir) {
+                    return "$dir/$path/$item";
+                }, $this->getRecursivePaths("$dir/$path")));
+            } else {
+                $result[] = $path;
             }
         }
+
+        unset($path);
 
         return $result;
     }
@@ -113,13 +124,13 @@ class Acless
      */
     public function getControllerURLs(): array
     {
-        if (isset($this->config['controllers']) && count($this->config['controllers'])) {
+        if (empty($this->config['controllers'])) {
             return null;
         }
 
         $urls = [];
         foreach ($this->config['controllers'] as $controllerDir) {
-            if (!isset($controllerDir['path']) || !trim($controllerDir['path'])) {
+            if (empty($controllerDir['path'])) {
                 throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
             }
 
@@ -143,14 +154,19 @@ class Acless
      */
     public function getFilesURLs(): array
     {
-        if (isset($this->config['files']) && count($this->config['files'])) {
+        if (empty($this->config['files'])) {
             return null;
         }
 
         $urls = [];
         foreach ($this->config['files'] as $fileDir) {
             $urls = array_merge($urls, array_map(function ($item) use ($fileDir) {
-                return trim(str_replace($fileDir, '', $item), '\/ ');
+                return [
+                    'text' => trim(str_replace($fileDir, '', $item), '\/ '),
+                    'name' => null,
+                    'filter' => null,
+                    'filter_reference' => null
+                ];
             }, $this->getRecursivePaths($fileDir)));
         }
 
@@ -164,7 +180,14 @@ class Acless
      */
     public function getPlainURLs(): array
     {
-        return $this->config['urls'];
+        return array_map(function ($item) {
+            return [
+                'text' => trim($item, '\/ '),
+                'name' => null,
+                'filter' => null,
+                'filter_reference' => null
+            ];
+        }, $this->config['urls'] ?? []);
     }
 
     /**
