@@ -2,39 +2,107 @@
 
 namespace avtomon;
 
-use phpDocumentor\Reflection\DocBlockFactory;
-use Symfony\Component\Yaml\Yaml;
-
 class AclessException extends \Exception
 {
 }
 
-class Acless
+/**
+ * Класс формирования списка урлов и проверки прав
+ *
+ * Class Acless
+ * @package avtomon
+ */
+class Acless extends AbstractAcless
 {
-    private $docBlockFactory = null;
-    private $config = null;
+    private $docBlockFactory = null; // Фабрика phpdoc-блоков
 
-    public function __construct()
+    /**
+     * Вернуть информацию о всех доступных пользователю урлах или о каком-то конкретном урле
+     *
+     * @param string|null $url - текст урла
+     *
+     * @return array
+     *
+     * @throws AclessException
+     */
+    private function getAccessRights(string $url = null): array
     {
-        $this->docBlockFactory = DocBlockFactory::createInstance();
-        $this->config = Yaml::parse(file_get_contents(__DIR__ . '/config.yml'));
-    }
+        switch ($this->config['cache_storage']) {
+            case 'redis':
+                if (empty($this->config['redis']['socket'])) {
+                    throw new AclessException('В конфигурации не задан путь к Redis-сокету');
+                }
 
-    public function getConfig()
-    {
-        return $this->config;
+                $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
+                if ($url) {
+                    return $redis->hGet("user:{$this->userId}", $url) ?? [];
+                } else {
+                    return $redis->hGetAll("user:{$this->userId}") ?? [];
+                }
+
+                break;
+
+            case 'session':
+                return $_SESSION['access_rights'][$url] ?? [];
+                break;
+
+            default:
+                throw new AclessException("Драйвер {$config['cache_storage']} кэширующего хранилища не поддерживается системой");
+        }
     }
 
     /**
-     * Превратить строку в виде camelCase в строку вида dashed (camelCase -> camel-case)
+     * Проверить доступ к методу
      *
-     * @param string $str - строка в camelCase
+     * @param \Reflector $ref - Reflection-обертка для метода
+     *
+     * @return bool
+     *
+     * @throws AclessException
+     */
+    public function checkMethodRights(\Reflector $ref): bool
+    {
+        $url = $this->methodToURL(static::class, $ref->getName());
+        if (!($accessRight = $this->getAccessRights($url))) {
+            throw new AclessException('Метод не разрешен Вам для выпонения');
+        }
+
+        if (!($docBlock = $this->docBlockFactory->create($ref->getDocComment()) || !($docParam = end($docBlock->getTagsByName('acless'))))) {
+            return true;
+        }
+
+        $filter = trim($docParam->getDescription()->render());
+        if ($filter && in_array($filter, $args)) {
+            if (($accessRight['is_allow'] && !in_array($args[$filter], $accessRight['values'])) || (!$accessRight['is_allow'] && in_array($args[$filter], $accessRight['values']))) {
+                throw new AclessException("Выполнение метода с таким параметром $filter Вам не разрешено");
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Сформировать урл из имени контроллера и имени метода
+     *
+     * @param string $className - имя класса
+     * @param string $methodName - имя метода
      *
      * @return string
+     *
+     * @throws AclessException
      */
-    public static function camel2dashed(string $str): string
+    public function methodToURL(string $className, string $methodName)
     {
-        return strtolower(preg_replace('/([a-zA-Z])(?=[A-Z])/', '$1-', $str));
+        $methodName = str_replace('\\', '/', trim($className, '\/ ') . '\\' . trim($methodName, '\/ '));
+        foreach ($this->config['controllers'] as $controllerDir) {
+            if (empty($controllerDir['path'])) {
+                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
+            }
+
+            str_replace($controllerDir['path'], '', $methodName);
+        }
+
+        return AclessHelper::camel2dashed(str_replace('Controller', '', $methodName));
     }
 
     /**
@@ -64,7 +132,7 @@ class Acless
                 'text' => '/' .
                 strtolower(str_replace('Controller', '', $controller)) .
                 '/' .
-                self::camel2dashed(str_replace('action', '', $method->getName())),
+                AclessHelper::camel2dashed(str_replace('action', '', $method->getName())),
                 'name' => null,
                 'filter' => null,
                 'filter_reference' => null
@@ -89,7 +157,7 @@ class Acless
     /**
      * Найти все файлы в каталоге, включая вложенные директории
      *
-     * @param string $dir
+     * @param string $dir - путь к каталогу
      *
      * @return array
      */
