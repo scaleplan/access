@@ -8,16 +8,17 @@ namespace avtomon;
  * Class AclessModify
  * @package avtomon
  */
-class AclessModify extends AbstractAcless
+class AclessModify extends AclessAbstract
 {
+    protected static $instance = null;
+
     /**
-     * Загрузить права доступа для текущего пользователя в кэш
      *
-     * @return bool
+     * Загрузить права доступа для текущего пользователя в кэш
      *
      * @throws AclessException
      */
-    public function loadAccessRights(): bool
+    public function loadAclessRights(): void
     {
         $sth = $this->getPSConnection()
             ->prepare('SELECT 
@@ -31,8 +32,8 @@ class AclessModify extends AbstractAcless
                          ON 
                            ar.url_id = u.id
                        WHERE 
-                         ar.user_id = :user_id')
-            ->execute(['user_id' => $this->userId]);
+                         ar.user_id = :user_id');
+        $sth->execute(['user_id' => $this->userId]);
 
         $accessRights = $sth->fetchAll();
 
@@ -43,7 +44,10 @@ class AclessModify extends AbstractAcless
                 }
 
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
-                if ($this->cs->hMSet("user:{$this->userId}", array_column($accessRights, null, 'url'))) {
+                if (!$this->cs->hMSet("user:{$this->userId}", array_map(function ($item) {
+                        return json_encode($item, JSON_UNESCAPED_UNICODE) ?? $item;
+                    }, array_column($accessRights, null, 'url'))))
+                {
                     throw new AclessException('Не удалось записать права доступа в Redis');
                 }
 
@@ -56,8 +60,6 @@ class AclessModify extends AbstractAcless
             default:
                 throw new AclessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой");
         }
-
-        return true;
     }
 
     /**
@@ -110,7 +112,7 @@ class AclessModify extends AbstractAcless
         }
 
         if (empty($this->config['roles'])) {
-            return;
+            return [];
         }
 
         $roles = [];

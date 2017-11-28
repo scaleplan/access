@@ -21,9 +21,13 @@ persistent_storage: postgresql
 cache_storage: redis
 
 postgresql:
-  - dns: pgsql:host=91.240.87.173;port=5432;dbname=edu
-  - user: avtomonov
-  - password: password
+  dns: pgsql:host=91.240.87.173;port=5432;dbname=edu
+  user: avtomonov
+  password: password
 
 redis:
-  - socket: /var/run/redis/redis.sock
+  socket: /var/run/redis/redis.sock
+
+filter_label: acclessFilter
+
+accless_label: aclessMethod

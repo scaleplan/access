@@ -10,6 +10,31 @@ namespace avtomon;
  */
 abstract class AclessControllerParent
 {
+    private static function checkControllerMethod(string $methodName, array $args, object $obj = null)
+    {
+        $args = reset($args);
+        if (!is_array($args)) {
+            throw new AclessException("Метод $name принимает параметры в виде массива");
+        }
+
+        $refclass = new \ReflectionClass(static::class);
+
+        if (!$refclass->hasMethod($methodName)) {
+            throw new AclessException('Метод не существует');
+        }
+
+        $method = $refclass->getMethod($methodName);
+        $acless = Acless::create();
+        if (empty($doc = $method->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig()['accless_label'])))
+        {
+            throw new AclessException('Метод не доступен');
+        }
+
+        $acless->checkMethodRights($method);
+        $method->setAccessible(true);
+        return $method->invokeArgs($obj, AclessHelper::sanitizeMethodArgs($method, $args));
+    }
+
     /**
      * Проверка прав доступа для статических методов
      *
@@ -22,18 +47,12 @@ abstract class AclessControllerParent
      */
     protected static function __callStatic(string $methodName, array $args)
     {
-        $refclass = new ReflectionClass(static::class);
-
-        if (!($method = $refclass->getMethod($methodName)) || $method->isPrivate()) {
-            throw new AclessException('Этот урл не доступен');
-        }
-
-        Acless::create()->checkMethodRights($method);
-        return $method->invokeArgs(null, $args);
+        return self::checkControllerMethod($methodName, $args);
     }
 
     /**
      * Проверка прав доступа
+     *
      *
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
@@ -44,13 +63,6 @@ abstract class AclessControllerParent
      */
     protected function __call(string $methodName, array $args)
     {
-        $refclass = new ReflectionClass(static::class);
-
-        if (!($method = $refclass->getMethod($methodName)) || $method->isPrivate()) {
-            throw new AclessException('Этот урл не доступен');
-        }
-
-        Acless::create()->checkMethodRights($method);
-        return $method->invokeArgs($this, $args);
+        return self::checkControllerMethod($methodName, $args, $this);
     }
 }

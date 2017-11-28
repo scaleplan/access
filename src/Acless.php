@@ -12,9 +12,11 @@ class AclessException extends \Exception
  * Class Acless
  * @package avtomon
  */
-class Acless extends AbstractAcless
+class Acless extends AclessAbstract
 {
-    private $docBlockFactory = null; // Фабрика phpdoc-блоков
+    public $docBlockFactory = null; // Фабрика phpdoc-блоков
+
+    protected static $instance = null;
 
     /**
      * Вернуть информацию о всех доступных пользователю урлах или о каком-то конкретном урле
@@ -35,15 +37,17 @@ class Acless extends AbstractAcless
 
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
                 if ($url) {
-                    return $redis->hGet("user:{$this->userId}", $url) ?? [];
+                    return json_decode($this->cs->hGet("user:{$this->userId}", $url), true)  ?? [];
                 } else {
-                    return $redis->hGetAll("user:{$this->userId}") ?? [];
+                    return array_map(function ($item) {
+                        return json_decode($item, true) || $item;
+                    }, array_filter($this->cs->hGetAll("user:{$this->userId}")));
                 }
 
                 break;
 
             case 'session':
-                return $_SESSION['access_rights'][$url] ?? [];
+                return $url ? ($_SESSION['access_rights'][$url] ?? []) : array_filter($_SESSION['access_rights']);
                 break;
 
             default:
@@ -62,16 +66,16 @@ class Acless extends AbstractAcless
      */
     public function checkMethodRights(\Reflector $ref): bool
     {
-        $url = $this->methodToURL(static::class, $ref->getName());
-        if (!($accessRight = $this->getAccessRights($url))) {
+        $url = $this->methodToURL($ref->getDeclaringClass()->getName(), $ref->getName());
+        if (empty($accessRight = $this->getAccessRights($url))) {
             throw new AclessException('Метод не разрешен Вам для выпонения');
         }
 
-        if (!($docBlock = $this->docBlockFactory->create($ref->getDocComment()) || !($docParam = end($docBlock->getTagsByName('acless'))))) {
+        if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($docParam = end($docBlock->getTagsByName($this->config['accless_label'])))) {
             return true;
         }
 
-        $filter = trim($docParam->getDescription()->render());
+        $filter = trim($docParam->getDescription() ? $docParam->getDescription()->render() : '');
         if ($filter && in_array($filter, $args)) {
             if (($accessRight['is_allow'] && !in_array($args[$filter], $accessRight['values'])) || (!$accessRight['is_allow'] && in_array($args[$filter], $accessRight['values']))) {
                 throw new AclessException("Выполнение метода с таким параметром $filter Вам не разрешено");
@@ -93,16 +97,16 @@ class Acless extends AbstractAcless
      */
     public function methodToURL(string $className, string $methodName)
     {
-        $methodName = str_replace('\\', '/', trim($className, '\/ ') . '\\' . trim($methodName, '\/ '));
         foreach ($this->config['controllers'] as $controllerDir) {
             if (empty($controllerDir['path'])) {
                 throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
             }
 
-            str_replace($controllerDir['path'], '', $methodName);
+            $className = str_replace($controllerDir['namespace'], '', $className);
         }
 
-        return AclessHelper::camel2dashed(str_replace('Controller', '', $methodName));
+        $methodName = str_replace('\\', '/', trim($className, '\/ ') . '\\' . trim($methodName, '\/ '));
+        return AclessHelper::camel2dashed(preg_replace('(Controller|action)', '', $methodName));
     }
 
     /**
@@ -128,21 +132,28 @@ class Acless extends AbstractAcless
 
         $urls = [];
         foreach ($refClass->getMethods() as $method) {
+            if (empty($doc = $method->getDocComment()) || empty($docBlock = $this->docBlockFactory->create($method->getDocComment())) || empty($docBlock->getTagsByName($this->config['accless_label'])))
+            {
+                continue;
+            }
+
             $url = [
                 'text' => '/' .
                 strtolower(str_replace('Controller', '', $controller)) .
                 '/' .
                 AclessHelper::camel2dashed(str_replace('action', '', $method->getName())),
-                'name' => null,
+                'name' => $docBlock->getSummary(),
                 'filter' => null,
                 'filter_reference' => null
             ];
-            if ($method->getDocComment()) {
-                $docBlock = $this->docBlockFactory->create($method->getDocComment());
-                $url['name'] = $docBlock->getSummary();
-                $acless = $docBlock->getTagsByName('acless');
+            if ($acless = $docBlock->getTagsByName($this->config['filter_label'])) {
                 $pr = '[\w\d_\-\.]+';
-                if (end($acless) && preg_match("/^\\\$($pr)\s*\->\s*($pr\.$pr\.$pr)$/i", end($acless)->getDescription()->render(), $mathches)) {
+                if (end($acless) && preg_match(
+                    "/^\\\$($pr)\s*\->\s*(($pr\.$pr\.$pr)|null)$/i",
+                    end($acless)->getDescription() ? end($acless)->getDescription()->render() : '',
+                    $mathches
+                    )
+                ) {
                     $url['filter'] = $mathches[1];
                     $url['filter_reference'] = $mathches[2];
                 }
@@ -255,7 +266,7 @@ class Acless extends AbstractAcless
                 'filter' => null,
                 'filter_reference' => null
             ];
-        }, $this->config['urls'] ?? []);
+        }, array_filter($this->config['urls']));
     }
 
     /**

@@ -24,9 +24,9 @@ class AclessHelper
     {
         $sanArgs = [];
         foreach ($method->getParameters() as &$param) {
-            $paramType = $param->getType()->getName() ?? null;
+            $paramType = $param->getType()->getName();
             $paramName = $param->getName();
-            $arg = $args[$methodName];
+            $arg = $args[$paramName];
 
             if ($param->isVariadic()) {
                 if (!$paramType) {
