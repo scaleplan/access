@@ -26,7 +26,7 @@ abstract class AclessAbstract
      *
      * @throws AclessException
      */
-    public static function create(int $userId = -1)
+    public static function create(int $userId = -1, string $confPath = __DIR__ . '/config.yml')
     {
         if (!static::$instance) {
             $className = static::class;
@@ -36,9 +36,9 @@ abstract class AclessAbstract
         return static::$instance;
     }
 
-    protected function __construct(int $userId)
+    protected function __construct(int $userId, string $confPath)
     {
-        $this->config = Yaml::parse(file_get_contents(__DIR__ . '/config.yml'));
+        $this->config = Yaml::parse(file_get_contents($confPath));
 
         if (empty($this->config)) {
             throw new AclessException('Отсутствует конфигурация');

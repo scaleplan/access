@@ -71,7 +71,7 @@ class Acless extends AclessAbstract
             throw new AclessException('Метод не разрешен Вам для выпонения');
         }
 
-        if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($docParam = end($docBlock->getTagsByName($this->config['accless_label'])))) {
+        if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['accless_label'])) || empty($docParam = end($tag))) {
             return true;
         }
 
@@ -125,7 +125,8 @@ class Acless extends AclessAbstract
             $controllerNamespace = "\\$controllerNamespace\\";
             $controller = str_replace('/', '\\', $controller);
         } else {
-            $controller = end(explode('/', $controller));
+            $controller = explode('/', $controller);
+            $controller = end($controller);
         }
 
         $refClass = new \ReflectionClass("$controllerNamespace$controller");

@@ -26,7 +26,14 @@ class AclessHelper
         foreach ($method->getParameters() as &$param) {
             $paramType = $param->getType()->getName();
             $paramName = $param->getName();
-            $arg = $args[$paramName];
+
+            if (!in_array($paramName, array_keys($args))) {
+                if (!$param->isOptional()) {
+                    throw new AclessException("Отсутствует необходимый параметр $name");
+                }
+
+                continue;
+            }
 
             if ($param->isVariadic()) {
                 if (!$paramType) {
@@ -44,13 +51,7 @@ class AclessHelper
                 break;
             }
 
-            if (!in_array($paramName, array_keys($args))) {
-                if (!$item->isOptional()) {
-                    throw new AclessException("Отсутствует необходимый параметр $name");
-                }
-
-                continue;
-            }
+            $arg = $args[$paramName];
 
             if ($paramType && $paramType !== gettype($arg) && $tmp = $arg && settype($tmp, $paramType) && $tmp != $arg) {
                 throw new AclessException("Неверный тип данных для параметра $name");
