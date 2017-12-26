@@ -188,7 +188,7 @@ abstract class AclessControllerParent
     {
         $args = reset($args);
         if (!is_array($args)) {
-            throw new AclessException("Метод $name принимает параметры в виде массива");
+            throw new AclessException("Метод $methodName принимает параметры в виде массива");
         }
 
         $refclass = new \ReflectionClass(static::class);
@@ -245,7 +245,7 @@ abstract class AclessControllerParent
      *
      * @throws AclessException
      */
-    protected static function __callStatic(string $methodName, array $args)
+    public static function __callStatic(string $methodName, array $args)
     {
         return self::checkControllerMethod($methodName, $args);
     }
@@ -261,7 +261,7 @@ abstract class AclessControllerParent
      *
      * @throws AclessException
      */
-    protected function __call(string $methodName, array $args)
+    public function __call(string $methodName, array $args)
     {
         return self::checkControllerMethod($methodName, $args, $this);
     }

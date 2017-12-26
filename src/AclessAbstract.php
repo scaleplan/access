@@ -30,7 +30,7 @@ abstract class AclessAbstract
     {
         if (!static::$instance) {
             $className = static::class;
-            static::$instance = new $className($userId);
+            static::$instance = new $className($userId, $confPath);
         }
 
         return static::$instance;

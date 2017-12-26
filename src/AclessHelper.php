@@ -2,6 +2,8 @@
 
 namespace avtomon;
 
+use phpDocumentor\Reflection\DocBlockFactory;
+
 /**
  * Класс хэлперов
  *
@@ -27,11 +29,12 @@ class AclessHelper
             $paramType = $param->getType()->getName();
             $paramName = $param->getName();
 
-            if (!in_array($paramName, array_keys($args))) {
-                if (!$param->isOptional()) {
-                    throw new AclessException("Отсутствует необходимый параметр $name");
-                }
+            if (!isset($args[$paramName]) && !$param->isOptional()) {
+                throw new AclessException("Отсутствует необходимый параметр $paramName");
+            }
 
+            if ($param->isOptional() && (!isset($args[$paramName]) || ($args[$paramName] == $param->getDefaultValue() && is_null($param->getDefaultValue())))) {
+                $sanArgs[] = $param->getDefaultValue();
                 continue;
             }
 
@@ -42,8 +45,12 @@ class AclessHelper
                 }
 
                 $sanArgs = array_merge($sanArgs, array_map(function ($item) use ($param, $paramType) {
-                    if ($paramType && $paramType !== gettype($item) && $tmp = $item && settype($tmp, $paramType) && $tmp != $item) {
-                        throw new AclessException("Неверный тип данных для параметра $name");
+                    if ($paramType && (string) $paramType !== gettype($item)) {
+                        $tmp = $item;
+                        settype($tmp, (string) $paramType);
+                        if ($tmp != $item) {
+                            throw new AclessException("Неверный тип данных для параметра $paramName");
+                        }
                     }
 
                     return $item;
@@ -53,8 +60,12 @@ class AclessHelper
 
             $arg = $args[$paramName];
 
-            if ($paramType && $paramType !== gettype($arg) && $tmp = $arg && settype($tmp, $paramType) && $tmp != $arg) {
-                throw new AclessException("Неверный тип данных для параметра $name");
+            if ($paramType && (string) $paramType !== gettype($arg)) {
+                $tmp = $arg;
+                settype($tmp, (string) $paramType);
+                if ($tmp != $arg) {
+                    throw new AclessException("Неверный тип данных для параметра $paramName");
+                }
             }
 
             gettype($arg) === 'string' && $arg = strip_tags($arg);
@@ -78,7 +89,13 @@ class AclessHelper
     public static function sanitizeSQLPropertyArgs(\ReflectionProperty $property, array $args): array
     {
         $sanArgs = [];
+        if (!$property->isPublic())
+        {
+            $property->setAccessible(true);
+        }
+
         $params = self::getSQLParams($property->getValue());
+        $property->setAccessible(false);
         $docBlock = DocBlockFactory::createInstance()->create($property->getDocComment());
         $docParams = [];
         foreach ($docBlock->getTagsByName('param') as $docParam) {
@@ -94,8 +111,12 @@ class AclessHelper
 
             $arg = $args[$paramName];
             $paramType = $docParams[$paramName]['type'] ?? null;
-            if ($paramType && $paramType !== gettype($arg) && $tmp = $arg && settype($tmp, $paramType) && $tmp != $arg) {
-                throw new AclessException("Тип параметра $paramName не соответствует заданному типу {$docParams[$paramName]['type']}");
+            if ($paramType && (string) $paramType !== gettype($arg)) {
+                $tmp = $arg;
+                settype($tmp, (string) $paramType);
+                if ($tmp != $arg) {
+                    throw new AclessException("Тип параметра $paramName не соответствует заданному типу {$docParams[$paramName]['type']}");
+                }
             }
 
             gettype($arg) === 'string' && $arg = strip_tags($arg);
@@ -114,7 +135,7 @@ class AclessHelper
      */
     public static function getSQLParams($sql): array
     {
-        if (preg_match_all('/:([\w\d_\-]+)/i', $sql, $matches))
+        if (preg_match_all('/[^:]:([\w\d_\-]+)/i', $sql, $matches))
         {
             return array_unique($matches[1]);
         }
