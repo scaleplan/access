@@ -58,6 +58,11 @@ class AclessModelResult
         return $this->result;
     }
 
+    public function getArrayResult(): array
+    {
+        return is_array($this->result) ? $this->result : [];
+    }
+
     public function setResult($result): void
     {
         $this->result = $result;
@@ -65,7 +70,12 @@ class AclessModelResult
 
     public function __toString(): string
     {
-        return json_encode($this->getResult(), JSON_UNESCAPED_UNICODE);
+        return is_array($this->getResult()) ? json_encode($this->getResult(), JSON_UNESCAPED_UNICODE) : $this->getResult();
+    }
+
+    public function getFirstResult(): array
+    {
+        return !empty($this->result[0]) && is_array($this->result[0]) ? $this->result[0] : [];
     }
 }
 
@@ -79,9 +89,9 @@ class AclessModelParent
 {
     private static function checkModelMethod(string $methodName, array $args, object $obj = null)
     {
-        $args = reset($args);
+        $args = $args ? reset($args) : $args;
         if (!is_array($args)) {
-            throw new AclessException("Метод $methodName принимает параметры в виде массива");
+            throw new AclessException("Метод $methodName принимает параметры в виде массива", 26);
         }
 
         $className = static::class;
@@ -90,15 +100,14 @@ class AclessModelParent
         if ($refclass->hasMethod($methodName)) {
             $method = $refclass->getMethod($methodName);
             if ($method->isStatic() && $obj) {
-                throw new AclessException('Метод должен вызываться в статическом контексте');
+                throw new AclessException('Метод должен вызываться в статическом контексте', 27);
             } elseif(!$method->isStatic() && !$obj) {
-                throw new AclessException('Метод должен вызываться в контектсте объекта');
+                throw new AclessException('Метод должен вызываться в контектсте объекта', 28);
             }
 
             $acless = Acless::create();
-            if (empty($doc = $method->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig()['accless_label'])))
-            {
-                throw new AclessException('Метод не доступен');
+            if (!empty($doc = $method->getDocComment()) && !empty($docBlock = $acless->docBlockFactory->create($doc)) && !empty($docBlock->getTagsByName($acless->getConfig()['accless_label']))) {
+                $args = AclessHelper::sanitizeMethodArgs($method, $args);
             }
 
             $method->setAccessible(true);
@@ -109,20 +118,19 @@ class AclessModelParent
                 $method,
                 null,
                 $args,
-                $method->invokeArgs(null, AclessHelper::sanitizeMethodArgs($method, $args))
+                $method->invokeArgs($obj, $args)
             );
         } elseif ($refclass->hasProperty($methodName)) {
             $property = $refclass->getProperty($methodName);
             if ($property->isStatic() && $obj) {
-                throw new AclessException('Метод должен вызываться в статическом контексте');
+                throw new AclessException('Метод должен вызываться в статическом контексте', 30);
             } elseif(!$property->isStatic() && !$obj) {
-                throw new AclessException('Метод должен вызываться в контектсте объекта');
+                throw new AclessException('Метод должен вызываться в контектсте объекта', 31);
             }
 
             $acless = Acless::create();
-            if (empty($doc = $property->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig()['accless_label'])))
-            {
-                throw new AclessException('Свойство не доступно');
+            if (!empty($doc = $property->getDocComment()) && !empty($docBlock = $acless->docBlockFactory->create($doc)) && !empty($docBlock->getTagsByName($acless->getConfig()['accless_label']))) {
+                $args = AclessHelper::sanitizeSQLPropertyArgs($property, $args);
             }
 
             return new AclessModelResult(
@@ -130,11 +138,11 @@ class AclessModelParent
                 $obj,
                 null,
                 $property,
-                AclessHelper::sanitizeSQLPropertyArgs($property, $args)
+                $args
             );
         }
 
-        throw new AclessException('Метод не существует');
+        throw new AclessException("Метод $methodName не существует", 33);
     }
 
     /**

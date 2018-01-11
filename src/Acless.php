@@ -32,16 +32,16 @@ class Acless extends AclessAbstract
         switch ($this->config['cache_storage']) {
             case 'redis':
                 if (empty($this->config['redis']['socket'])) {
-                    throw new AclessException('В конфигурации не задан путь к Redis-сокету');
+                    throw new AclessException('В конфигурации не задан путь к Redis-сокету', 41);
                 }
 
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
                 if ($url) {
-                    return json_decode($this->cs->hGet("user:{$this->userId}", $url), true)  ?? [];
+                    return json_decode($this->cs->hGet("user_id:{$this->userId}", $url), true)  ?? [];
                 } else {
                     return array_map(function ($item) {
                         return json_decode($item, true) || $item;
-                    }, array_filter($this->cs->hGetAll("user:{$this->userId}")));
+                    }, array_filter($this->cs->hGetAll("user_id:{$this->userId}")));
                 }
 
                 break;
@@ -51,7 +51,7 @@ class Acless extends AclessAbstract
                 break;
 
             default:
-                throw new AclessException("Драйвер {$config['cache_storage']} кэширующего хранилища не поддерживается системой");
+                throw new AclessException("Драйвер {$config['cache_storage']} кэширующего хранилища не поддерживается системой", 42);
         }
     }
 
@@ -68,7 +68,7 @@ class Acless extends AclessAbstract
     {
         $url = $this->methodToURL($ref->getDeclaringClass()->getName(), $ref->getName());
         if (empty($accessRight = $this->getAccessRights($url))) {
-            throw new AclessException('Метод не разрешен Вам для выпонения');
+            throw new AclessException('Метод не разрешен Вам для выпонения', 43);
         }
 
         if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['accless_label'])) || empty($docParam = end($tag))) {
@@ -78,7 +78,7 @@ class Acless extends AclessAbstract
         $filter = trim($docParam->getDescription() ? $docParam->getDescription()->render() : '');
         if ($filter && in_array($filter, $args)) {
             if (($accessRight['is_allow'] && !in_array($args[$filter], $accessRight['values'])) || (!$accessRight['is_allow'] && in_array($args[$filter], $accessRight['values']))) {
-                throw new AclessException("Выполнение метода с таким параметром $filter Вам не разрешено");
+                throw new AclessException("Выполнение метода с таким параметром $filter Вам не разрешено", 44);
             }
         }
 
@@ -99,7 +99,7 @@ class Acless extends AclessAbstract
     {
         foreach ($this->config['controllers'] as $controllerDir) {
             if (empty($controllerDir['path'])) {
-                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
+                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"', 45);
             }
 
             $className = str_replace($controllerDir['namespace'], '', $className);
@@ -147,16 +147,19 @@ class Acless extends AclessAbstract
                 'filter' => null,
                 'filter_reference' => null
             ];
-            if ($acless = $docBlock->getTagsByName($this->config['filter_label'])) {
+            if ($filterField = $docBlock->getTagsByName($this->config['filter_label'])) {
                 $pr = '[\w\d_\-\.]+';
-                if (end($acless) && preg_match(
-                    "/^\\\$($pr)\s*\->\s*(($pr\.$pr\.$pr)|null)$/i",
-                    end($acless)->getDescription() ? end($acless)->getDescription()->render() : '',
+                $filterField = end($filterField);
+                if ($filterField && preg_match(
+                    "/^\\\$($pr)\s*\(?:->)*\s*($pr\.$pr\.$pr)*\s*$/i",
+                    $filterField->getDescription() ? $filterField->getDescription()->render() : '',
                     $mathches
                     )
                 ) {
                     $url['filter'] = $mathches[1];
-                    $url['filter_reference'] = $mathches[2];
+                    if (!empty($mathches[2])) {
+                        $url['filter_reference'] = $mathches[2];
+                    }
                 }
             }
 
@@ -211,7 +214,7 @@ class Acless extends AclessAbstract
         $urls = [];
         foreach ($this->config['controllers'] as $controllerDir) {
             if (empty($controllerDir['path'])) {
-                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
+                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"', 46);
             }
 
             $controllers = array_map(function ($item) use ($controllerDir) {

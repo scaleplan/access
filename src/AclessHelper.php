@@ -26,17 +26,8 @@ class AclessHelper
     {
         $sanArgs = [];
         foreach ($method->getParameters() as &$param) {
-            $paramType = $param->getType()->getName();
+            $paramType = $param->getType() ? $param->getType()->getName() : null;
             $paramName = $param->getName();
-
-            if (!isset($args[$paramName]) && !$param->isOptional()) {
-                throw new AclessException("Отсутствует необходимый параметр $paramName");
-            }
-
-            if ($param->isOptional() && (!isset($args[$paramName]) || ($args[$paramName] == $param->getDefaultValue() && is_null($param->getDefaultValue())))) {
-                $sanArgs[] = $param->getDefaultValue();
-                continue;
-            }
 
             if ($param->isVariadic()) {
                 if (!$paramType) {
@@ -49,7 +40,7 @@ class AclessHelper
                         $tmp = $item;
                         settype($tmp, (string) $paramType);
                         if ($tmp != $item) {
-                            throw new AclessException("Неверный тип данных для параметра $paramName");
+                            throw new AclessException("Неверный тип данных для параметра $paramName", 22);
                         }
                     }
 
@@ -58,13 +49,22 @@ class AclessHelper
                 break;
             }
 
+            if (!isset($args[$paramName]) && !$param->isOptional()) {
+                throw new AclessException("Отсутствует необходимый параметр $paramName", 21);
+            }
+
+            if ($param->isOptional() && (!isset($args[$paramName]) || ($args[$paramName] == $param->getDefaultValue() && is_null($param->getDefaultValue())))) {
+                $sanArgs[] = $param->getDefaultValue();
+                continue;
+            }
+
             $arg = $args[$paramName];
 
             if ($paramType && (string) $paramType !== gettype($arg)) {
                 $tmp = $arg;
                 settype($tmp, (string) $paramType);
                 if ($tmp != $arg) {
-                    throw new AclessException("Неверный тип данных для параметра $paramName");
+                    throw new AclessException("Неверный тип данных для параметра $paramName", 23);
                 }
             }
 
@@ -94,28 +94,26 @@ class AclessHelper
             $property->setAccessible(true);
         }
 
-        $params = self::getSQLParams($property->getValue());
         $property->setAccessible(false);
         $docBlock = DocBlockFactory::createInstance()->create($property->getDocComment());
-        $docParams = [];
+        $docParams = null;
         foreach ($docBlock->getTagsByName('param') as $docParam) {
-            $docParams[$docParam->getVariableName()] = [
-                'type' => $docParam->getType()
-            ];
+            $docParams[$docParam->getVariableName()] = $docParam->getType();
         }
 
-        foreach ($params as $paramName) {
+        $params = $docParams ?? array_fill_keys(self::getSQLParams($property->getValue()), null);
+
+        foreach ($params as $paramName => $paramType) {
             if (!in_array($paramName, array_keys($args))) {
-                throw new AclessException("Не хватает параметра $paramName");
+                throw new AclessException("Не хватает параметра $paramName", 24);
             }
 
             $arg = $args[$paramName];
-            $paramType = $docParams[$paramName]['type'] ?? null;
             if ($paramType && (string) $paramType !== gettype($arg)) {
                 $tmp = $arg;
                 settype($tmp, (string) $paramType);
                 if ($tmp != $arg) {
-                    throw new AclessException("Тип параметра $paramName не соответствует заданному типу {$docParams[$paramName]['type']}");
+                    throw new AclessException("Тип параметра $paramName не соответствует заданному типу {$docParams[$paramName]['type']}", 25);
                 }
             }
 
@@ -141,6 +139,19 @@ class AclessHelper
         }
 
         return [];
+    }
+
+    /**
+     * Почистить параметры SQL-запроса от неиспользуемых в запросе
+     *
+     * @param string $sql - текст запроса
+     * @param array $args - параметры запроса
+     *
+     * @return array
+     */
+    public static function removeExcessSQLArgs(string $sql, array $args): array
+    {
+        return array_intersect_key($args, array_flip(self::getSQLParams($sql)));
     }
 
     /**

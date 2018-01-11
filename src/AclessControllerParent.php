@@ -33,7 +33,7 @@ abstract class AclessControllerParent
         $argCount = array_push(static::$beforeArgs, $args);
         $funcCount = array_push(static::$before, $function);
         if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив before-функций не соответствует количеству массивов аргуметов');
+            throw new AclessException('Количество элементов в массив before-функций не соответствует количеству массивов аргуметов', 12);
         }
 
         return $funcCount;
@@ -54,7 +54,7 @@ abstract class AclessControllerParent
         $argCount = array_unshift(static::$beforeArgs, $args);
         $funcCount = array_unshift(static::$before, $function);
         if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив before-функций не соответствует количеству массивов аргуметов');
+            throw new AclessException('Количество элементов в массив before-функций не соответствует количеству массивов аргуметов', 13);
         }
 
         return $funcCount;
@@ -76,7 +76,7 @@ abstract class AclessControllerParent
         $argCount = count(array_merge(array_slice(static::$beforeArgs, 0, $index), $args, array_slice(static::$beforeArgs, $index)));
         $funcCount =  count(array_merge(array_slice(static::$before, 0, $index), $function, array_slice(static::$before, $index)));
         if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив before-функций не соответствует количеству массивов аргуметов');
+            throw new AclessException('Количество элементов в массив before-функций не соответствует количеству массивов аргуметов', 14);
         }
 
         return $funcCount;
@@ -97,7 +97,7 @@ abstract class AclessControllerParent
         $argCount = array_push(static::$afterArgs, $args);
         $funcCount = array_push(static::$after, $function);
         if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив after-функций не соответствует количеству массивов аргуметов');
+            throw new AclessException('Количество элементов в массив after-функций не соответствует количеству массивов аргуметов', 15);
         }
 
         return $funcCount;
@@ -118,7 +118,7 @@ abstract class AclessControllerParent
         $argCount = array_unshift(static::$afterArgs, $args);
         $funcCount = array_unshift(static::$after, $function);
         if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив after-функций не соответствует количеству массивов аргуметов');
+            throw new AclessException('Количество элементов в массив after-функций не соответствует количеству массивов аргуметов', 16);
         }
 
         return $funcCount;
@@ -140,7 +140,7 @@ abstract class AclessControllerParent
         $argCount = count(array_merge(array_slice(static::$afterArgs, 0, $index), $args, array_slice(static::$afterArgs, $index)));
         $funcCount =  count(array_merge(array_slice(static::$after, 0, $index), $function, array_slice(static::$after, $index)));
         if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив after-функций не соответствует количеству массивов аргуметов');
+            throw new AclessException('Количество элементов в массив after-функций не соответствует количеству массивов аргуметов', 17);
         }
 
         return $funcCount;
@@ -188,20 +188,20 @@ abstract class AclessControllerParent
     {
         $args = reset($args);
         if (!is_array($args)) {
-            throw new AclessException("Метод $methodName принимает параметры в виде массива");
+            throw new AclessException("Метод $methodName принимает параметры в виде массива", 18);
         }
 
         $refclass = new \ReflectionClass(static::class);
 
         if (!$refclass->hasMethod($methodName)) {
-            throw new AclessException('Метод не существует');
+            throw new AclessException('Метод не существует', 19);
         }
 
         $method = $refclass->getMethod($methodName);
         $acless = Acless::create();
         if (empty($doc = $method->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig()['accless_label'])))
         {
-            throw new AclessException('Метод не доступен');
+            throw new AclessException('Метод не доступен', 20);
         }
 
         $acless->checkMethodRights($method);
