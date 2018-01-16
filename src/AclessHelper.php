@@ -94,7 +94,6 @@ class AclessHelper
             $property->setAccessible(true);
         }
 
-        $property->setAccessible(false);
         $docBlock = DocBlockFactory::createInstance()->create($property->getDocComment());
         $docParams = null;
         foreach ($docBlock->getTagsByName('param') as $docParam) {
@@ -139,19 +138,6 @@ class AclessHelper
         }
 
         return [];
-    }
-
-    /**
-     * Почистить параметры SQL-запроса от неиспользуемых в запросе
-     *
-     * @param string $sql - текст запроса
-     * @param array $args - параметры запроса
-     *
-     * @return array
-     */
-    public static function removeExcessSQLArgs(string $sql, array $args): array
-    {
-        return array_intersect_key($args, array_flip(self::getSQLParams($sql)));
     }
 
     /**
