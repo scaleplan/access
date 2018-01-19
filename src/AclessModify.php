@@ -44,18 +44,20 @@ class AclessModify extends AclessAbstract
                 }
 
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
-                if (!$accessRights) {
-                    $this->cs->set("user_id:{$this->userId}", null);
-                    break;
+                if (!$this->cs->delete("user_id:{$this->userId}"))
+                {
+                    throw new AclessException('Не удалось очистить права в Redis');
                 }
 
-                $hashValue = array_map(function ($item) {
-                    return json_encode($item, JSON_UNESCAPED_UNICODE) ?? $item;
-                }, array_column($accessRights, null, 'url'));
+                if ($accessRights) {
+                    $hashValue = array_map(function ($item) {
+                        return json_encode($item, JSON_UNESCAPED_UNICODE) ?? $item;
+                    }, array_column($accessRights, null, 'url'));
 
-                if (!$this->cs->hMSet("user_id:{$this->userId}", $hashValue))
-                {
-                    throw new AclessException('Не удалось записать права доступа в Redis', 35);
+                    if (!$this->cs->hMSet("user_id:{$this->userId}", $hashValue))
+                    {
+                        throw new AclessException('Не удалось записать права доступа в Redis', 35);
+                    }
                 }
 
                 break;

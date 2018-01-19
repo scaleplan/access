@@ -1,33 +1,51 @@
+# Данные для своры данных о конроллерах
 controllers:
   - path: /var/www/payment_system/controllers
     method_prefix: action
     namespace: app\controllers
 
+# Пути к директориям файлов
 files:
   - /var/www/payment_system/views/private/materials
 
+# Дополнительные урлы для добавления
 urls:
   - /var/www/payment_system/composer.json
 
+# Роли пользователей
 roles:
   - Администратор
   - Преподаватель
   - Слушатель
   - Гость
 
+# Роль по умолчанию
 default_role: Гость
 
+# Тип постоянного хранилица
 persistent_storage: postgresql
+
+# Тип кэширующего хранилища
 cache_storage: redis
 
+# Данные для поключения к постоянному хранилищу
 postgresql:
   dns: pgsql:host=/var/run/postgresql;port=5432;dbname=edu
   user: avtomonov
   password: password
 
+# Данные для поключения к кэширующему хранилищу
 redis:
   socket: /var/run/redis/redis.sock
 
+# Метка PHPDOC для указания аргумента, по которому следует дополнительно проверять доступ к методу
 filter_label: aclessFilter
 
-accless_label: aclessMethod
+# Метка PHPDOC указывающая, что метод следует обработать Acless
+acless_label: aclessMethod
+
+# Метка PHPDOC указывающая, что аргументы метода упакованы в массив и их не стоит проверять
+acless_array_arg: aclessArrayArg
+
+# Идентификатор пользователя-гостя
+guest_user_id: 0

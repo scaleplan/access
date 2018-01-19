@@ -14,7 +14,12 @@ class AclessException extends \Exception
  */
 class Acless extends AclessAbstract
 {
-    public $docBlockFactory = null; // Фабрика phpdoc-блоков
+    /**
+     * Фабрика phpdoc-блоков
+     *
+     * @var null
+     */
+    public $docBlockFactory = null;
 
     protected static $instance = null;
 
@@ -68,10 +73,14 @@ class Acless extends AclessAbstract
     {
         $url = $this->methodToURL($ref->getDeclaringClass()->getName(), $ref->getName());
         if (empty($accessRight = $this->getAccessRights($url))) {
+            if ($this->getUserId() === $this->getConfig('guest_user_id')) {
+                throw new AclessException('Авторизуйтесь на сайте', 47);
+            }
+
             throw new AclessException('Метод не разрешен Вам для выпонения', 43);
         }
 
-        if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['accless_label'])) || empty($docParam = end($tag))) {
+        if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['acless_label'])) || empty($docParam = end($tag))) {
             return true;
         }
 
@@ -133,7 +142,7 @@ class Acless extends AclessAbstract
 
         $urls = [];
         foreach ($refClass->getMethods() as $method) {
-            if (empty($doc = $method->getDocComment()) || empty($docBlock = $this->docBlockFactory->create($method->getDocComment())) || empty($docBlock->getTagsByName($this->config['accless_label'])))
+            if (empty($doc = $method->getDocComment()) || empty($docBlock = $this->docBlockFactory->create($method->getDocComment())) || empty($docBlock->getTagsByName($this->config['acless_label'])))
             {
                 continue;
             }

@@ -10,12 +10,46 @@ namespace avtomon;
  */
 abstract class AclessControllerParent
 {
+    /**
+     * Функции для выполнения перед исполнением метода контроллера
+     *
+     * @var array
+     */
     protected static $before = [];
-    protected static $beforeArgs = [];
-    public static $beforeResult;
 
+    /**
+     * Аргументы функций для выполнения перед исполнением метода контроллера
+     *
+     * @var array
+     */
+    protected static $beforeArgs = [];
+
+    /**
+     * Результат выполения before-функции по умолчанию
+     *
+     * @var
+     */
+    public static $beforeDefaultResult;
+
+    /**
+     * Функции для выполнения после исполнения метода контроллера
+     *
+     * @var array
+     */
     protected static $after = [];
+
+    /**
+     * Аргументы функций для выполнения после исполнения метода контроллера
+     *
+     * @var array
+     */
     protected static $afterArgs = [];
+
+    /**
+     * Результат выполения after-функции по умолчанию
+     *
+     * @var
+     */
     public static $afterResult;
 
     /**
@@ -182,8 +216,17 @@ abstract class AclessControllerParent
         return count(static::$after);
     }
 
-
-
+    /**
+     * Проверка прав доступа и входных данных для метода
+     *
+     * @param string $methodName - имя метода
+     * @param array $args - аргументы выполнения
+     * @param object|null $obj - объект, к контекте которого должен выполниться метод (если нестатический)
+     *
+     * @return mixed
+     *
+     * @throws AclessException
+     */
     private static function checkControllerMethod(string $methodName, array $args, object $obj = null)
     {
         $args = reset($args);
@@ -199,13 +242,15 @@ abstract class AclessControllerParent
 
         $method = $refclass->getMethod($methodName);
         $acless = Acless::create();
-        if (empty($doc = $method->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig()['accless_label'])))
+        if (empty($doc = $method->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig('acless_label'))))
         {
             throw new AclessException('Метод не доступен', 20);
         }
 
+        $isPlainArgs = empty($docBlock->getTagsByName($acless->getConfig('acless_array_arg')));
+
         $acless->checkMethodRights($method);
-        $args = AclessHelper::sanitizeMethodArgs($method, $args);
+        $args = $isPlainArgs ? AclessHelper::sanitizeMethodArgs($method, $args) : $args;
 
         foreach (static::$before as $index => $func) {
             $result = $func(static::class, $args, $obj);
@@ -214,12 +259,16 @@ abstract class AclessControllerParent
             }
 
             if ($result === null) {
-                return static::$beforeResult;
+                return static::$beforeDefaultResult;
             }
         }
 
         $method->setAccessible(true);
-        $result = $method->invokeArgs($obj, $args);
+        if ($isPlainArgs) {
+            $result = $method->invokeArgs($obj, $args);
+        } else {
+            $result = $method->invoke($obj, $args);
+        }
 
         foreach (static::$after as $index => $func) {
             $result = $func($result, ...static::$afterArgs[$index]);
@@ -236,7 +285,7 @@ abstract class AclessControllerParent
     }
 
     /**
-     * Проверка прав доступа для статических методов
+     * Проверка прав доступа и входных данных для статических методов
      *
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
@@ -251,8 +300,7 @@ abstract class AclessControllerParent
     }
 
     /**
-     * Проверка прав доступа
-     *
+     * Проверка прав доступа и входных данных для нестатических методов
      *
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов

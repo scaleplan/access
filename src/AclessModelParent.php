@@ -2,16 +2,66 @@
 
 namespace avtomon;
 
+/**
+ * Класс результата выполнения модели
+ *
+ * Class AclessModelResult
+ * @package avtomon
+ */
 class AclessModelResult
 {
+    /**
+     * Отражение класса модели
+     *
+     * @var null|\ReflectionClass
+     */
     private $class = null;
+
+    /**
+     * Объект класса модели
+     *
+     * @var null|object
+     */
     private $object = null;
+
+    /**
+     * Отражение метода модели
+     *
+     * @var null|\ReflectionMethod
+     */
     private $method = null;
+
+    /**
+     * Отражение свойства модели
+     *
+     * @var null|\ReflectionProperty
+     */
     private $property = null;
+
+    /**
+     * Аргументы выполнения
+     *
+     * @var array|null
+     */
     private $args = null;
 
+    /**
+     * Результат выполнения
+     *
+     * @var null
+     */
     private $result = null;
 
+    /**
+     * AclessModelResult constructor
+     *
+     * @param \ReflectionClass $class
+     * @param object|null $object
+     * @param \ReflectionMethod|null $method
+     * @param \ReflectionProperty|null $property
+     * @param array|null $args
+     * @param null $result
+     */
     public function __construct(
         \ReflectionClass $class,
         object $object = null,
@@ -28,51 +78,103 @@ class AclessModelResult
         $this->result = $result;
     }
 
+    /**
+     * Геттер для отражения класса модели
+     *
+     * @return null|\ReflectionClass
+     */
     public function getClass(): ?\ReflectionClass
     {
         return $this->class;
     }
 
+    /**
+     * Геттер для объекта класса модели
+     *
+     * @return null|object
+     */
     public function getObject(): ?object
     {
         return $this->object;
     }
 
+    /**
+     * Геттер для отражения метода модели
+     *
+     * @return null|\ReflectionMethod
+     */
     public function getMethod(): ?\ReflectionMethod
     {
         return $this->method;
     }
 
+    /**
+     * Геттер для отражения свойства модели
+     *
+     * @return null|\ReflectionProperty
+     */
     public function getProperty(): ?\ReflectionProperty
     {
         return $this->property;
     }
 
+    /**
+     * Геттер для аргументов выполнения
+     *
+     * @return array|null
+     */
     public function getArgs(): ?array
     {
         return $this->args;
     }
 
+    /**
+     * Геттер для результата выполнения
+     *
+     * @return null|mixed
+     */
     public function getResult()
     {
         return $this->result;
     }
 
+    /**
+     * Вернуть результат выполнения, если результат - массив, иначе вернуть пустой массив
+     *
+     * @return array
+     */
     public function getArrayResult(): array
     {
         return is_array($this->result) ? $this->result : [];
     }
 
-    public function setResult($result): void
+    /**
+     * Установить результат выполнения
+     *
+     * @param $result - рузультат
+     *
+     * @return mixed
+     */
+    public function setResult($result)
     {
-        $this->result = $result;
+        return $this->result = $result;
     }
 
+    /**
+     * Вернуть объект в виде строки
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         return is_array($this->getResult()) ? json_encode($this->getResult(), JSON_UNESCAPED_UNICODE) : $this->getResult();
     }
 
+    /**
+     * Вернуть первую запись результата, если результат - массив
+     *
+     * @return array
+     */
     public function getFirstResult(): array
     {
         return !empty($this->result[0]) && is_array($this->result[0]) ? $this->result[0] : [];
@@ -87,7 +189,18 @@ class AclessModelResult
  */
 class AclessModelParent
 {
-    private static function checkModelMethod(string $methodName, array $args, object $obj = null)
+    /**
+     * Аудит метода или свойства, и выполнение для методов
+     *
+     * @param string $methodName - имя метода
+     * @param array $args - аргументы
+     * @param object|null $obj - объект, в контексте которого должен выполняться метод
+     *
+     * @return AclessModelResult
+     *
+     * @throws AclessException
+     */
+    private static function checkModelMethodEssence(string $methodName, array $args, object $obj = null)
     {
         $args = $args ? reset($args) : $args;
         if (!is_array($args)) {
@@ -106,7 +219,7 @@ class AclessModelParent
             }
 
             $acless = Acless::create();
-            if (!empty($doc = $method->getDocComment()) && !empty($docBlock = $acless->docBlockFactory->create($doc)) && !empty($docBlock->getTagsByName($acless->getConfig()['accless_label']))) {
+            if (!empty($doc = $method->getDocComment()) && !empty($docBlock = $acless->docBlockFactory->create($doc)) && !empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
                 $args = AclessHelper::sanitizeMethodArgs($method, $args);
             }
 
@@ -129,7 +242,7 @@ class AclessModelParent
             }
 
             $acless = Acless::create();
-            if (!empty($doc = $property->getDocComment()) && !empty($docBlock = $acless->docBlockFactory->create($doc)) && !empty($docBlock->getTagsByName($acless->getConfig()['accless_label']))) {
+            if (!empty($doc = $property->getDocComment()) && !empty($docBlock = $acless->docBlockFactory->create($doc)) && !empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
                 $args = AclessHelper::sanitizeSQLPropertyArgs($property, $args);
             }
 
@@ -157,7 +270,7 @@ class AclessModelParent
      */
     public static function __callStatic(string $methodName, array $args): ?AclessModelResult
     {
-        return self::checkModelMethod($methodName, $args);
+        return self::checkModelMethodEssence($methodName, $args);
     }
 
     /**
@@ -172,6 +285,6 @@ class AclessModelParent
      */
     public function __call(string $methodName, array $args): ?AclessModelResult
     {
-        return self::checkModelMethod($methodName, $args, $this);
+        return self::checkModelMethodEssence($methodName, $args, $this);
     }
 }

@@ -13,14 +13,38 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class AclessAbstract
 {
-    protected $config = null; // Конфигурация
-    protected $userId = 0; // Идентификатор пользователя
-
-    protected $ps = null; // Подключение к РСУБД
-    protected $cs = null; // Подключение к кэшу
+    /**
+     * Конфигурация
+     *
+     * @var array|null
+     */
+    protected $config = null;
 
     /**
-     * @param int|null $userId - Идентификатор пользователя
+     * Идентификатор пользователя
+     *
+     * @var int
+     */
+    protected $userId = 0;
+
+    /**
+     * Подключение к РСУБД
+     *
+     * @var null|\PDO
+     */
+    protected $ps = null;
+
+    /**
+     * Подключение к кэшу
+     *
+     * @var null|\Redis
+     */
+    protected $cs = null;
+
+    /**
+     * Синглтон
+     *
+     * @param int $userId - Идентификатор пользователя
      *
      * @return Acless
      *
@@ -36,6 +60,14 @@ abstract class AclessAbstract
         return static::$instance;
     }
 
+    /**
+     * AclessAbstract constructor
+     *
+     * @param int $userId - идентификатор пользователя
+     * @param string $confPath - пусть к конфигурации
+     *
+     * @throws AclessException
+     */
     protected function __construct(int $userId, string $confPath)
     {
         $this->config = Yaml::parse(file_get_contents($confPath));
@@ -68,7 +100,7 @@ abstract class AclessAbstract
             throw new AclessException('В конфигурации отсутствует имя для метки фильтрующего аргумента', 7);
         }
 
-        if (empty($this->config['accless_label'])) {
+        if (empty($this->config['acless_label'])) {
             throw new AclessException('В конфигурации отсутствует имя метки Acless', 8);
         }
 
@@ -78,6 +110,16 @@ abstract class AclessAbstract
 
         $this->userId = $userId;
         $this->docBlockFactory = DocBlockFactory::createInstance();
+    }
+
+    /**
+     * Возвращает идентификатор пользователя
+     *
+     * @return int
+     */
+    public function getUserId(): int
+    {
+        return $this->userId;
     }
 
     /**
@@ -116,12 +158,12 @@ abstract class AclessAbstract
     }
 
     /**
-     * Вернуть конфигурацию
+     * Вернуть конфигурацию или ее часть
      *
-     * @return array
+     * @return mixed
      */
-    public function getConfig(): array
+    public function getConfig(string $key = null)
     {
-        return $this->config;
+        return $key ? $this->config[$key] ?? null : $this->config;
     }
 }

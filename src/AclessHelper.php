@@ -54,7 +54,7 @@ class AclessHelper
             }
 
             if ($param->isOptional() && (!isset($args[$paramName]) || ($args[$paramName] == $param->getDefaultValue() && is_null($param->getDefaultValue())))) {
-                $sanArgs[] = $param->getDefaultValue();
+                $sanArgs[$paramName] = $param->getDefaultValue();
                 continue;
             }
 
@@ -70,7 +70,7 @@ class AclessHelper
 
             gettype($arg) === 'string' && $arg = strip_tags($arg);
 
-            $sanArgs[] = $arg;
+            $sanArgs[$paramName] = $arg;
         }
 
         return $sanArgs;
