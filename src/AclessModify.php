@@ -44,10 +44,7 @@ class AclessModify extends AclessAbstract
                 }
 
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
-                if (!$this->cs->delete("user_id:{$this->userId}"))
-                {
-                    throw new AclessException('Не удалось очистить права в Redis');
-                }
+                $this->cs->delete("user_id:{$this->userId}");
 
                 if ($accessRights) {
                     $hashValue = array_map(function ($item) {

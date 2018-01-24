@@ -151,12 +151,23 @@ class AclessModelResult
     /**
      * Установить результат выполнения
      *
-     * @param $result - рузультат
+     * @param $result - результат
+     * @param string $prefix - если результат - выборка из БД, то добавляем в начало ключей этот префикс
      *
      * @return mixed
      */
-    public function setResult($result)
+    public function setResult($result, string $prefix = '')
     {
+        if ($prefix && is_array($result) && !empty($result[0])) {
+            foreach ($result as &$record) {
+                foreach ($record as $key => &$value) {
+                    $record["$prefix_$key"] = $value;
+                }
+            }
+
+            unset($record, $value);
+        }
+
         return $this->result = $result;
     }
 
