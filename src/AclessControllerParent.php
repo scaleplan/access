@@ -264,11 +264,7 @@ abstract class AclessControllerParent
         }
 
         $method->setAccessible(true);
-        if ($isPlainArgs) {
-            $result = $method->invokeArgs($obj, $args);
-        } else {
-            $result = $method->invoke($obj, $args);
-        }
+        $result = $isPlainArgs ? $method->invokeArgs($obj, $args) : $result = $method->invoke($obj, $args);
 
         foreach (static::$after as $index => $func) {
             $result = $func($result, ...static::$afterArgs[$index]);

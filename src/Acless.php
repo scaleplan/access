@@ -71,6 +71,10 @@ class Acless extends AclessAbstract
      */
     public function checkMethodRights(\Reflector $ref): bool
     {
+        if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['acless_label']))) {
+            return true;
+        }
+
         $url = $this->methodToURL($ref->getDeclaringClass()->getName(), $ref->getName());
         if (empty($accessRight = $this->getAccessRights($url))) {
             if ($this->getUserId() === $this->getConfig('guest_user_id')) {
@@ -80,15 +84,38 @@ class Acless extends AclessAbstract
             throw new AclessException('Метод не разрешен Вам для выпонения', 43);
         }
 
-        if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['acless_label'])) || empty($docParam = end($tag))) {
+        if (empty($tag = $docBlock->getTagsByName($this->config['filter_label']))) {
             return true;
         }
 
+        $docParam = end($tag);
         $filter = trim($docParam->getDescription() ? $docParam->getDescription()->render() : '');
         if ($filter && in_array($filter, $args)) {
             if (($accessRight['is_allow'] && !in_array($args[$filter], $accessRight['values'])) || (!$accessRight['is_allow'] && in_array($args[$filter], $accessRight['values']))) {
                 throw new AclessException("Выполнение метода с таким параметром $filter Вам не разрешено", 44);
             }
+        }
+
+        return true;
+    }
+
+    /**
+     * Проверить доступ к файлу
+     *
+     * @param string $filePath - путь к файлу
+     *
+     * @return bool
+     *
+     * @throws AclessException
+     */
+    public function checkFileRights(string $filePath): bool
+    {
+        if (empty($accessRight = $this->getAccessRights($filePath))) {
+            if ($this->getUserId() === $this->getConfig('guest_user_id')) {
+                throw new AclessException('Авторизуйтесь на сайте', 47);
+            }
+
+            throw new AclessException('Файл Вам не доступен', 43);
         }
 
         return true;
