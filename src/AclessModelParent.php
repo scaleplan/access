@@ -196,6 +196,27 @@ class AclessModelResult
     {
         return !empty($this->result[0]) && is_array($this->result[0]) ? $this->result[0] : [];
     }
+
+    /**
+     * Вернуть поле id первой записи результата
+     *
+     * @return mixed|null
+     */
+    public function getResultId()
+    {
+        $firstResult = $this->getFirstResult();
+        return !empty($firstResult['id']) ? $firstResult['id'] : null;
+    }
+
+    public function getResultFirstField()
+    {
+        $firstResult = $this->getFirstResult();
+        if (!$firstResult) {
+            throw new AclessException('Результирующий массив пуст');
+        }
+
+        return reset($firstResult);
+    }
 }
 
 /**

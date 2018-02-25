@@ -69,7 +69,7 @@ class Acless extends AclessAbstract
      *
      * @throws AclessException
      */
-    public function checkMethodRights(\Reflector $ref): bool
+    public function checkMethodRights(\Reflector $ref, array $args): bool
     {
         if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['acless_label']))) {
             return true;
@@ -88,10 +88,18 @@ class Acless extends AclessAbstract
             return true;
         }
 
+
+
         $docParam = end($tag);
         $filter = trim($docParam->getDescription() ? $docParam->getDescription()->render() : '');
-        if ($filter && in_array($filter, $args)) {
-            if (($accessRight['is_allow'] && !in_array($args[$filter], $accessRight['values'])) || (!$accessRight['is_allow'] && in_array($args[$filter], $accessRight['values']))) {
+        if ($filter) {
+            $accessRight['values'] = json_decode($accessRight['values'], true);
+            if (
+                empty($args)
+                || !in_array($filter, array_keys($args))
+                || ($accessRight['is_allow'] && !in_array($args[$filter], $accessRight['values']))
+                || (!$accessRight['is_allow'] && in_array($args[$filter], $accessRight['values']))
+            ) {
                 throw new AclessException("Выполнение метода с таким параметром $filter Вам не разрешено", 44);
             }
         }

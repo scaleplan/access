@@ -249,7 +249,7 @@ abstract class AclessControllerParent
 
         $isPlainArgs = empty($docBlock->getTagsByName($acless->getConfig('acless_array_arg')));
 
-        $acless->checkMethodRights($method);
+        $acless->checkMethodRights($method, $args);
         $args = $isPlainArgs ? AclessHelper::sanitizeMethodArgs($method, $args) : $args;
 
         foreach (static::$before as $index => $func) {

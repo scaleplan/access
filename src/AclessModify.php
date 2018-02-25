@@ -24,7 +24,7 @@ class AclessModify extends AclessAbstract
             ->prepare('SELECT 
                          u.text AS url,
                          ar.is_allow,
-                         ar.values
+                         array_to_json(ar.values) "values"
                        FROM 
                          acless.url u 
                        LEFT JOIN
@@ -48,7 +48,9 @@ class AclessModify extends AclessAbstract
 
                 if ($accessRights) {
                     $hashValue = array_map(function ($item) {
-                        return json_encode($item, JSON_UNESCAPED_UNICODE) ?? $item;
+                        return json_encode(
+                            $item,
+                            JSON_FORCE_OBJECT) ?? $item;
                     }, array_column($accessRights, null, 'url'));
 
                     if (!$this->cs->hMSet("user_id:{$this->userId}", $hashValue))
