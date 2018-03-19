@@ -69,7 +69,7 @@ class Acless extends AclessAbstract
      *
      * @throws AclessException
      */
-    public function checkMethodRights(\Reflector $ref, array $args): bool
+    public function checkMethodRights(\ReflectionMethod $ref, array $args): bool
     {
         if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['acless_label']))) {
             return true;
@@ -84,7 +84,7 @@ class Acless extends AclessAbstract
             throw new AclessException('Метод не разрешен Вам для выпонения', 43);
         }
 
-        if (empty($tag = $docBlock->getTagsByName($this->config['filter_label']))) {
+        if (empty($tag = $docBlock->getTagsByName($this->config['acless_filter_label']))) {
             return true;
         }
 
@@ -182,30 +182,15 @@ class Acless extends AclessAbstract
                 continue;
             }
 
+            $methodName = str_replace('action', '', $method->getName());
+
             $url = [
-                'text' => '/' .
-                strtolower(str_replace('Controller', '', $controller)) .
-                '/' .
-                AclessHelper::camel2dashed(str_replace('action', '', $method->getName())),
+                'text' => '/' . strtolower(str_replace('Controller', '', $controller)) . '/' . AclessHelper::camel2dashed($methodName),
                 'name' => $docBlock->getSummary(),
-                'filter' => null,
-                'filter_reference' => null
+                'schema' => $docBlock->getTagsByName($this->config['acless_schema']),
+                'tables' => $docBlock->getTagsByName($this->config['acless_tables']),
+                'is_write' => strpos($methodName, 'Get') === 0 ? false : true
             ];
-            if ($filterField = $docBlock->getTagsByName($this->config['filter_label'])) {
-                $pr = '[\w\d_\-\.]+';
-                $filterField = end($filterField);
-                if ($filterField && preg_match(
-                    "/^\\\$($pr)\s*\(?:->)*\s*($pr\.$pr\.$pr)*\s*$/i",
-                    $filterField->getDescription() ? $filterField->getDescription()->render() : '',
-                    $mathches
-                    )
-                ) {
-                    $url['filter'] = $mathches[1];
-                    if (!empty($mathches[2])) {
-                        $url['filter_reference'] = $mathches[2];
-                    }
-                }
-            }
 
             array_push($urls, $url);
         }

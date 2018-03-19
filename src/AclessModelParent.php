@@ -184,7 +184,7 @@ class AclessModelResult
      */
     public function __toString(): string
     {
-        return is_array($this->getResult()) ? json_encode($this->getResult(), JSON_UNESCAPED_UNICODE) : $this->getResult();
+        return is_array($this->getResult()) ? json_encode($this->getResult(), JSON_UNESCAPED_UNICODE) : (string) $this->getResult();
     }
 
     /**

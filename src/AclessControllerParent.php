@@ -242,14 +242,19 @@ abstract class AclessControllerParent
 
         $method = $refclass->getMethod($methodName);
         $acless = Acless::create();
-        if (empty($doc = $method->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig('acless_label'))))
-        {
+        if (empty($doc = $method->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig('acless_label')))) {
             throw new AclessException('Метод не доступен', 20);
         }
 
         $isPlainArgs = empty($docBlock->getTagsByName($acless->getConfig('acless_array_arg')));
+        if ($isPlainArgs && !empty($params[0]) && $params[0]->isVariadic()) {
+            $isPlainArgs = false;
+        }
 
-        $acless->checkMethodRights($method, $args);
+        if (empty($docBlock->getTagsByName($acless->getConfig('acless_no_rights_check')))) {
+            $acless->checkMethodRights($method, $args);
+        }
+
         $args = $isPlainArgs ? AclessHelper::sanitizeMethodArgs($method, $args) : $args;
 
         foreach (static::$before as $index => $func) {
@@ -264,7 +269,7 @@ abstract class AclessControllerParent
         }
 
         $method->setAccessible(true);
-        $result = $isPlainArgs ? $method->invokeArgs($obj, $args) : $result = $method->invoke($obj, $args);
+        $result = $isPlainArgs ? $method->invokeArgs($obj, $args) : $method->invoke($obj, $args);
 
         foreach (static::$after as $index => $func) {
             $result = $func($result, ...static::$afterArgs[$index]);

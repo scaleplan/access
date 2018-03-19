@@ -39,13 +39,22 @@ redis:
   socket: /var/run/redis/redis.sock
 
 # Метка PHPDOC для указания аргумента, по которому следует дополнительно проверять доступ к методу
-filter_label: aclessFilter
+acless_filter_label: aclessFilter
 
 # Метка PHPDOC указывающая, что метод следует обработать Acless
 acless_label: aclessMethod
 
 # Метка PHPDOC указывающая, что аргументы метода упакованы в массив и их не стоит проверять
 acless_array_arg: aclessArrayArg
+
+# Не проверять права на выполнение метода контроллера
+acless_no_rights_check: noCheck
+
+# Дескриптор указывающий имя схемы, таблицы которой используются при выполнении метода контроллера
+acless_schema: schema
+
+# Дескриптор, указывающий имя таблицы (модели) для матода контроллера
+acless_tables: table
 
 # Идентификатор пользователя-гостя
 guest_user_id: 0

@@ -96,7 +96,7 @@ abstract class AclessAbstract
             throw new AclessException('Список ролей должен быть задан списком', 6);
         }
 
-        if (empty($this->config['filter_label'])) {
+        if (empty($this->config['acless_filter_label'])) {
             throw new AclessException('В конфигурации отсутствует имя для метки фильтрующего аргумента', 7);
         }
 
