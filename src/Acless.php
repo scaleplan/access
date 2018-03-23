@@ -32,7 +32,7 @@ class Acless extends AclessAbstract
      *
      * @throws AclessException
      */
-    private function getAccessRights(string $url = null): array
+    protected function getAccessRights(string $url = null): array
     {
         switch ($this->config['cache_storage']) {
             case 'redis':
@@ -161,7 +161,7 @@ class Acless extends AclessAbstract
      *
      * @return array
      */
-    private function generateControllerURLs(string $controllerFileName, string $controllerNamespace = null): array
+    protected function generateControllerURLs(string $controllerFileName, string $controllerNamespace = null): array
     {
         $controller = trim(explode('.', $controllerFileName)[0]);
         $controllerNamespace = trim($controllerNamespace, '/\ ');
@@ -176,20 +176,40 @@ class Acless extends AclessAbstract
         $refClass = new \ReflectionClass("$controllerNamespace$controller");
 
         $urls = [];
+        $sql = 'SELECT id, schema_name, table_name FROM acless.model';
+        $models = $this->getPSConnection()->query($sql)->fetchAll(PDO::FETCH_COLUMN);
+
+        $seachModel = function (string $schema, string $table) use ($models): ?int {
+            if (empty($models) || !is_array($models) || empty($schema) || empty($table)) {
+                return null;
+            }
+
+            foreach ($models as $model) {
+                if ($model['schema_name'] !== $schema || $model['table_name'] !== $table) {
+                    continue;
+                }
+
+                return $model['id'];
+            }
+        };
+
         foreach ($refClass->getMethods() as $method) {
-            if (empty($doc = $method->getDocComment()) || empty($docBlock = $this->docBlockFactory->create($method->getDocComment())) || empty($docBlock->getTagsByName($this->config['acless_label'])))
-            {
+            if (empty($doc = $method->getDocComment()) || empty($docBlock = $this->docBlockFactory->create($method->getDocComment())) || empty($docBlock->getTagsByName($this->config['acless_label']))) {
+                continue;
+            }
+
+            if ($method->getDeclaringClass()->getName() === 'avtomon\AclessControllerParent') {
                 continue;
             }
 
             $methodName = str_replace('action', '', $method->getName());
+            $modelId = $seachModel(end($docBlock->getTagsByName($this->config['acless_schema'])), end($docBlock->getTagsByName($this->config['acless_tables'])));
 
             $url = [
                 'text' => '/' . strtolower(str_replace('Controller', '', $controller)) . '/' . AclessHelper::camel2dashed($methodName),
                 'name' => $docBlock->getSummary(),
-                'schema' => $docBlock->getTagsByName($this->config['acless_schema']),
-                'tables' => $docBlock->getTagsByName($this->config['acless_tables']),
-                'is_write' => strpos($methodName, 'Get') === 0 ? false : true
+                'model_id' => $modelId,
+                'type' => end($docBlock->getTagsByName($this->config['acless_url_type']))
             ];
 
             array_push($urls, $url);
@@ -205,7 +225,7 @@ class Acless extends AclessAbstract
      *
      * @return array
      */
-    private function getRecursivePaths(string $dir): array
+    protected function getRecursivePaths(string $dir): array
     {
         $dir = rtrim($dir, '/\ ');
         $paths = scandir($dir);
@@ -243,7 +263,7 @@ class Acless extends AclessAbstract
         $urls = [];
         foreach ($this->config['controllers'] as $controllerDir) {
             if (empty($controllerDir['path'])) {
-                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"', 46);
+                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
             }
 
             $controllers = array_map(function ($item) use ($controllerDir) {
@@ -276,8 +296,8 @@ class Acless extends AclessAbstract
                 return [
                     'text' => trim(str_replace($fileDir, '', $item), '\/ '),
                     'name' => null,
-                    'filter' => null,
-                    'filter_reference' => null
+                    'model_id' => null,
+                    'type' => null
                 ];
             }, $this->getRecursivePaths($fileDir)));
         }
@@ -296,8 +316,8 @@ class Acless extends AclessAbstract
             return [
                 'text' => trim($item, '\/ '),
                 'name' => null,
-                'filter' => null,
-                'filter_reference' => null
+                'model_id' => null,
+                'type' => null
             ];
         }, array_filter($this->config['urls']));
     }

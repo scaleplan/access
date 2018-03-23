@@ -141,16 +141,16 @@ abstract class AclessAbstract
                     throw new AclessException('Недостаточно данных для подключения к PostgreSQL', 10);
                 }
 
-                $connect = $this->ps = $this->ps ?? new \PDO(
+                $this->ps = $this->ps ?? new \PDO(
                         $this->config['postgresql']['dns'],
                         $this->config['postgresql']['user'],
                         $this->config['postgresql']['password']
                     );
-                $connect->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                $connect->setAttribute(\PDO::ATTR_ORACLE_NULLS, \PDO::NULL_TO_STRING);
-                $connect->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+                $this->ps->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                $this->ps->setAttribute(\PDO::ATTR_ORACLE_NULLS, \PDO::NULL_TO_STRING);
+                $this->ps->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
-                return $connect;
+                return $this->ps;
 
             default:
                 throw new AclessException("Драйвер {$this->config['persistent_storage']} постоянного хранилища не поддерживается системой", 11);

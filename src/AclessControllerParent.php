@@ -227,7 +227,7 @@ abstract class AclessControllerParent
      *
      * @throws AclessException
      */
-    private static function checkControllerMethod(string $methodName, array $args, object $obj = null)
+    protected static function checkControllerMethod(string $methodName, array $args, object $obj = null)
     {
         $args = reset($args);
         if (!is_array($args)) {
@@ -271,6 +271,16 @@ abstract class AclessControllerParent
         $method->setAccessible(true);
         $result = $isPlainArgs ? $method->invokeArgs($obj, $args) : $method->invoke($obj, $args);
 
+        return $result;
+    }
+
+    /**
+     * Выполнить обработчики окончания выполнения запроса
+     *
+     * @return mixed
+     */
+    public static function executeAfterHandlers()
+    {
         foreach (static::$after as $index => $func) {
             $result = $func($result, ...static::$afterArgs[$index]);
             if ($result === false) {
@@ -281,8 +291,6 @@ abstract class AclessControllerParent
                 return static::$afterResult;
             }
         }
-
-        return $result;
     }
 
     /**

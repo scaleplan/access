@@ -75,7 +75,7 @@ class AclessModify extends AclessAbstract
      *
      * @return int
      */
-    private function initSQLScheme(): int
+    protected function initSQLScheme(): int
     {
         $sql = file_get_contents(__DIR__ . '/acless.sql');
 
@@ -85,9 +85,9 @@ class AclessModify extends AclessAbstract
     /**
      * Инициальзировать персистентное хранилище данных о правах доступа
      *
-     * @return array
+     * @return int
      */
-    public function initPersistentStorage(): array
+    public function initPersistentStorage(): int
     {
         if (!$this->initSQLScheme()) {
             throw new AclessException('Не удалось создать необходимые объекты базы данных', 37);
@@ -100,18 +100,18 @@ class AclessModify extends AclessAbstract
                                   acless.url
                                  (text,
                                   name,
-                                  filter,
-                                  filter_reference)
+                                  model_id,
+                                  type)
                                 VALUES
                                  (:text,
                                   :name,
-                                  :filter,
-                                  :filter_reference)
+                                  :model_id,
+                                  :type)
                                 ON CONFLICT 
                                   (text) 
                                 DO UPDATE SET 
-                                  filter = EXCLUDED.filter,
-                                  filter_reference = EXCLUDED.filter_reference,
+                                  model_id = EXCLUDED.model_id,
+                                  type = EXCLUDED.type,
                                   name = EXCLUDED.name'
         );
         foreach ($this->getAllURLs() as $arr) {
@@ -134,27 +134,7 @@ class AclessModify extends AclessAbstract
         $sth = $this->ps->prepare("CREATE TYPE acless.roles AS ENUM ($rolesPlaceholders)");
         $sth->execute($roles);
 
-        $defaultRightsCount = $sth = $this->getPSConnection()->exec(
-            "INSERT INTO
-                                      acless.default_right
-                                    SELECT 
-                                      u.id,
-                                      r.role
-                                    FROM
-                                      acless.url u
-                                    CROSS JOIN
-                                     (SELECT
-                                        pg_enum.enumlabel AS role
-                                      FROM
-                                        pg_type
-                                      JOIN
-                                        pg_enum
-                                        ON
-                                          pg_enum.enumtypid = pg_type.oid
-                                      WHERE
-                                        pg_type.typname = 'roles') r");
-
-        return [$urlsCount, $defaultRightsCount];
+        return $urlsCount;
     }
 
     /**
@@ -167,31 +147,25 @@ class AclessModify extends AclessAbstract
      *
      * @return array
      */
-    public function addRoleAccessRight(int $url_id, string $role, bool $is_allow, array $values = []): array
+    public function addRoleAccessRight(int $url_id, string $role): array
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
                                   acless.default_right
                                 VALUES
                                  (:url_id,
-                                  :role,
-                                  :is_allow,
-                                  :values::int[])
+                                  :role)
                                 ON CONFLICT 
                                   (url_id,
                                    role) 
-                                DO UPDATE SET 
-                                  is_allow = EXCLUDED.is_allow,
-                                  values = EXCLUDED.values
+                                DO NOTHING 
                                 RETURNING
                                   *'
         );
         $sth->execute(
             [
                 'url_id'   => $url_id,
-                'role'     => $role,
-                'is_allow' => $is_allow,
-                'values'   => '{' . implode(',', $values) . '}'
+                'role'     => $role
             ]
         );
 
@@ -225,26 +199,20 @@ class AclessModify extends AclessAbstract
 
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
-                                  acless.default_right
-                                VALUES
-                                 (:url_id,
-                                  :role,
-                                  :is_allow,
-                                  :values::int[])
-                                ON CONFLICT 
-                                  (url_id,
-                                   role) 
-                                DO UPDATE SET 
-                                  is_allow = EXCLUDED.is_allow,
-                                  values = EXCLUDED.values
-                                RETURNING
-                                  *');
+                          acless.default_right
+                        VALUES
+                         (:url_id,
+                          :role)
+                        ON CONFLICT 
+                         (url_id,
+                          role) 
+                        DO NOTHING
+                        RETURNING
+                          *');
         $sth->execute(
             [
                 'url_id'   => $url_id,
-                'role'     => $role,
-                'is_allow' => $is_allow,
-                'values'   => '{' . implode(',', $values) . '}'
+                'role'     => $role
             ]
         );
 
@@ -256,8 +224,6 @@ class AclessModify extends AclessAbstract
      *
      * @param int $url_id - идентификатор урла
      * @param int $user_id - идентификатор пользователя
-     * @param bool $is_allow - $values будут разрешающими или запрещающими
-     * @param array $values - с какими значения фильтра разрешать/запрещать доступ
      *
      * @return array
      */
@@ -289,35 +255,6 @@ class AclessModify extends AclessAbstract
         );
 
         return $sth->fetchAll();
-    }
-
-    /**
-     * Сгенерировать права доступа для пользователей из прав доступа для ролей
-     *
-     * @return int
-     */
-    public function generateAccessRightsFromRoles(): int
-    {
-        return $this->getPSConnection()->exec(
-            'INSERT INTO
-                                  acless.access_right
-                                SELECT 
-                                  dr.url_id,
-                                  ur.user_id,
-                                  dr.is_allow,
-                                  dr.values
-                                FROM
-                                  acless.default_right dr 
-                                JOIN 
-                                  acless.user_role ur 
-                                  ON 
-                                    ur.role = dr.role
-                                ON CONFLICT 
-                                  (url_id,
-                                   user_id) 
-                                DO UPDATE SET 
-                                  is_allow = EXCLUDED.is_allow,
-                                  values = EXCLUDED.values');
     }
 
     /**

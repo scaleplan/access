@@ -6,7 +6,7 @@ controllers:
 
 # Пути к директориям файлов
 files:
-  - /var/www/payment_system/views/private/materials
+
 
 # Дополнительные урлы для добавления
 urls:
@@ -55,6 +55,9 @@ acless_schema: schema
 
 # Дескриптор, указывающий имя таблицы (модели) для матода контроллера
 acless_tables: table
+
+# Тип опарации метода контроллера (создание, изменение, удаление, чтение)
+acless_url_type: urlType
 
 # Идентификатор пользователя-гостя
 guest_user_id: 0
