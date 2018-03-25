@@ -2,7 +2,7 @@
 
 namespace avtomon;
 
-class AclessException extends \Exception
+class AclessException extends CustomException
 {
 }
 
@@ -69,13 +69,14 @@ class Acless extends AclessAbstract
      *
      * @throws AclessException
      */
-    public function checkMethodRights(\ReflectionMethod $ref, array $args): bool
+    public function checkMethodRights(\ReflectionMethod $refMethod, array $args, \ReflectionClass $refClass = null): bool
     {
-        if (empty($docBlock = $this->docBlockFactory->create($ref->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['acless_label']))) {
+        if (empty($docBlock = $this->docBlockFactory->create($refMethod->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['acless_label']))) {
             return true;
         }
 
-        $url = $this->methodToURL($ref->getDeclaringClass()->getName(), $ref->getName());
+        $className = $refClass ? $refClass->getName() : $refMethod->getDeclaringClass()->getName();
+        $url = $this->methodToURL($className, $refMethod->getName());
         if (empty($accessRight = $this->getAccessRights($url))) {
             if ($this->getUserId() === $this->getConfig('guest_user_id')) {
                 throw new AclessException('Авторизуйтесь на сайте', 47);

@@ -3,7 +3,7 @@
 namespace avtomon;
 
 /**
- * Родитель для контроллеров - проверка прав доступа
+ * Родитель для контроллеров - проверка прав доступа, фильтрация параметров
  *
  * Class AclessControllerParent
  * @package avtomon
@@ -18,18 +18,11 @@ abstract class AclessControllerParent
     protected static $before = [];
 
     /**
-     * Аргументы функций для выполнения перед исполнением метода контроллера
-     *
-     * @var array
-     */
-    protected static $beforeArgs = [];
-
-    /**
      * Результат выполения before-функции по умолчанию
      *
      * @var
      */
-    public static $beforeDefaultResult;
+    public static $beforeDefaultResult = null;
 
     /**
      * Функции для выполнения после исполнения метода контроллера
@@ -39,181 +32,101 @@ abstract class AclessControllerParent
     protected static $after = [];
 
     /**
-     * Аргументы функций для выполнения после исполнения метода контроллера
-     *
-     * @var array
-     */
-    protected static $afterArgs = [];
-
-    /**
      * Результат выполения after-функции по умолчанию
      *
      * @var
      */
-    public static $afterResult;
+    public static $afterDefaultResult = null;
 
     /**
      * Добавить функцию в конец массива функций выполняемых перед исполнением метода контроллера
      *
-     * @param \Closure $function - функция
-     * @param array ...$args - агрументы функции
-     *
-     * @return int
-     *
-     * @throws AclessException
+     * @param callable $function - функция
      */
-    public static function pushBefore(\Closure $function, ...$args): int
+    public static function pushBefore(callable $function): void
     {
-        $argCount = array_push(static::$beforeArgs, $args);
-        $funcCount = array_push(static::$before, $function);
-        if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив before-функций не соответствует количеству массивов аргуметов', 12);
-        }
-
-        return $funcCount;
+        array_push(static::$before, $function);
     }
 
     /**
      * Добавить функцию в начало массива функций выполняемых перед исполнением метода контроллера
      *
-     * @param \Closure $function - функция
-     * @param array ...$args - аругументы функции
-     *
-     * @return int
-     *
-     * @throws AclessException
+     * @param callable $function - функция
      */
-    public static function unshiftBefore(\Closure $function, ...$args): int
+    public static function unshiftBefore(callable $function): void
     {
-        $argCount = array_unshift(static::$beforeArgs, $args);
-        $funcCount = array_unshift(static::$before, $function);
-        if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив before-функций не соответствует количеству массивов аргуметов', 13);
-        }
-
-        return $funcCount;
+        array_unshift(static::$before, $function);
     }
 
     /**
      * Добавить функцию в заданную позицию массива функций выполняемых перед исполнением метода контроллера
      *
      * @param int $index - позиция вставки
-     * @param \Closure $function - функция
-     * @param array ...$args - аргументы функции
-     *
-     * @return int
-     *
-     * @throws AclessException
+     * @param callable $function - функция
      */
-    public static function insertBefore(int $index, \Closure $function, ...$args): int
+    public static function insertBefore(int $index, callable $function): void
     {
-        $argCount = count(array_merge(array_slice(static::$beforeArgs, 0, $index), $args, array_slice(static::$beforeArgs, $index)));
-        $funcCount =  count(array_merge(array_slice(static::$before, 0, $index), $function, array_slice(static::$before, $index)));
-        if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив before-функций не соответствует количеству массивов аргуметов', 14);
-        }
-
-        return $funcCount;
+        array_merge(array_slice(static::$before, 0, $index), $function, array_slice(static::$before, $index));
     }
 
     /**
      * Добавить функцию в конец массива функций выполняемых после исполнения метода контроллера
      *
-     * @param \Closure $function - функция
-     * @param array ...$args - аргументы функции
-     *
-     * @return int
-     *
-     * @throws AclessException
+     * @param callable $function - функция
      */
-    public static function pushAfter(\Closure $function, ...$args): int
+    public static function pushAfter(\Closure $function, ...$args): void
     {
-        $argCount = array_push(static::$afterArgs, $args);
-        $funcCount = array_push(static::$after, $function);
-        if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив after-функций не соответствует количеству массивов аргуметов', 15);
-        }
-
-        return $funcCount;
+        array_push(static::$after, $function);
     }
 
     /**
      * Добавить функцию в начало массива функций выполняемых после исполнения метода контроллера
      *
-     * @param \Closure $function - функция
-     * @param array ...$args - аргументы функции
-     *
-     * @return int
-     *
-     * @throws AclessException
+     * @param callable $function - функция
      */
-    public static function unshiftAfter(\Closure $function, ...$args): int
+    public static function unshiftAfter(callable $function): int
     {
-        $argCount = array_unshift(static::$afterArgs, $args);
-        $funcCount = array_unshift(static::$after, $function);
-        if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив after-функций не соответствует количеству массивов аргуметов', 16);
-        }
-
-        return $funcCount;
+        array_unshift(static::$after, $function);
     }
 
     /**
      * Добавить функцию в заданную позицию массива функций выполняемых после исполнения метода контроллера
      *
      * @param int $index - позиция вставки
-     * @param \Closure $function - функция
-     * @param array ...$args - агрументы функции
-     *
-     * @return int
-     *
-     * @throws AclessException
+     * @param callable $function - функция
      */
-    public static function insertAfter(int $index, \Closure $function, ...$args): int
+    public static function insertAfter(int $index, callable $function)
     {
-        $argCount = count(array_merge(array_slice(static::$afterArgs, 0, $index), $args, array_slice(static::$afterArgs, $index)));
-        $funcCount =  count(array_merge(array_slice(static::$after, 0, $index), $function, array_slice(static::$after, $index)));
-        if ($argCount !== $funcCount) {
-            throw new AclessException('Количество элементов в массив after-функций не соответствует количеству массивов аргуметов', 17);
-        }
-
-        return $funcCount;
+        array_merge(array_slice(static::$after, 0, $index), $function, array_slice(static::$after, $index));
     }
 
     /**
      * Удалить функцию или все функции, которые должны выполняться перед исполненим метода контроллера
      *
      * @param int|null $index - позиция удаления
-     *
-     * @return int
      */
-    public static function removeBefore(int $index = null): int
+    public static function removeBefore(int $index = null): void
     {
         if ($index === null) {
-            static::$beforeArgs = static::$before = [];
-        } else {
-            unset(static::$beforeArgs[$index], static::$before[$index]);
+            static::$before = [];
+            return;
         }
 
-        return count(static::$before);
+        unset(static::$before[$index]);
     }
 
     /**
      * Удалить функцию или все функции, которые должны выполняться после исполнения метода контроллера
      *
      * @param int|null $index - позиция удаления
-     *
-     * @return int
      */
-    public static function removeAfter(int $index = null): int
+    public static function removeAfter(int $index = null): void
     {
         if ($index === null) {
-            static::$afterArgs = static::$after = [];
-        } else {
-            unset(static::$afterArgs[$index], static::$after[$index]);
+            static::$after = [];
         }
 
-        return count(static::$after);
+        unset(static::$after[$index]);
     }
 
     /**
@@ -252,21 +165,12 @@ abstract class AclessControllerParent
         }
 
         if (empty($docBlock->getTagsByName($acless->getConfig('acless_no_rights_check')))) {
-            $acless->checkMethodRights($method, $args);
+            $acless->checkMethodRights($method, $args, $refclass);
         }
 
         $args = $isPlainArgs ? AclessHelper::sanitizeMethodArgs($method, $args) : $args;
 
-        foreach (static::$before as $index => $func) {
-            $result = $func(static::class, $args, $obj);
-            if ($result === false) {
-                break;
-            }
-
-            if ($result === null) {
-                return static::$beforeDefaultResult;
-            }
-        }
+        self::executeBeforeHandlers($method, $args);
 
         $method->setAccessible(true);
         $result = $isPlainArgs ? $method->invokeArgs($obj, $args) : $method->invoke($obj, $args);
@@ -275,20 +179,46 @@ abstract class AclessControllerParent
     }
 
     /**
-     * Выполнить обработчики окончания выполнения запроса
+     * Выполнить обработчики начала выполнения запроса
+     *
+     * @param null|\ReflectionMethod $method - отражение метода, который будет выполняться
+     * @param array $args - его аргументы
      *
      * @return mixed
      */
-    public static function executeAfterHandlers()
+    public static function executeBeforeHandlers(?\ReflectionMethod $method = null, array $args = [])
     {
-        foreach (static::$after as $index => $func) {
-            $result = $func($result, ...static::$afterArgs[$index]);
+        foreach (static::$before as $index => $func) {
+            $result = $func($method, $args);
             if ($result === false) {
                 break;
             }
 
             if ($result === null) {
-                return static::$afterResult;
+                return static::$beforeDefaultResult;
+            }
+        }
+    }
+
+    /**
+     * Выполнить обработчики окончания выполнения запроса
+     *
+     * @param \ReflectionMethod|null $method - отражение выполнявшегося метода констроллера
+     * @param array $args - его аргументы
+     * @param null $result - результат выполнения
+     *
+     * @return mixed
+     */
+    public static function executeAfterHandlers(\ReflectionMethod $method = null, array $args = [], $result = null)
+    {
+        foreach (static::$after as $index => $func) {
+            $result = $func($method, $args, $result);
+            if ($result === false) {
+                break;
+            }
+
+            if ($result === null) {
+                return static::$afterDefaultResult;
             }
         }
     }
