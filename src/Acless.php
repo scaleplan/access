@@ -21,6 +21,11 @@ class Acless extends AclessAbstract
      */
     public $docBlockFactory = null;
 
+    /**
+     * Инстанс класса
+     *
+     * @var null|Acless
+     */
     protected static $instance = null;
 
     /**
@@ -32,7 +37,7 @@ class Acless extends AclessAbstract
      *
      * @throws AclessException
      */
-    protected function getAccessRights(string $url = null): array
+    public function getAccessRights(string $url = null): array
     {
         switch ($this->config['cache_storage']) {
             case 'redis':
@@ -45,7 +50,7 @@ class Acless extends AclessAbstract
                     return json_decode($this->cs->hGet("user_id:{$this->userId}", $url), true)  ?? [];
                 } else {
                     return array_map(function ($item) {
-                        return json_decode($item, true) || $item;
+                        return json_decode($item, true) ?? $item;
                     }, array_filter($this->cs->hGetAll("user_id:{$this->userId}")));
                 }
 
@@ -56,7 +61,7 @@ class Acless extends AclessAbstract
                 break;
 
             default:
-                throw new AclessException("Драйвер {$config['cache_storage']} кэширующего хранилища не поддерживается системой", 42);
+                throw new AclessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой", 42);
         }
     }
 
@@ -89,16 +94,20 @@ class Acless extends AclessAbstract
             return true;
         }
 
-
-
         $docParam = end($tag);
         $filter = trim($docParam->getDescription() ? $docParam->getDescription()->render() : '');
         if ($filter) {
             $accessRight['values'] = json_decode($accessRight['values'], true);
+            if (empty($args)) {
+                throw new AclessException("Список параметров выполнения действия пуст", 44);
+            }
+
+            if (!in_array($filter, array_keys($args))) {
+                throw new AclessException("Список параметров выполнения действия не содержит фильтрующий параметр", 44);
+            }
+
             if (
-                empty($args)
-                || !in_array($filter, array_keys($args))
-                || ($accessRight['is_allow'] && !in_array($args[$filter], $accessRight['values']))
+                ($accessRight['is_allow'] && !in_array($args[$filter], $accessRight['values']))
                 || (!$accessRight['is_allow'] && in_array($args[$filter], $accessRight['values']))
             ) {
                 throw new AclessException("Выполнение метода с таким параметром $filter Вам не разрешено", 44);

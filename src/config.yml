@@ -61,3 +61,6 @@ acless_url_type: urlType
 
 # Идентификатор пользователя-гостя
 guest_user_id: 0
+
+# Префикс полей сохранения прав
+save_fields_prefix: acless_

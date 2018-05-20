@@ -136,11 +136,11 @@ abstract class AclessControllerParent
      * @param array $args - аргументы выполнения
      * @param object|null $obj - объект, к контекте которого должен выполниться метод (если нестатический)
      *
-     * @return mixed
+     * @return AbstractResult
      *
      * @throws AclessException
      */
-    protected static function checkControllerMethod(string $methodName, array $args, object $obj = null)
+    protected static function checkControllerMethod(string $methodName, array $args, object $obj = null): AbstractResult
     {
         $args = reset($args);
         if (!is_array($args)) {
@@ -150,13 +150,13 @@ abstract class AclessControllerParent
         $refclass = new \ReflectionClass(static::class);
 
         if (!$refclass->hasMethod($methodName)) {
-            throw new AclessException('Метод не существует', 19);
+            throw new AclessException("Метод $methodName не существует", 19);
         }
 
         $method = $refclass->getMethod($methodName);
         $acless = Acless::create();
         if (empty($doc = $method->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig('acless_label')))) {
-            throw new AclessException('Метод не доступен', 20);
+            throw new AclessException("Метод $methodName не доступен", 20);
         }
 
         $isPlainArgs = empty($docBlock->getTagsByName($acless->getConfig('acless_array_arg')));
@@ -175,7 +175,15 @@ abstract class AclessControllerParent
         $method->setAccessible(true);
         $result = $isPlainArgs ? $method->invokeArgs($obj, $args) : $method->invoke($obj, $args);
 
-        return $result;
+        if ($result instanceof AbstractResult) {
+            return $result;
+        }
+
+        if (is_array($result)) {
+            return new DbResultItem($result);
+        }
+
+        return new HTMLResultItem($result);
     }
 
     /**
@@ -233,7 +241,7 @@ abstract class AclessControllerParent
      *
      * @throws AclessException
      */
-    public static function __callStatic(string $methodName, array $args)
+    public static function __callStatic(string $methodName, array $args): AbstractResult
     {
         return self::checkControllerMethod($methodName, $args);
     }
@@ -248,7 +256,7 @@ abstract class AclessControllerParent
      *
      * @throws AclessException
      */
-    public function __call(string $methodName, array $args)
+    public function __call(string $methodName, array $args): AbstractResult
     {
         return self::checkControllerMethod($methodName, $args, $this);
     }

@@ -31,11 +31,11 @@ class AclessHelper
 
             if ($param->isVariadic()) {
                 if (!$paramType) {
-                    $sanArgs = array_merge($sanArgs, $args);
+                    $sanArgs = array_merge($sanArgs, [$paramName => array_diff_key($args, $sanArgs)]);
                     break;
                 }
 
-                $sanArgs = array_merge($sanArgs, array_map(function ($item) use ($param, $paramType) {
+                $sanArgs = array_merge($sanArgs, array_map(function ($item) use ($param, $paramType, $paramName) {
                     if ($paramType && (string) $paramType !== gettype($item)) {
                         $tmp = $item;
                         settype($tmp, (string) $paramType);
@@ -86,25 +86,37 @@ class AclessHelper
      *
      * @throws AclessException
      */
-    public static function sanitizeSQLPropertyArgs(\ReflectionProperty $property, array $args): array
+    public static function sanitizeSQLPropertyArgs(\ReflectionProperty $property, array $args, object $object = null): array
     {
         $sanArgs = [];
-        if (!$property->isPublic())
-        {
+        if (!$property->isPublic()) {
             $property->setAccessible(true);
         }
 
         $docBlock = DocBlockFactory::createInstance()->create($property->getDocComment());
-        $docParams = null;
-        foreach ($docBlock->getTagsByName('param') as $docParam) {
-            $docParams[$docParam->getVariableName()] = $docParam->getType();
+        $allParams = $optionParams = [];
+        $docParams = $docBlock->getTagsByName('param');
+        if ($docParams) {
+            foreach ($docParams as $docParam) {
+                $allParams[$docParam->getVariableName()] = $docParam->getType();
+                $paramDescription = (string) $docParam->getDescription();
+                if ($paramDescription && stripos($paramDescription, '(optional)') !== false) {
+                    $optionParams[$docParam->getVariableName()] = $docParam->getType();
+                }
+            }
+        } else {
+            $sqlParams = self::getSQLParams($property->getValue($object));
+            $allParams = array_fill_keys($sqlParams[0], null);
+            $optionParams = array_fill_keys($sqlParams[1], null);
         }
 
-        $params = $docParams ?? array_fill_keys(self::getSQLParams($property->getValue()), null);
-
-        foreach ($params as $paramName => $paramType) {
+        foreach ($allParams as $paramName => $paramType) {
             if (!in_array($paramName, array_keys($args))) {
-                throw new AclessException("Не хватает параметра $paramName", 24);
+                if (!in_array($paramName, array_keys($optionParams))) {
+                    throw new AclessException("Не хватает параметра $paramName");
+                }
+
+                continue;
             }
 
             $arg = $args[$paramName];
@@ -128,16 +140,21 @@ class AclessHelper
      * Получить из SQL-запроса все параметры
      *
      * @param $sql
+     *
      * @return array
      */
     public static function getSQLParams($sql): array
     {
-        if (preg_match_all('/[^:]:([\w\d_\-]+)/i', $sql, $matches))
-        {
-            return array_unique($matches[1]);
+        $all = $optional = [];
+        if (preg_match_all('/[^:]*?:([\w\d_\-]+).*/i', $sql, $matches)) {
+            $all = array_unique($matches[1]);
         }
 
-        return [];
+        if (preg_match_all('/\[[^\]]*?:([\w\d_\-]+)[^\[]*?\]/i', $sql, $matches)) {
+            $optional = array_unique($matches[1]);
+        }
+
+        return [$all, $optional];
     }
 
     /**

@@ -71,7 +71,7 @@ class AclessModify extends AclessAbstract
     }
 
     /**
-     * Залить в базу данных схема для работы с Acless
+     * Залить в базу данных схему для работы с Acless
      *
      * @return int
      */
@@ -138,7 +138,7 @@ class AclessModify extends AclessAbstract
     }
 
     /**
-     * Добавить/изменить права доступа для роли
+     * Добавить/изменить права доступа по умолчанию для роли
      *
      * @param int $url_id - идентификатор урла
      * @param string $role - наименование роли
@@ -199,13 +199,12 @@ class AclessModify extends AclessAbstract
 
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
-                          acless.default_right
+                          acless.user_role
                         VALUES
-                         (:url_id,
-                          :role)
-                        ON CONFLICT 
-                         (url_id,
-                          role) 
+                         (:role,
+                          :user_id)
+                        ON CONFLICT ON CONSTRAINT
+                          user_role_pkey
                         DO NOTHING
                         RETURNING
                           *');

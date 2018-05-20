@@ -123,10 +123,22 @@ class AclessModelResult extends DbResultItem
     }
 
     /**
+     * Будут ли параметры выполнения загружаться в виде последовательности аргументов
+     *
      * @return bool
      */
     public function getIsPlainArgs(): bool
     {
         return $this->isPlainArgs;
+    }
+
+    /**
+     * Добавить результат из другого объекта DbResultItem
+     *
+     * @param DbResultItem|null $rawResult
+     */
+    public function setRawResult(?DbResultItem $rawResult)
+    {
+        $this->result = $rawResult->result ?? null;
     }
 }
