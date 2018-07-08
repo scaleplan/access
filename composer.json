@@ -12,6 +12,6 @@
     },
     "require": {
         "phpdocumentor/reflection-docblock": "~2.0",
-        "symfony/yaml": "dev-master"
+        "symfony/yaml": "~4.0"
     }
 }
