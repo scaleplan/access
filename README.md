@@ -1,2 +1,5 @@
 # Acless
-PHP access control system
+
+Система управления правами доступа
+
+* [Документация](docs)
