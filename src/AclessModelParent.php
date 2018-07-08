@@ -15,16 +15,18 @@ class AclessModelParent
      *
      * @param string $methodName - имя метода
      * @param array $args - аргументы
+     * @param object|null $object - объект модели
      *
      * @return AclessModelResult
      *
      * @throws AclessException
+     * @throws \ReflectionException
      */
-    protected static function checkModelMethodEssence(string $methodName, array $args, object $object = null)
+    protected static function checkModelMethodEssence(string $methodName, array $args, object $object = null): AclessModelResult
     {
         $formatArgs = function (array &$args) use (&$methodName): array {
             $args = $args ? reset($args) : $args;
-            if (!is_array($args)) {
+            if (!\is_array($args)) {
                 throw new AclessException("Метод $methodName принимает параметры в виде массива", 26);
             }
 
@@ -56,7 +58,9 @@ class AclessModelParent
                 $args,
                 $isPlainArgs
             );
-        } elseif ($refclass->hasProperty($methodName)) {
+        }
+
+        if ($refclass->hasProperty($methodName)) {
             $property = $refclass->getProperty($methodName);
 
             if (empty($doc = $property->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
@@ -84,9 +88,10 @@ class AclessModelParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return AclessModelResult
+     * @return AclessModelResult|null
      *
      * @throws AclessException
+     * @throws \ReflectionException
      */
     public static function __callStatic(string $methodName, array $args): ?AclessModelResult
     {
@@ -99,9 +104,10 @@ class AclessModelParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return AclessModelResult
+     * @return AclessModelResult|null
      *
      * @throws AclessException
+     * @throws \ReflectionException
      */
     public function __call(string $methodName, array $args): ?AclessModelResult
     {

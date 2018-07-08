@@ -35,8 +35,8 @@ class AclessHelper
                     break;
                 }
 
-                $sanArgs = array_merge($sanArgs, array_map(function ($item) use ($param, $paramType, $paramName) {
-                    if ($paramType && (string) $paramType !== gettype($item)) {
+                $sanArgs = array_merge($sanArgs, array_map(function ($item) use ($paramType, $paramName) {
+                    if ($paramType && (string) $paramType !== \gettype($item)) {
                         $tmp = $item;
                         settype($tmp, (string) $paramType);
                         if ($tmp != $item) {
@@ -49,18 +49,18 @@ class AclessHelper
                 break;
             }
 
-            if (!isset($args[$paramName]) && !$param->isOptional()) {
+            if (!array_key_exists($paramName, $args) && !$param->isOptional()) {
                 throw new AclessException("Отсутствует необходимый параметр $paramName", 21);
             }
 
-            if ($param->isOptional() && (!isset($args[$paramName]) || ($args[$paramName] == $param->getDefaultValue() && is_null($param->getDefaultValue())))) {
+            if ($param->isOptional() && (!array_key_exists($paramName, $args) || ($args[$paramName] == $param->getDefaultValue() && $param->getDefaultValue() === null))) {
                 $sanArgs[$paramName] = $param->getDefaultValue();
                 continue;
             }
 
             $arg = $args[$paramName];
 
-            if ($paramType && (string) $paramType !== gettype($arg)) {
+            if ($paramType && (string) $paramType !== \gettype($arg)) {
                 $tmp = $arg;
                 settype($tmp, (string) $paramType);
                 if ($tmp != $arg) {
@@ -68,7 +68,7 @@ class AclessHelper
                 }
             }
 
-            gettype($arg) === 'string' && $arg = strip_tags($arg);
+            \is_string($arg) && $arg = strip_tags($arg);
 
             $sanArgs[$paramName] = $arg;
         }
@@ -81,6 +81,7 @@ class AclessHelper
      *
      * @param \ReflectionProperty $property - Reflection-обертка для SQL-свойства
      * @param array $args - массив аргументов
+     * @param object|null $object - объект модели
      *
      * @return array
      *
@@ -111,8 +112,8 @@ class AclessHelper
         }
 
         foreach ($allParams as $paramName => $paramType) {
-            if (!in_array($paramName, array_keys($args))) {
-                if (!in_array($paramName, array_keys($optionParams))) {
+            if (!array_key_exists($paramName, $args)) {
+                if (!array_key_exists($paramName, $optionParams)) {
                     throw new AclessException("Не хватает параметра $paramName");
                 }
 
@@ -120,7 +121,7 @@ class AclessHelper
             }
 
             $arg = $args[$paramName];
-            if ($paramType && (string) $paramType !== gettype($arg)) {
+            if ($paramType && (string) $paramType !== \gettype($arg)) {
                 $tmp = $arg;
                 settype($tmp, (string) $paramType);
                 if ($tmp != $arg) {
@@ -128,7 +129,7 @@ class AclessHelper
                 }
             }
 
-            gettype($arg) === 'string' && $arg = strip_tags($arg);
+            \is_string($arg) && $arg = strip_tags($arg);
 
             $sanArgs[$paramName] = $arg;
         }
@@ -146,11 +147,11 @@ class AclessHelper
     public static function getSQLParams($sql): array
     {
         $all = $optional = [];
-        if (preg_match_all('/[^:]*?:([\w\d_\-]+).*/i', $sql, $matches)) {
+        if (preg_match_all('/[^:]+?:([\w_\-]+).*?/i', $sql, $matches)) {
             $all = array_unique($matches[1]);
         }
 
-        if (preg_match_all('/\[[^\]]*?:([\w\d_\-]+)[^\[]*?\]/i', $sql, $matches)) {
+        if (preg_match_all('/\[[^\]]*?:([\w_\-]+)[^\[]*?\]/i', $sql, $matches)) {
             $optional = array_unique($matches[1]);
         }
 

@@ -2,6 +2,14 @@
 
 namespace avtomon;
 
+use phpDocumentor\Reflection\DocBlockFactory;
+
+/**
+ * Класс исключений
+ *
+ * Class AclessException
+ * @package avtomon
+ */
 class AclessException extends CustomException
 {
 }
@@ -15,18 +23,25 @@ class AclessException extends CustomException
 class Acless extends AclessAbstract
 {
     /**
-     * Фабрика phpdoc-блоков
-     *
-     * @var null
-     */
-    public $docBlockFactory = null;
-
-    /**
      * Инстанс класса
      *
      * @var null|Acless
      */
-    protected static $instance = null;
+    protected static $instance;
+
+    /**
+     * Фабрика phpdoc-блоков
+     *
+     * @var null|DocBlockFactory
+     */
+    public $docBlockFactory;
+
+    /**
+     * Разделитель значений фильтров
+     *
+     * @var string
+     */
+    protected $filterSeparator = ':';
 
     /**
      * Вернуть информацию о всех доступных пользователю урлах или о каком-то конкретном урле
@@ -36,8 +51,9 @@ class Acless extends AclessAbstract
      * @return array
      *
      * @throws AclessException
+     * @throws RedisSingletonException
      */
-    public function getAccessRights(string $url = null): array
+    public function getAccessRights(string $url = ''): array
     {
         switch ($this->config['cache_storage']) {
             case 'redis':
@@ -48,17 +64,14 @@ class Acless extends AclessAbstract
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
                 if ($url) {
                     return json_decode($this->cs->hGet("user_id:{$this->userId}", $url), true)  ?? [];
-                } else {
-                    return array_map(function ($item) {
-                        return json_decode($item, true) ?? $item;
-                    }, array_filter($this->cs->hGetAll("user_id:{$this->userId}")));
                 }
 
-                break;
+                return array_map(function ($item) {
+                    return json_decode($item, true) ?? $item;
+                }, array_filter($this->cs->hGetAll("user_id:{$this->userId}")));
 
             case 'session':
                 return $url ? ($_SESSION['access_rights'][$url] ?? []) : array_filter($_SESSION['access_rights']);
-                break;
 
             default:
                 throw new AclessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой", 42);
@@ -68,13 +81,16 @@ class Acless extends AclessAbstract
     /**
      * Проверить доступ к методу
      *
-     * @param \Reflector $ref - Reflection-обертка для метода
+     * @param \Reflector $refMethod - Reflection-обертка для метода
+     * @param array $args - параметры выполнения
+     * @param \ReflectionClass|null $refClass - класс метода
      *
      * @return bool
      *
      * @throws AclessException
+     * @throws RedisSingletonException
      */
-    public function checkMethodRights(\ReflectionMethod $refMethod, array $args, \ReflectionClass $refClass = null): bool
+    public function checkMethodRights(\Reflector $refMethod, array $args, \ReflectionClass $refClass = null): bool
     {
         if (empty($docBlock = $this->docBlockFactory->create($refMethod->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['acless_label']))) {
             return true;
@@ -95,22 +111,54 @@ class Acless extends AclessAbstract
         }
 
         $docParam = end($tag);
-        $filter = trim($docParam->getDescription() ? $docParam->getDescription()->render() : '');
-        if ($filter) {
-            $accessRight['values'] = json_decode($accessRight['values'], true);
+        $filters = trim($docParam->getDescription() ? $docParam->getDescription()->render() : '');
+        if ($filters) {
+            $filters = array_map('trim', explode(',', $filters));
+
+            $accessRight['values'] = array_map(function ($item) {
+                return array_map('trim', explode($this->filterSeparator, $item));
+            }, json_decode($accessRight['values'], true));
+
             if (empty($args)) {
-                throw new AclessException("Список параметров выполнения действия пуст", 44);
+                throw new AclessException('Список параметров выполнения действия пуст', 44);
             }
 
-            if (!in_array($filter, array_keys($args))) {
-                throw new AclessException("Список параметров выполнения действия не содержит фильтрующий параметр", 44);
+            $methodDefaults = null;
+            $getMethodDefaults = function (?array &$methodDefaults) use ($refMethod): ?array {
+                if ($methodDefaults === null) {
+                    $methodDefaults = [];
+                    foreach ($refMethod->getParameters() as $parameter) {
+                        if ($parameter->isOptional()) {
+                            $methodDefaults[$parameter->getName()] = $parameter->getDefaultValue();
+                        }
+                    }
+                }
+
+                return $methodDefaults;
+            };
+
+            if (\count($accessRight['values'][0]) !== \count($filters)) {
+                throw new AclessException('Количество фильтрующих параметров не соответствует количеству фильтрующих значений');
+            }
+
+            $checkValue = [];
+            foreach ($filters as $filter) {
+                if (!array_key_exists($filter, $args) && array_key_exists($filter, $getMethodDefaults($methodDefaults))) {
+                    $args[$filter] = $getMethodDefaults($methodDefaults)[$filter];
+                }
+
+                $checkValue[] = $args[$filter];
+            }
+
+            if (array_intersect($filters, array_keys($args)) !== $filters) {
+                throw new AclessException('Список параметров выполнения действия не содержит все фильтрующие параметры', 44);
             }
 
             if (
-                ($accessRight['is_allow'] && !in_array($args[$filter], $accessRight['values']))
-                || (!$accessRight['is_allow'] && in_array($args[$filter], $accessRight['values']))
+                ($accessRight['is_allow'] && !\in_array($checkValue, $accessRight['values'], true))
+                || (!$accessRight['is_allow'] && \in_array($checkValue, $accessRight['values'], true))
             ) {
-                throw new AclessException("Выполнение метода с таким параметром $filter Вам не разрешено", 44);
+                throw new AclessException("Выполнение метода с такими параметрами $filters Вам не разрешено", 44);
             }
         }
 
@@ -125,6 +173,7 @@ class Acless extends AclessAbstract
      * @return bool
      *
      * @throws AclessException
+     * @throws RedisSingletonException
      */
     public function checkFileRights(string $filePath): bool
     {
@@ -149,7 +198,7 @@ class Acless extends AclessAbstract
      *
      * @throws AclessException
      */
-    public function methodToURL(string $className, string $methodName)
+    public function methodToURL(string $className, string $methodName): string
     {
         foreach ($this->config['controllers'] as $controllerDir) {
             if (empty($controllerDir['path'])) {
@@ -160,6 +209,7 @@ class Acless extends AclessAbstract
         }
 
         $methodName = str_replace('\\', '/', trim($className, '\/ ') . '\\' . trim($methodName, '\/ '));
+
         return AclessHelper::camel2dashed(preg_replace('(Controller|action)', '', $methodName));
     }
 
@@ -170,6 +220,9 @@ class Acless extends AclessAbstract
      * @param string|null $controllerNamespace - пространство имен для конроллера, если есть
      *
      * @return array
+     *
+     * @throws AclessException
+     * @throws \ReflectionException
      */
     protected function generateControllerURLs(string $controllerFileName, string $controllerNamespace = null): array
     {
@@ -186,11 +239,11 @@ class Acless extends AclessAbstract
         $refClass = new \ReflectionClass("$controllerNamespace$controller");
 
         $urls = [];
-        $sql = 'SELECT id, schema_name, table_name FROM acless.model';
-        $models = $this->getPSConnection()->query($sql)->fetchAll(PDO::FETCH_COLUMN);
+        $sql = 'SELECT id, schema_name, table_name FROM acless.model_type';
+        $models = $this->getPSConnection()->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
 
         $seachModel = function (string $schema, string $table) use ($models): ?int {
-            if (empty($models) || !is_array($models) || empty($schema) || empty($table)) {
+            if (empty($models) || !\is_array($models) || empty($schema) || empty($table)) {
                 return null;
             }
 
@@ -201,6 +254,8 @@ class Acless extends AclessAbstract
 
                 return $model['id'];
             }
+
+            return null;
         };
 
         foreach ($refClass->getMethods() as $method) {
@@ -213,16 +268,24 @@ class Acless extends AclessAbstract
             }
 
             $methodName = str_replace('action', '', $method->getName());
-            $modelId = $seachModel(end($docBlock->getTagsByName($this->config['acless_schema'])), end($docBlock->getTagsByName($this->config['acless_tables'])));
+
+            $aclessSchema = $docBlock->getTagsByName($this->config['acless_schema']);
+            $aclessSchema = end($aclessSchema);
+            $aclessTables = $docBlock->getTagsByName($this->config['acless_tables']);
+            $aclessTables = end($aclessTables);
+            $aclessUrlType = $docBlock->getTagsByName($this->config['acless_url_type']);
+            $aclessUrlType = end($aclessUrlType);
+
+            $modelId = $seachModel($aclessSchema, $aclessTables);
 
             $url = [
                 'text' => '/' . strtolower(str_replace('Controller', '', $controller)) . '/' . AclessHelper::camel2dashed($methodName),
                 'name' => $docBlock->getSummary(),
-                'model_id' => $modelId,
-                'type' => end($docBlock->getTagsByName($this->config['acless_url_type']))
+                'model_type_id' => $modelId,
+                'type' => $aclessUrlType
             ];
 
-            array_push($urls, $url);
+            $urls[] = $url;
         }
 
         return $urls;
@@ -238,7 +301,7 @@ class Acless extends AclessAbstract
     protected function getRecursivePaths(string $dir): array
     {
         $dir = rtrim($dir, '/\ ');
-        $paths = scandir($dir);
+        $paths = scandir($dir, SCANDIR_SORT_NONE);
         unset($paths[0], $paths[1]);
         $result = [];
 
@@ -263,6 +326,7 @@ class Acless extends AclessAbstract
      * @return array
      *
      * @throws AclessException
+     * @throws \ReflectionException
      */
     public function getControllerURLs(): array
     {
@@ -306,7 +370,7 @@ class Acless extends AclessAbstract
                 return [
                     'text' => trim(str_replace($fileDir, '', $item), '\/ '),
                     'name' => null,
-                    'model_id' => null,
+                    'model_type_id' => null,
                     'type' => null
                 ];
             }, $this->getRecursivePaths($fileDir)));
@@ -326,7 +390,7 @@ class Acless extends AclessAbstract
             return [
                 'text' => trim($item, '\/ '),
                 'name' => null,
-                'model_id' => null,
+                'model_type_id' => null,
                 'type' => null
             ];
         }, array_filter($this->config['urls']));
@@ -336,6 +400,9 @@ class Acless extends AclessAbstract
      * Возращает все собранные урлы
      *
      * @return array
+     *
+     * @throws AclessException
+     * @throws \ReflectionException
      */
     public function getAllURLs(): array
     {

@@ -20,9 +20,9 @@ abstract class AclessControllerParent
     /**
      * Результат выполения before-функции по умолчанию
      *
-     * @var
+     * @var mixed
      */
-    public static $beforeDefaultResult = null;
+    public static $beforeDefaultResult;
 
     /**
      * Функции для выполнения после исполнения метода контроллера
@@ -34,9 +34,9 @@ abstract class AclessControllerParent
     /**
      * Результат выполения after-функции по умолчанию
      *
-     * @var
+     * @var mixed
      */
-    public static $afterDefaultResult = null;
+    public static $afterDefaultResult;
 
     /**
      * Добавить функцию в конец массива функций выполняемых перед исполнением метода контроллера
@@ -45,7 +45,7 @@ abstract class AclessControllerParent
      */
     public static function pushBefore(callable $function): void
     {
-        array_push(static::$before, $function);
+        static::$before[] = $function;
     }
 
     /**
@@ -66,7 +66,7 @@ abstract class AclessControllerParent
      */
     public static function insertBefore(int $index, callable $function): void
     {
-        array_merge(array_slice(static::$before, 0, $index), $function, array_slice(static::$before, $index));
+        array_merge(\array_slice(static::$before, 0, $index), $function, \array_slice(static::$before, $index));
     }
 
     /**
@@ -74,9 +74,9 @@ abstract class AclessControllerParent
      *
      * @param callable $function - функция
      */
-    public static function pushAfter(\Closure $function, ...$args): void
+    public static function pushAfter(callable $function): void
     {
-        array_push(static::$after, $function);
+        static::$after[] = $function;
     }
 
     /**
@@ -84,7 +84,7 @@ abstract class AclessControllerParent
      *
      * @param callable $function - функция
      */
-    public static function unshiftAfter(callable $function): int
+    public static function unshiftAfter(callable $function): void
     {
         array_unshift(static::$after, $function);
     }
@@ -95,37 +95,28 @@ abstract class AclessControllerParent
      * @param int $index - позиция вставки
      * @param callable $function - функция
      */
-    public static function insertAfter(int $index, callable $function)
+    public static function insertAfter(int $index, callable $function): void
     {
-        array_merge(array_slice(static::$after, 0, $index), $function, array_slice(static::$after, $index));
+        array_merge(\array_slice(static::$after, 0, $index), $function, \array_slice(static::$after, $index));
     }
 
     /**
      * Удалить функцию или все функции, которые должны выполняться перед исполненим метода контроллера
      *
-     * @param int|null $index - позиция удаления
+     * @param int $index - позиция удаления
      */
-    public static function removeBefore(int $index = null): void
+    public static function removeBefore(int $index): void
     {
-        if ($index === null) {
-            static::$before = [];
-            return;
-        }
-
         unset(static::$before[$index]);
     }
 
     /**
      * Удалить функцию или все функции, которые должны выполняться после исполнения метода контроллера
      *
-     * @param int|null $index - позиция удаления
+     * @param int $index - позиция удаления
      */
-    public static function removeAfter(int $index = null): void
+    public static function removeAfter(int $index): void
     {
-        if ($index === null) {
-            static::$after = [];
-        }
-
         unset(static::$after[$index]);
     }
 
@@ -134,16 +125,18 @@ abstract class AclessControllerParent
      *
      * @param string $methodName - имя метода
      * @param array $args - аргументы выполнения
-     * @param object|null $obj - объект, к контекте которого должен выполниться метод (если нестатический)
+     * @param \object|null $obj - объект, к контекте которого должен выполниться метод (если нестатический)
      *
      * @return AbstractResult
      *
      * @throws AclessException
+     * @throws DbResultItemException
+     * @throws \ReflectionException
      */
     protected static function checkControllerMethod(string $methodName, array $args, object $obj = null): AbstractResult
     {
         $args = reset($args);
-        if (!is_array($args)) {
+        if (!\is_array($args)) {
             throw new AclessException("Метод $methodName принимает параметры в виде массива", 18);
         }
 
@@ -179,7 +172,7 @@ abstract class AclessControllerParent
             return $result;
         }
 
-        if (is_array($result)) {
+        if (\is_array($result)) {
             return new DbResultItem($result);
         }
 
@@ -201,11 +194,9 @@ abstract class AclessControllerParent
             if ($result === false) {
                 break;
             }
-
-            if ($result === null) {
-                return static::$beforeDefaultResult;
-            }
         }
+
+        return $result ?? static::$beforeDefaultResult;
     }
 
     /**
@@ -224,11 +215,9 @@ abstract class AclessControllerParent
             if ($result === false) {
                 break;
             }
-
-            if ($result === null) {
-                return static::$afterDefaultResult;
-            }
         }
+
+        return $result ?? static::$afterDefaultResult;
     }
 
     /**
@@ -237,9 +226,11 @@ abstract class AclessControllerParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return mixed
+     * @return AbstractResult
      *
      * @throws AclessException
+     * @throws DbResultItemException
+     * @throws \ReflectionException
      */
     public static function __callStatic(string $methodName, array $args): AbstractResult
     {
@@ -252,9 +243,11 @@ abstract class AclessControllerParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return mixed
+     * @return AbstractResult
      *
      * @throws AclessException
+     * @throws DbResultItemException
+     * @throws \ReflectionException
      */
     public function __call(string $methodName, array $args): AbstractResult
     {

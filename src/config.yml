@@ -64,3 +64,5 @@ guest_user_id: 0
 
 # Префикс полей сохранения прав
 save_fields_prefix: acless_
+
+acless_separator: ':'

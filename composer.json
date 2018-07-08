@@ -1,7 +1,6 @@
 {
     "name": "avtomon/Acless",
     "description": "PHP access control system",
-    "type": "project",
     "minimum-stability": "dev",
     "config": {
         "process-timeout": 1800
@@ -12,7 +11,7 @@
         }
     },
     "require": {
-        "phpdocumentor/reflection-docblock": "*",
-        "symfony/yaml": "*"
+        "phpdocumentor/reflection-docblock": "~2.0",
+        "symfony/yaml": "dev-master"
     }
 }

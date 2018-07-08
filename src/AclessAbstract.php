@@ -16,9 +16,9 @@ abstract class AclessAbstract
     /**
      * Конфигурация
      *
-     * @var array|null
+     * @var array
      */
-    protected $config = null;
+    protected $config = [];
 
     /**
      * Идентификатор пользователя
@@ -32,25 +32,31 @@ abstract class AclessAbstract
      *
      * @var null|\PDO
      */
-    protected $ps = null;
+    protected $ps;
 
     /**
      * Подключение к кэшу
      *
      * @var null|\Redis
      */
-    protected $cs = null;
+    protected $cs;
+
+    /**
+     * Инстанс класса
+     *
+     * @var null|AclessAbstract
+     */
+    protected static $instance;
 
     /**
      * Синглтон
      *
-     * @param int $userId - Идентификатор пользователя
+     * @param int $userId - идентификатор пользователя
+     * @param string $confPath - путь в файлу конфигурации
      *
-     * @return Acless
-     *
-     * @throws AclessException
+     * @return AclessAbstract
      */
-    public static function create(int $userId = -1, string $confPath = __DIR__ . '/config.yml')
+    public static function create(int $userId = -1, string $confPath = __DIR__ . '/config.yml'): AclessAbstract
     {
         if (!static::$instance) {
             $className = static::class;
@@ -68,7 +74,7 @@ abstract class AclessAbstract
      *
      * @throws AclessException
      */
-    protected function __construct(int $userId, string $confPath)
+    private function __construct(int $userId, string $confPath)
     {
         $this->config = Yaml::parse(file_get_contents($confPath));
 
@@ -92,7 +98,7 @@ abstract class AclessAbstract
             throw new AclessException('В конфигурации отсутствуют данные о подключениие к кэширующему хранилищу прав', 5);
         }
 
-        if (!is_array($this->config['roles'])){
+        if (!\is_array($this->config['roles'])){
             throw new AclessException('Список ролей должен быть задан списком', 6);
         }
 
@@ -102,6 +108,10 @@ abstract class AclessAbstract
 
         if (empty($this->config['acless_label'])) {
             throw new AclessException('В конфигурации отсутствует имя метки Acless', 8);
+        }
+
+        if (empty($this->config['acless_separator'])) {
+            throw new AclessException('В конфигурации отсутствует разделитель фильтров', 8);
         }
 
         if ($userId < 0) {
@@ -160,7 +170,9 @@ abstract class AclessAbstract
     /**
      * Вернуть конфигурацию или ее часть
      *
-     * @return mixed
+     * @param string|null $key - ключ конфигурации
+     *
+     * @return array|mixed|null
      */
     public function getConfig(string $key = null)
     {

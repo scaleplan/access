@@ -10,18 +10,24 @@ namespace avtomon;
  */
 class AclessModify extends AclessAbstract
 {
-    protected static $instance = null;
+    /**
+     * Инстанс класса
+     *
+     * @var null|AclessModify
+     */
+    protected static $instance;
 
     /**
-     *
      * Загрузить права доступа для текущего пользователя в кэш
      *
      * @throws AclessException
+     * @throws RedisSingletonException
      */
     public function loadAclessRights(): void
     {
         $sth = $this->getPSConnection()
-            ->prepare('SELECT 
+            ->prepare('
+                       SELECT 
                          u.text AS url,
                          ar.is_allow,
                          array_to_json(ar.values) "values"
@@ -32,7 +38,8 @@ class AclessModify extends AclessAbstract
                          ON 
                            ar.url_id = u.id
                        WHERE 
-                         ar.user_id = :user_id');
+                         ar.user_id = :user_id
+                    ');
         $sth->execute(['user_id' => $this->userId]);
 
         $accessRights = $sth->fetchAll();
@@ -53,7 +60,7 @@ class AclessModify extends AclessAbstract
                             JSON_FORCE_OBJECT) ?? $item;
                     }, array_column($accessRights, null, 'url'));
 
-                    if (!$this->cs->hMSet("user_id:{$this->userId}", $hashValue))
+                    if (!$this->cs->hMset("user_id:{$this->userId}", $hashValue))
                     {
                         throw new AclessException('Не удалось записать права доступа в Redis', 35);
                     }
@@ -74,18 +81,22 @@ class AclessModify extends AclessAbstract
      * Залить в базу данных схему для работы с Acless
      *
      * @return int
+     *
+     * @throws AclessException
      */
     protected function initSQLScheme(): int
     {
         $sql = file_get_contents(__DIR__ . '/acless.sql');
 
-        return $sth = $this->getPSConnection()->exec($sql);
+        return $this->getPSConnection()->exec($sql);
     }
 
     /**
      * Инициальзировать персистентное хранилище данных о правах доступа
      *
      * @return int
+     *
+     * @throws AclessException
      */
     public function initPersistentStorage(): int
     {
@@ -93,14 +104,14 @@ class AclessModify extends AclessAbstract
             throw new AclessException('Не удалось создать необходимые объекты базы данных', 37);
         }
 
-        $urlsCount = $defaultRightsCount = 0;
+        $urlsCount = 0;
 
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
                                   acless.url
                                  (text,
                                   name,
-                                  model_id,
+                                  model_type_id,
                                   type)
                                 VALUES
                                  (:text,
@@ -110,21 +121,21 @@ class AclessModify extends AclessAbstract
                                 ON CONFLICT 
                                   (text) 
                                 DO UPDATE SET 
-                                  model_id = EXCLUDED.model_id,
+                                  model_type_id = EXCLUDED.model_type_id,
                                   type = EXCLUDED.type,
                                   name = EXCLUDED.name'
         );
-        foreach ($this->getAllURLs() as $arr) {
+        foreach (Acless::create($this->userId)->getAllURLs() as $arr) {
             $sth->execute($arr);
             $urlsCount += $sth->rowCount();
         }
 
         if (empty($this->config['roles'])) {
-            return [];
+            return 0;
         }
 
         $roles = [];
-        foreach ($acless->getConfig()['roles'] as $index => $role) {
+        foreach ($this->config['roles'] as $index => $role) {
             $roles["value{$index}"] = $role;
         }
 
@@ -142,15 +153,15 @@ class AclessModify extends AclessAbstract
      *
      * @param int $url_id - идентификатор урла
      * @param string $role - наименование роли
-     * @param bool $is_allow - $values будут разрешающими или запрещающими
-     * @param array $values - с какими значения фильтра разрешать/запрещать доступ
      *
      * @return array
+     *
+     * @throws AclessException
      */
     public function addRoleAccessRight(int $url_id, string $role): array
     {
         $sth = $this->getPSConnection()->prepare(
-            'INSERT INTO
+                     'INSERT INTO
                                   acless.default_right
                                 VALUES
                                  (:url_id,
@@ -182,9 +193,9 @@ class AclessModify extends AclessAbstract
      *
      * @throws AclessException
      */
-    public function addUserToRole(int $user_id, string $role = null): array
+    public function addUserToRole(int $user_id, string $role = ''): array
     {
-        $role = $role ?? ($this->config['default_role'] || null);
+        $role = $role ?? $this->config['default_role'];
         if (!$role) {
             throw new AclessException('Не задана роль по умолчанию', 38);
         }
@@ -193,7 +204,7 @@ class AclessModify extends AclessAbstract
             throw new AclessException('Список ролей пуст', 39);
         }
 
-        if (!in_array($role, $this->config['roles'])) {
+        if (!\in_array($role, $this->config['roles'], true)) {
             throw new AclessException('Заданная роль не входит в список доступных ролей', 40);
         }
 
@@ -210,8 +221,8 @@ class AclessModify extends AclessAbstract
                           *');
         $sth->execute(
             [
-                'url_id'   => $url_id,
-                'role'     => $role
+                'role'     => $role,
+                'user_id' => $user_id
             ]
         );
 
@@ -223,22 +234,28 @@ class AclessModify extends AclessAbstract
      *
      * @param int $url_id - идентификатор урла
      * @param int $user_id - идентификатор пользователя
+     * @param bool $is_allow - $values будут разрешающими или запрещающими
+     * @param array $values - с какими значения фильтра разрешать/запрещать доступ
      *
      * @return array
+     *
+     * @throws AclessException
      */
     public function addAccessRight(int $url_id, int $user_id, bool $is_allow, array $values): array
     {
         $sth = $this->getPSConnection()->prepare(
-            'INSERT INTO
+                     'INSERT INTO
                                   acless.access_right
                                 VALUES
                                  (:url_id,
                                   :user_id,
                                   :is_allow,
-                                  :values::int[])
+                                  :values::varchar[])
                                 ON CONFLICT 
                                   (url_id,
-                                   user_id) 
+                                   user_id,
+                                   is_allow,
+                                   values) 
                                 DO UPDATE SET 
                                   is_allow = EXCLUDED.is_allow,
                                   values = EXCLUDED.values
@@ -249,7 +266,7 @@ class AclessModify extends AclessAbstract
                 'url_id'   => $url_id,
                 'user_id'     => $user_id,
                 'is_allow' => $is_allow,
-                'values'   => '{' . implode(',', $values) . '}'
+                'values'   => "{'" . implode("', '", $values) . "'}"
             ]
         );
 
@@ -262,17 +279,19 @@ class AclessModify extends AclessAbstract
      * @param int $userId - идентификатор пользователя
      *
      * @return array
+     *
+     * @throws AclessException
      */
-    public function shiftAccessRightFromRole(int $userId)
+    public function shiftAccessRightFromRole(int $userId): array
     {
         $sth = $this->getPSConnection()->prepare(
-            'INSERT INTO
+                    'INSERT INTO
                                   acless.access_right
+                                 (url_id,
+                                  user_id)
                                 SELECT 
                                   dr.url_id,
-                                  ur.user_id,
-                                  dr.is_allow,
-                                  dr.values
+                                  ur.user_id
                                 FROM
                                   acless.default_right dr 
                                 JOIN 
@@ -287,6 +306,7 @@ class AclessModify extends AclessAbstract
                                 DO UPDATE SET 
                                   is_allow = EXCLUDED.is_allow,
                                   values = EXCLUDED.values');
+
         $sth->execute(['user_id' => $userId]);
 
         return $sth->fetchAll();

@@ -15,28 +15,28 @@ class AclessModelResult extends DbResultItem
      *
      * @var null|\ReflectionClass
      */
-    protected $class = null;
+    protected $class;
 
     /**
      * Отражение метода модели
      *
      * @var null|\ReflectionMethod
      */
-    protected $method = null;
+    protected $method;
 
     /**
      * Отражение свойства модели
      *
      * @var null|\ReflectionProperty
      */
-    protected $property = null;
+    protected $property;
 
     /**
      * Аргументы выполнения
      *
-     * @var array|null
+     * @var array
      */
-    protected $args = null;
+    protected $args = [];
 
     /**
      * true - метод модели принимает аргументы в виде набора
@@ -49,11 +49,12 @@ class AclessModelResult extends DbResultItem
     /**
      * AclessModelResult constructor
      *
-     * @param \ReflectionClass $class
-     * @param \ReflectionMethod|null $method
-     * @param \ReflectionProperty|null $property
-     * @param array|null $args
-     * @param null $result
+     * @param \ReflectionClass $class - отражение класса модели
+     * @param \ReflectionMethod|null $method - отражение метода модели
+     * @param \ReflectionProperty|null $property - отражение свойства модели
+     * @param array|null $args - аргументы выполнения
+     * @param bool $isPlainArgs - true - метод модели принимает аргументы в виде набора, false - в виде ассоциативного массива
+     * @param null|mixed $result - результат
      */
     public function __construct(
         \ReflectionClass $class,
@@ -80,16 +81,6 @@ class AclessModelResult extends DbResultItem
     public function getClass(): ?\ReflectionClass
     {
         return $this->class;
-    }
-
-    /**
-     * Геттер для объекта класса модели
-     *
-     * @return null|object
-     */
-    public function getObject(): ?object
-    {
-        return $this->object;
     }
 
     /**
@@ -137,8 +128,8 @@ class AclessModelResult extends DbResultItem
      *
      * @param DbResultItem|null $rawResult
      */
-    public function setRawResult(?DbResultItem $rawResult)
+    public function setRawResult(?DbResultItem $rawResult): void
     {
-        $this->result = $rawResult->result ?? null;
+        $this->result = $rawResult ? $rawResult->result : null;
     }
 }
