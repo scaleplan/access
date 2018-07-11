@@ -11,7 +11,7 @@
         }
     },
     "require": {
-        "phpdocumentor/reflection-docblock": "dev-master",
+        "phpdocumentor/reflection-docblock": "~2.0",
         "symfony/yaml": "~3.0",
         "avtomon/RedisSingleton": "dev-master"
     },
