@@ -81,7 +81,7 @@ class AclessHelper
      *
      * @param \ReflectionProperty $property - Reflection-обертка для SQL-свойства
      * @param array $args - массив аргументов
-     * @param object|null $object - объект модели
+     * @param \object|null $object - объект модели
      *
      * @return array
      *

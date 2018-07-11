@@ -15,7 +15,7 @@ class AclessModelParent
      *
      * @param string $methodName - имя метода
      * @param array $args - аргументы
-     * @param object|null $object - объект модели
+     * @param \object|null $object - объект модели
      *
      * @return AclessModelResult
      *
@@ -88,12 +88,12 @@ class AclessModelParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return AclessModelResult|null
+     * @return AclessModelResult
      *
      * @throws AclessException
      * @throws \ReflectionException
      */
-    public static function __callStatic(string $methodName, array $args): ?AclessModelResult
+    public static function __callStatic(string $methodName, array $args): AclessModelResult
     {
         return self::checkModelMethodEssence($methodName, $args);
     }
@@ -104,12 +104,12 @@ class AclessModelParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return AclessModelResult|null
+     * @return AclessModelResult
      *
      * @throws AclessException
      * @throws \ReflectionException
      */
-    public function __call(string $methodName, array $args): ?AclessModelResult
+    public function __call(string $methodName, array $args): AclessModelResult
     {
         return self::checkModelMethodEssence($methodName, $args, $this);
     }

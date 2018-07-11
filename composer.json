@@ -12,6 +12,13 @@
     },
     "require": {
         "phpdocumentor/reflection-docblock": "~2.0",
-        "symfony/yaml": "~3.0"
-    }
+        "symfony/yaml": "~3.0",
+        "avtomon/RedisSingleton": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git@github.com:avtomon/RedisSingleton.git"
+        }
+    ]
 }
