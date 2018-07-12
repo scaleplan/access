@@ -1,6 +1,7 @@
 <?php
 
 namespace avtomon;
+use phpDocumentor\Reflection\DocBlock;
 
 /**
  * Родитель для контроллеров - проверка прав доступа, фильтрация параметров
@@ -148,7 +149,7 @@ abstract class AclessControllerParent
 
         $method = $refclass->getMethod($methodName);
         $acless = Acless::create();
-        if (empty($doc = $method->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig('acless_label')))) {
+        if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($acless->getConfig('acless_label')))) {
             throw new AclessException("Метод $methodName не доступен", 20);
         }
 

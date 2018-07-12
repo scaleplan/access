@@ -2,7 +2,8 @@
 
 namespace avtomon;
 
-use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\DocBlock;
+use PhpParser\Comment\Doc;
 
 /**
  * Класс исключений
@@ -28,13 +29,6 @@ class Acless extends AclessAbstract
      * @var null|Acless
      */
     protected static $instance;
-
-    /**
-     * Фабрика phpdoc-блоков
-     *
-     * @var null|DocBlockFactory
-     */
-    public $docBlockFactory;
 
     /**
      * Разделитель значений фильтров
@@ -92,7 +86,7 @@ class Acless extends AclessAbstract
      */
     public function checkMethodRights(\Reflector $refMethod, array $args, \ReflectionClass $refClass = null): bool
     {
-        if (empty($docBlock = $this->docBlockFactory->create($refMethod->getDocComment())) || empty($tag = $docBlock->getTagsByName($this->config['acless_label']))) {
+        if (empty($docBlock = new DocBlock($refMethod)) || empty($tag = $docBlock->getTagsByName($this->config['acless_label']))) {
             return true;
         }
 
@@ -259,7 +253,7 @@ class Acless extends AclessAbstract
         };
 
         foreach ($refClass->getMethods() as $method) {
-            if (empty($doc = $method->getDocComment()) || empty($docBlock = $this->docBlockFactory->create($method->getDocComment())) || empty($docBlock->getTagsByName($this->config['acless_label']))) {
+            if (empty($doc = $method->getDocComment()) || empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($this->config['acless_label']))) {
                 continue;
             }
 

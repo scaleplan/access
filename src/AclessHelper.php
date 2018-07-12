@@ -2,7 +2,7 @@
 
 namespace avtomon;
 
-use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\DocBlock;
 
 /**
  * Класс хэлперов
@@ -94,7 +94,7 @@ class AclessHelper
             $property->setAccessible(true);
         }
 
-        $docBlock = DocBlockFactory::createInstance()->create($property->getDocComment());
+        $docBlock = new DocBlock($property);
         $allParams = $optionParams = [];
         $docParams = $docBlock->getTagsByName('param');
         if ($docParams) {

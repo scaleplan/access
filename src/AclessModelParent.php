@@ -1,6 +1,8 @@
 <?php
 
 namespace avtomon;
+use phpDocumentor\Reflection\DocBlock;
+use PhpParser\Comment\Doc;
 
 /**
  * Родитель для моделей - для проверки аргументов
@@ -39,7 +41,7 @@ class AclessModelParent
         if ($refclass->hasMethod($methodName)) {
             $method = $refclass->getMethod($methodName);
 
-            if (empty($doc = $method->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
+            if (empty(empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
                 throw new AclessException("Метод $methodName не доступен", 20);
             }
 
@@ -63,7 +65,7 @@ class AclessModelParent
         if ($refclass->hasProperty($methodName)) {
             $property = $refclass->getProperty($methodName);
 
-            if (empty($doc = $property->getDocComment()) || empty($docBlock = $acless->docBlockFactory->create($doc)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
+            if (empty($docBlock = new DocBlock($property)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
                 throw new AclessException("Свойство $methodName не доступно", 20);
             }
 

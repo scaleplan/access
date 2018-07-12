@@ -2,7 +2,7 @@
 
 namespace avtomon;
 
-use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\DocBlock;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -119,7 +119,6 @@ abstract class AclessAbstract
         }
 
         $this->userId = $userId;
-        $this->docBlockFactory = DocBlockFactory::createInstance();
     }
 
     /**
