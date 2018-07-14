@@ -17,4 +17,10 @@ done
 
 UPPER_LANG=`echo "$TO_LANG" | awk '{print toupper($0)}'`
 
-`"$TRANS_PATH" -no-autocorrect "ru:$2" "file://$CURRENT_PATH/README.ru-RU.md" | sed -f translate.sed > "$CURRENT_PATH/README.$TO_LANG-$UPPER_LANG.md"`
+if [[ $TO_LANG = "en" ]]; then
+    DESC_FILE="$CURRENT_PATH/README.md"
+else
+    DESC_FILE="$CURRENT_PATH/README.$TO_LANG-$UPPER_LANG.md"
+fi
+
+`"$TRANS_PATH" -no-autocorrect "ru:$2" "file://$CURRENT_PATH/README.ru-RU.md" | sed -f translate.sed > "$DESC_FILE"`

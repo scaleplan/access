@@ -14,3 +14,4 @@ s/` /`/g
 s/- `\$/\t- `$/g
 s/- \[`/  - [`/g
 s/<\/ small>/<\/small>/g
+s/docs_ru/docs_en/g

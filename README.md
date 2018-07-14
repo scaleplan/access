@@ -1,14 +1,14 @@
 # Acless
 
-Система управления правами доступа + проверка типов аргументов.
+The system of access rights management + checking the types of arguments.
 
-### Установка
+### Installation
 
 ``
 composer reqire avtomon/acless
 ``
-<br>
-### Инициализация
+The <br>
+### Initialization
 
 ```
 cd vendor/avtomon/Acless
@@ -16,196 +16,196 @@ cd vendor/avtomon/Acless
 ./init schema data
 ```
 
-где schema и data необязательные параметры указывающие на необходимость генерации схемы Acless в базе данных и урлов API, файлов и введенных в конфигурации соответственно.
+where schema and data are optional parameters indicating the need to generate the Acless schema in the database and APIs, the files and entered in the configuration respectively.
 
-<br>
+The <br>
 
-### Механика работы
+### Mechanics of operation
 
-Вызывается метод контроллера извне класса контроллера. Каким образом это происходит неважно. 
+The controller method is called from outside the controller class. How this happens does not matter.
 
-Если метод публичный, либо в комментарии в методу указано значение директивы *acless_no_rights_check*
-конфигурации, система не задействуется и выполнение происходит как обычно. 
-Если метод приватный (модификаторы доступа private и protected) и если  указан специальный phpdoc-тег обработки метода системой Acless (значение директивы acless_label конфигурации), то происходит запрос к базе данных, проверящий возможность исполнения метода с пришедшими параметрами и для определенного пользователя (идентификатор пользователя задается при создании объектов Acless).
+If the method is public, or in the comment, the method's value is specified in the method * acless_no_rights_check *
+configuration, the system is not enabled and execution occurs as usual.
+If the method is private (access modifiers private and protected) and if a special phpdoc-tag of the method's processing is specified by the system Acless (the value of the acless_label configuration directive), then a query is made to the database, which checks whether the method can execute with the parameters arrived and for a specific user (user ID is set when creating Acless objects).
 
-Например:
+For example:
 
 ```
 class User
 {
-    /**
-     * Get user object
-     *
-     * @aclessMethod
-     *
-     * @param int $id - user identifier
-     *
-     * @return UserAbstract
-     */
-    protected static function get(int $id): UserAbstract
-    {
-        // ...
-    }
+/ **
+* Get user object
+*
+* @aclessMethod
+*
+* @param int $id - user identifier
+*
+* @return UserAbstract
+* /
+protected static function get (int $id): UserAbstract
+{
+// ...
+}
 }
 ```
 
-В данном примере будет проверяться доступ текущего пользователя к статическому методу get класса User для любых значений аргумента $id.
+In this example, the current user's access to the static get method of the User class will be checked for any values ​​of the $id argument.
 
-Однако, доступ можно определить для выполнения метода с определенными аргументами:
+However, you can define access to execute a method with certain arguments:
 
 ```
-     /**
-     * Get user object
-     *
-     * @aclessMethod
-     *
-     * @aclessFilter id
-     *
-     * @param int $id - user identifier
-     *
-     * @return UserAbstract
-     */
-    protected static function actionGet(int $id): UserAbstract
-    {
-        // ...
-    }
+/ **
+* Get user object
+*
+* @aclessMethod
+*
+* @aclessFilter id
+*
+* @param int $id - user identifier
+*
+* @return UserAbstract
+* /
+protected static function actionGet (int $id): UserAbstract
+{
+// ...
+}
 ```
 
-В этом примере доступ будет разрешен только если значение фильтрующего аргумента $id входит в список разрешенных значений, хранящийся в базе данных (столбец *values* таблицы *access_right*). А список в базе данных будет иметь вид:
+In this example, access is allowed only if the value of the filter argument $id is included in the list of allowed values ​​stored in the database (the * values ​​* column of the table * access_right *). A list in the database will look like:
 
 ``
-ARRAY['<значение фильтра 1>, <значение фильтра 2', ...]
+ARRAY ['<filter value 1>, <filter value 2', ...]
 ``
 
-Фильтровать можно и по нескольким аргументам:
+You can filter by several arguments:
 
 ```
-     /**
-     * Set user role
-     *
-     * @aclessMethod
-     *
-     * @aclessFilter id, role
-     *
-     * @param int $id - user identifier
-     * @param string $role - user role
-     *
-     * @return void
-     */
-    protected static function actionSetRole(int $id, string $role): void
-    {
-        // ...
-    }
+/ **
+* Set user role
+*
+* @aclessMethod
+*
+* @aclessFilter id, role
+*
+* @param int $id - user identifier
+* @param string $role - user role
+*
+* @return void
+* /
+protected static function actionSetRole (int $id, string $role): void
+{
+// ...
+}
 ```
 
-В этом случае в список разрешенных начений будет иметь формат 
+In this case, the list of permitted
 ```
-ARRAY['<значение для первого фильтра><разделитель><значение для второго фильтра>...', ...]
+ARRAY ['<value for the first filter> <separator> <value for the second filter> ...', ...]
 ```
 
-Таким образом для того чтобы разрешить выполнение метода ```User::setRole(21, 'Moderator')``` необходимо чтобы в списке разрешенных значений было значение `21:Moderator`, для раздклителя по умолчанию <b>:</b>
+Thus, in order to allow the execution of the method ```User :: setRole (21, 'Moderator')```it is necessary that the list of allowed values ​​be set to `21: Moderator`, for the default splitter <b>: </ b >
 
-Модуль поддерживает проверку типов входных параметров. Php 7 поддерживает type hinting для проверки типов, однако, Acless действует более интеллектуально:
+The module supports checking the types of input parameters. Php 7 supports type hinting for type checking, however, Acless acts more intelligently:
 
-1. В PHP аргументы метода и возвращаемый тип могут иметь только один тип:
- 
-    ``
- protected static function setRole(int $id, string $role): void
- ``
- 
-    Если же мы хотим типизацию с несколькими типами как, например, в C# или TypeScript:
- 
-    ``
- setMultiData(object: HTMLElement | NodeList, data: Object | Object[] | string = this.data): HTMLElement | NodeList
- ``
- 
-    то нативный PHP не позволит вам это сделать.
- 
-    Подсистема проверки типов Acless может ориентироваться на *PHPDOC* и проверять значения на соответствие нескольким типам если они указаны в *PHPDOC*:
+1. In PHP, the method arguments and the return type can have only one type:
 
-    ```
-     /**
-     * Set user role
-     *
-     * @aclessMethod
-     *
-     * @aclessFilter id, role
-     *
-     * @param int|string $id - user identifier
-     * @param string|IRole $role - user role
-     *
-     * @return UserAbstract|void
-     */
-    protected static function actionSetRole(int $id, string $role)
-    {
-        // ...
-    }
+``
+protected static function setRole (int $id, string $role): void
+``
 
-2. По умолчанию значение аргумента может считаться "правильным", даже если его тип не соответствует ожидаемому, но значение, приведенное к ожидаемому типу (или к одному из ожидаемых) не отличается от исходного при нечетком сравнении (==). Это поведение можно отключить задав тег из директивы конфигурации *deny_fuzzy* для метода.
+If we want to type with several types, such as in C # or TypeScript:
 
-Этот функционал доступен Как для методов контроллеров такое для методов моделей.
-<br>
+``
+setMultiData (object: HTMLElement | NodeList, data: Object | Object [] | string = this.data): HTMLElement | NodeList
+``
 
-Модуль поддерживает генерацию урлов на методы API из файлов контроллеров.
+then native PHP will not allow you to do this.
 
-Для этого необходимо лишь задать необходимые директивы конфигурации в файле конфигурации Acless.
+The Acless type checking subsystem can target * PHPDOC * and check the values ​​for matching to several types if they are specified in * PHPDOC *:
+
+```
+/ **
+* Set user role
+*
+* @aclessMethod
+*
+* @aclessFilter id, role
+*
+* @param int | string $id - user identifier
+* @param string | IRole $role - user role
+*
+* @return UserAbstract | void
+* /
+protected static function actionSetRole (int $id, string $role)
+{
+// ...
+}
+
+2. By default, the value of the argument can be considered "correct", even if its type does not match the expected one, but the value returned to the expected type (or to one of the expected ones) does not differ from the original in the case of fuzzy comparison (==). This behavior can be turned off by setting a tag from the * deny_fuzzy * configuration directive for the method.
+
+This functionality is available. As for the methods of controllers, this is for the methods of models.
+The <br>
+
+The module supports the generation of URLs to API methods from controller files.
+
+To do this, you only need to specify the necessary configuration directives in the Acless configuration file.
 
 ```
 controllers:
-  - path: /var/www/project/controllers
-    method_prefix: action
-    namespace: app\controllers
-``` 
+- path:/var/www/project/controllers
+method_prefix: action
+namespace: app\controllers
+```
 
-После генерации автоматически заполняется таблица *acless.url*
-<br>
+After generation, the table * acless.url *
+The <br>
 
-В конфигурационном файле можно задать роли пользователей системы
+In the configuration file, you can specify the roles of the users of the system
 
 ```
 roles:
-  - Администратор
-  - Модератор
-  - Слушатель
-  - Гость
+- Administrator
+- Moderator
+- Listener
+- A guest
 ```
-Зачем эти роли можно привязать к реально существующим пользователям, зарегистрированным в системе и выставить права доступа по умолчанию для каждой роли.
+Why these roles can be linked to existing users registered in the system and set the default access rights for each role.
 
-Не смотря на это, далее права доступа для любого пользователя можно менять независимо от начального набора прав - права доступа по умолчанию существуют лишь чтобы задать можно было автоматически выдать набор прав пользователю.
+In spite of this, further access rights for any user can be changed irrespective of the initial set of rights - access rights by default exist only to specify it was possible to automatically give out a set of rights to the user.
 
-Модуль поддерживает управление правами доступа для приватных файлов. Механизм работы такой же как и для API. По сути, системе всё равно работает она с урлами для методов контроллеров или с углами приватных файлов. Для генерации ссылок на файлы надо лишь задать в конфиге директории в которых эти файлы хранятся:
+The module supports the management of access rights for private files. The mechanism of operation is the same as for the API. In fact, the system still works with URLs for methods of controllers or with corners of private files. To generate links to files, you only need to specify in the config directory where these files are stored:
 ```
 files:
-    - /var/www/project/view/private/materials
+-/var/www/project/view/private/materials
 ```
 
-Дополнительные урлы для проверки можно задать просто записав их в конфигурационный файл в директиву urls:
+Additional URLs for verification can be specified simply by writing them to the configuration file in the urls directive:
 
 ```
 urls:
-  - /var/www/project/file.jpg
-  - /var/www/project/get-a-lot-of-money
+- /var/www/project/file.jpg
+-/var/www/project/get-a-lot-of-money
 ```
 
-<br>
+The <br>
 
-Для корректной работы с методами котроллеров необходимо, чтобы обрабатываемые классы контроллеров наследовались от класса AclessControllerParent. Для проверки аргументов методов моделей надо необходимо наследовать классы моделей от класса AclessModelParent.
-<br>
+To work correctly with the methods of controllers, it is necessary that the classes of controllers to be processed are inherited from the class AclessControllerParent. To test the arguments of the model methods, you need to inherit the classes of models from the class AclessModelParent.
+The <br>
 
-Основное хранилище данных системы это PostgreSQL. Однако данные необходимые для проверки прав доступа кэшируются в хранилище Redis. Для увеличения производительности. 
+The main data store of the system is PostgreSQL. However, the data needed to verify access rights is cached in the Redis repository. To increase productivity.
 
-При изменении данных в основном хранилище (PostgreSQL) данные в кэше (Redis) автоматически обновляются по триггеру. Для того, чтобы триггер корректно выполнялся пользователь процесса PostgreSQL должен иметь доступ к хранилищу Redis.
+When data is changed in the main repository (PostgreSQL), the data in the cache (Redis) is automatically updated by the trigger. In order for the trigger to be executed correctly by the user of the process, PostgreSQL must have access to the Redis repository.
 
-<br>
+The <br>
 
-#### Дополнительный функционал:
+#### Additional Features:
 
-1. Поддерживает добавление коллбеков выполняющихся до и после успешного исполнения метода контроллера. При этом эти колбеки могут менять входные данные и получившийся результат соответственно.
+1. Supports the addition of collbacks that run before and after the successful execution of the controller method. In this case, these bulbs can change the input data and the resulting result, respectively.
 
-2. Во время инициализации модуль выкачивает из базы данных название всех таблиц базы данных. В дальненйшем доступ к этим таблицам будет обрабатываться подсистемой проверки прав. Вы может как угодно править эту информацию в базе данных.
+2. During initialization, the module downloads the name of all the database tables from the database. In the future, access to these tables will be handled by the rights checking subsystem. You can either edit this information in the database.
 
-3. Дополнительно в БД можно задать тип метода контроллера, он же тип методы API, чтобы знать какой метод будет изменяющим, удаляющим, создающим или читающим, это может быть удобно для фильтрации методов контроллеров в пользовательском интерфейсе.
+3. In addition to the database, you can specify the type of controller method, the same type of API methods to know which method will be modifying, deleting, creating or reading, it can be convenient for filtering the methods of controllers in the user interface.
 
-<br>
+The <br>
 
-[Документация](docs_ru)
+[Documentation](docs_en)
