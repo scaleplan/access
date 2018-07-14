@@ -7,7 +7,7 @@ The system of access rights management + checking the types of arguments.
 ``
 composer reqire avtomon/acless
 ``
-The <br>
+<br>
 ### Initialization
 
 ```
@@ -18,7 +18,7 @@ cd vendor/avtomon/Acless
 
 where schema and data are optional parameters indicating the need to generate the Acless schema in the database and APIs, the files and entered in the configuration respectively.
 
-The <br>
+<br>
 
 ### Mechanics of operation
 
@@ -144,7 +144,7 @@ protected static function actionSetRole (int $id, string $role)
 2. By default, the value of the argument can be considered "correct", even if its type does not match the expected one, but the value returned to the expected type (or to one of the expected ones) does not differ from the original in the case of fuzzy comparison (==). This behavior can be turned off by setting a tag from the * deny_fuzzy * configuration directive for the method.
 
 This functionality is available. As for the methods of controllers, this is for the methods of models.
-The <br>
+<br>
 
 The module supports the generation of URLs to API methods from controller files.
 
@@ -158,7 +158,7 @@ namespace: app\controllers
 ```
 
 After generation, the table * acless.url *
-The <br>
+<br>
 
 In the configuration file, you can specify the roles of the users of the system
 
@@ -187,16 +187,16 @@ urls:
 -/var/www/project/get-a-lot-of-money
 ```
 
-The <br>
+<br>
 
 To work correctly with the methods of controllers, it is necessary that the classes of controllers to be processed are inherited from the class AclessControllerParent. To test the arguments of the model methods, you need to inherit the classes of models from the class AclessModelParent.
-The <br>
+<br>
 
 The main data store of the system is PostgreSQL. However, the data needed to verify access rights is cached in the Redis repository. To increase productivity.
 
 When data is changed in the main repository (PostgreSQL), the data in the cache (Redis) is automatically updated by the trigger. In order for the trigger to be executed correctly by the user of the process, PostgreSQL must have access to the Redis repository.
 
-The <br>
+<br>
 
 #### Additional Features:
 
@@ -206,6 +206,6 @@ The <br>
 
 3. In addition to the database, you can specify the type of controller method, the same type of API methods to know which method will be modifying, deleting, creating or reading, it can be convenient for filtering the methods of controllers in the user interface.
 
-The <br>
+<br>
 
 [Documentation](docs_en)
