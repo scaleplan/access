@@ -98,7 +98,8 @@ protected static function actionSetRole (int $id, string $role): void
 }
 ```
 
-In this case, the list of permitted
+In this case, the list of allowed occurrences will have the format:
+
 ```
 ARRAY ['<value for the first filter> <separator> <value for the second filter> ...', ...]
 ```
@@ -115,9 +116,10 @@ protected static function setRole (int $id, string $role): void
 
 If we want to type with several types, such as in C # or TypeScript:
 
-``
+```
 setMultiData (object: HTMLElement | NodeList, data: Object | Object [] | string = this.data): HTMLElement | NodeList
-``
+
+```
 
 then native PHP will not allow you to do this.
 
@@ -138,8 +140,9 @@ The Acless type checking subsystem can target * PHPDOC * and check the values â€
 * /
 protected static function actionSetRole (int $id, string $role)
 {
-// ...
+
 }
+```
 
 2. By default, the value of the argument can be considered "correct", even if its type does not match the expected one, but the value returned to the expected type (or to one of the expected ones) does not differ from the original in the case of fuzzy comparison (==). This behavior can be turned off by setting a tag from the * deny_fuzzy * configuration directive for the method.
 
@@ -174,6 +177,7 @@ Why these roles can be linked to existing users registered in the system and set
 In spite of this, further access rights for any user can be changed irrespective of the initial set of rights - access rights by default exist only to specify it was possible to automatically give out a set of rights to the user.
 
 The module supports the management of access rights for private files. The mechanism of operation is the same as for the API. In fact, the system still works with URLs for methods of controllers or with corners of private files. To generate links to files, you only need to specify in the config directory where these files are stored:
+
 ```
 files:
 -/var/www/project/view/private/materials

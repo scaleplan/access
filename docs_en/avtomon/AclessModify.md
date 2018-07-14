@@ -1,140 +1,140 @@
-<small>avtomon</small>
+<small> avtomon </small>
 
 AclessModify
 ============
 
-Класс внесения изменений
+Class of change
 
-Описание
+Description
 -----------
 
 Class AclessModify
 
-Сигнатура
+Signature
 ---------
 
 - **class**.
-- Является подклассом класса [`AclessAbstract`](../avtomon/AclessAbstract.md).
+- It is a subclass of the class [`AclessAbstract`](../ avtomon/AclessAbstract.md).
 
-Свойства
+Properties
 ----------
 
-class устанавливает следующие свойства:
+class sets the following properties:
 
-- [`$instance`](#$instance) &mdash; Инстанс класса
+  - [`$instance`](#$instance) &mdash; Instance class
 
-### `$instance` <a name="instance"></a>
+### `$instance`<a name="instance"> </a>
 
-Инстанс класса
+Instance class
 
-#### Сигнатура
+#### Signature
 
-- **protected static** property.
-- Может быть одного из следующих типов:
-    - `null`
-    - [`AclessModify`](../avtomon/AclessModify.md)
+**protected static** property.
+- Can be one of the following types:
+- `null`
+  - [`AclessModify`](../ avtomon/AclessModify.md)
 
-Методы
+Methods
 -------
 
-Методы класса class:
+Class methods class:
 
-- [`loadAclessRights()`](#loadAclessRights) &mdash; Загрузить права доступа для текущего пользователя в кэш
-- [`initSQLScheme()`](#initSQLScheme) &mdash; Залить в базу данных схему для работы с Acless
-- [`initPersistentStorage()`](#initPersistentStorage) &mdash; Инициальзировать персистентное хранилище данных о правах доступа
-- [`addRoleAccessRight()`](#addRoleAccessRight) &mdash; Добавить/изменить права доступа по умолчанию для роли
-- [`addUserToRole()`](#addUserToRole) &mdash; Выдать роль пользователю
-- [`addAccessRight()`](#addAccessRight) &mdash; Добавить/изменить право дотупа
-- [`shiftAccessRightFromRole()`](#shiftAccessRightFromRole) &mdash; Создать право доступа для пользователя на основе прав для его роли
+  - [`loadAclessRights()`](#loadAclessRights) &mdash; Load the current user's access rights into the cache
+- [initSQLScheme() `](#initSQLScheme) &mdash; Fill in the database the scheme for working with Acless
+  - [`initPersistentStorage()`](#initPersistentStorage) &mdash; Initiate a persistent storage of access rights data
+  - [`addRoleAccessRight()`](#addRoleAccessRight) &mdash; Add/Change the default permissions for the role
+  - [`addUserToRole()`](#addUserToRole) &mdash; Give the role to the user
+  - [`addAccessRight()`](#addAccessRight) &mdash; Add/change right of grant
+  - [`shiftAccessRightFromRole()`](#shiftAccessRightFromRole) &mdash; Create an access right for a rights-based user for its role
 
-### `loadAclessRights()` <a name="loadAclessRights"></a>
+### `loadAclessRights()`<a name="loadAclessRights"> </a>
 
-Загрузить права доступа для текущего пользователя в кэш
+Load the current user's access rights into the cache
 
-#### Сигнатура
+#### Signature
 
 - **public** method.
-- Ничего не возвращает.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
-    - `avtomon\RedisSingletonException`
+- Returns nothing.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+- `avtomon\RedisSingletonException`
 
-### `initSQLScheme()` <a name="initSQLScheme"></a>
+### `initSQLScheme()`<a name="initSQLScheme"> </a>
 
-Залить в базу данных схему для работы с Acless
+Fill in the database the scheme for working with Acless
 
-#### Сигнатура
+#### Signature
 
 - **protected** method.
-- Возвращает `int` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+Returns the int value.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 
-### `initPersistentStorage()` <a name="initPersistentStorage"></a>
+### `initPersistentStorage()`<a name="initPersistentStorage"> </a>
 
-Инициальзировать персистентное хранилище данных о правах доступа
+Initiate a persistent storage of access rights data
 
-#### Сигнатура
-
-- **public** method.
-- Возвращает `int` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
-
-### `addRoleAccessRight()` <a name="addRoleAccessRight"></a>
-
-Добавить/изменить права доступа по умолчанию для роли
-
-#### Сигнатура
+#### Signature
 
 - **public** method.
-- Может принимать следующий параметр(ы):
-    - `$url_id` (`int`) &mdash; - идентификатор урла
-    - `$role` (`string`) &mdash; - наименование роли
-- Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+Returns the int value.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 
-### `addUserToRole()` <a name="addUserToRole"></a>
+### `addRoleAccessRight()`<a name="addRoleAccessRight"> </a>
 
-Выдать роль пользователю
+Add/Change the default permissions for the role
 
-#### Сигнатура
+#### Signature
 
 - **public** method.
-- Может принимать следующий параметр(ы):
-    - `$user_id` (`int`) &mdash; - идентификатор пользователя
-    - `$role` (`string`) &mdash; - наименование роли
-- Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+- It can take the following parameter (s):
+	- `$url_id`(`int`) &mdash; - identifier URL
+	- `$role`(`string`) &mdash; - name of the role
+Returns the `array`value.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 
-### `addAccessRight()` <a name="addAccessRight"></a>
+### `addUserToRole()`<a name="addUserToRole"> </a>
 
-Добавить/изменить право дотупа
+Give the role to the user
 
-#### Сигнатура
-
-- **public** method.
-- Может принимать следующий параметр(ы):
-    - `$url_id` (`int`) &mdash; - идентификатор урла
-    - `$user_id` (`int`) &mdash; - идентификатор пользователя
-    - `$is_allow` (`bool`) &mdash; - $values будут разрешающими или запрещающими
-    - `$values` (`array`) &mdash; - с какими значения фильтра разрешать/запрещать доступ
-- Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
-
-### `shiftAccessRightFromRole()` <a name="shiftAccessRightFromRole"></a>
-
-Создать право доступа для пользователя на основе прав для его роли
-
-#### Сигнатура
+#### Signature
 
 - **public** method.
-- Может принимать следующий параметр(ы):
-    - `$userId` (`int`) &mdash; - идентификатор пользователя
-- Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+- It can take the following parameter (s):
+	- `$user_id`(`int`) &mdash; - user ID
+	- `$role`(`string`) &mdash; - name of the role
+Returns the `array`value.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+
+### `addAccessRight()`<a name="addAccessRight"> </a>
+
+Add/change right of grant
+
+#### Signature
+
+- **public** method.
+- It can take the following parameter (s):
+	- `$url_id`(`int`) &mdash; - identifier URL
+	- `$user_id`(`int`) &mdash; - user ID
+	- `$is_allow`(`bool`) &mdash; - $values ​​will be permissive or prohibitive
+	- `$values`(`array`) &mdash; - with what filter values ​​to allow/deny access
+Returns the `array`value.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+
+### `shiftAccessRightFromRole()`<a name="shiftAccessRightFromRole"> </a>
+
+Create an access right for a rights-based user for its role
+
+#### Signature
+
+- **public** method.
+- It can take the following parameter (s):
+	- `$userId`(`int`) &mdash; - user ID
+Returns the `array`value.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 
