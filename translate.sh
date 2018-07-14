@@ -11,7 +11,7 @@ cp -r $SRC_DIR/* $DESC_DIR/
 
 find "$SRC_DIR/" -name '*.md' -type f -printf '%P\0' |
 while IFS= read -r -d '' file; do
-    `"$TRANS_PATH" -no-autocorrect "ru:$2" "file://$CURRENT_PATH/$SRC_DIR/$file" | sed -f translate.sed > "$CURRENT_PATH/$DESC_DIR/$file"`
+    `"$TRANS_PATH" -no-auto "ru:$2" "file://$CURRENT_PATH/$SRC_DIR/$file" | sed -f translate.sed > "$CURRENT_PATH/$DESC_DIR/$file"`
     #echo "$CURRENT_PATH/$FILE_DIR"
 done
 

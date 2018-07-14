@@ -13,7 +13,6 @@ s/#__ /#__/g
 s/` /`/g
 s/- `\$/\t- `$/g
 s/- \[`/  - [`/g
-s/<\/ small>/<\/small>/g
-s/<\/ b>/<\/b>/g
+s/<\/\s*\(.*\)\s*>/<\/\1>/g
 s/docs_ru/docs_en/g
 s/The <br>/<br>/g

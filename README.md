@@ -103,7 +103,7 @@ In this case, the list of permitted
 ARRAY ['<value for the first filter> <separator> <value for the second filter> ...', ...]
 ```
 
-Thus, in order to allow the execution of the method ```User :: setRole (21, 'Moderator')```it is necessary that the list of allowed values ​​be set to `21: Moderator`, for the default splitter <b>: </ b >
+Thus, in order to allow the execution of the method ```User :: setRole (21, 'Moderator')```it is necessary that the list of allowed values ​​be set to `21: Moderator`, for the default splitter <b>: </b >
 
 The module supports checking the types of input parameters. Php 7 supports type hinting for type checking, however, Acless acts more intelligently:
 
