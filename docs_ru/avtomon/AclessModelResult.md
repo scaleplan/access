@@ -92,6 +92,7 @@ false - в виде ассоциативного массива
 - [`getArgs()`](#getArgs) &mdash; Геттер для аргументов выполнения
 - [`getIsPlainArgs()`](#getIsPlainArgs) &mdash; Будут ли параметры выполнения загружаться в виде последовательности аргументов
 - [`setRawResult()`](#setRawResult) &mdash; Добавить результат из другого объекта DbResultItem
+- [`checkDocReturn()`](#checkDocReturn) &mdash; Проверить тип возвращаемого значения по типам заданным в DOCBLOCK
 
 ### `__construct()` <a name="__construct"></a>
 
@@ -172,4 +173,15 @@ AclessModelResult constructor
 - Может принимать следующий параметр(ы):
     - `$rawResult` (`avtomon\DbResultItem`|`null`)
 - Ничего не возвращает.
+
+### `checkDocReturn()` <a name="checkDocReturn"></a>
+
+Проверить тип возвращаемого значения по типам заданным в DOCBLOCK
+
+#### Сигнатура
+
+- **public** method.
+- Ничего не возвращает.
+- Выбрасывает одно из следующих исключений:
+    - [`avtomon\AclessException`](../avtomon/AclessException.md)
 

@@ -1,8 +1,8 @@
 <?php
 
 namespace avtomon;
+
 use phpDocumentor\Reflection\DocBlock;
-use PhpParser\Comment\Doc;
 
 /**
  * Родитель для моделей - для проверки аргументов
@@ -17,19 +17,18 @@ class AclessModelParent
      *
      * @param string $methodName - имя метода
      * @param array $args - аргументы
-     * @param \object|null $object - объект модели
      *
      * @return AclessModelResult
      *
      * @throws AclessException
      * @throws \ReflectionException
      */
-    protected static function checkModelMethodEssence(string $methodName, array $args, object $object = null): AclessModelResult
+    protected static function checkModelMethodEssence(string $methodName, array $args): AclessModelResult
     {
         $formatArgs = function (array &$args) use (&$methodName): array {
             $args = $args ? reset($args) : $args;
             if (!\is_array($args)) {
-                throw new AclessException("Метод $methodName принимает параметры в виде массива", 26);
+                throw new AclessException("Метод $methodName принимает параметры в виде массива");
             }
 
             return $args;
@@ -42,13 +41,13 @@ class AclessModelParent
             $method = $refclass->getMethod($methodName);
 
             if (empty(empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
-                throw new AclessException("Метод $methodName не доступен", 20);
+                throw new AclessException("Метод $methodName не доступен");
             }
 
             $isPlainArgs = empty($docBlock->getTagsByName($acless->getConfig('acless_array_arg')));
             if ($isPlainArgs) {
                 $formatArgs($args);
-                $args = AclessHelper::sanitizeMethodArgs($method, $args);
+                $args = (new AclessSanitize($method, $args))->sanitizeArgs();
             }
 
             $method->setAccessible(true);
@@ -66,11 +65,11 @@ class AclessModelParent
             $property = $refclass->getProperty($methodName);
 
             if (empty($docBlock = new DocBlock($property)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
-                throw new AclessException("Свойство $methodName не доступно", 20);
+                throw new AclessException("Свойство $methodName не доступно");
             }
 
             $formatArgs($args);
-            $args = AclessHelper::sanitizeSQLPropertyArgs($property, $args, $object);
+            $args = (new AclessSanitize($property, $args))->sanitizeArgs();
 
             return new AclessModelResult(
                 $refclass,
@@ -81,7 +80,7 @@ class AclessModelParent
             );
         }
 
-        throw new AclessException("Метод $methodName не существует", 33);
+        throw new AclessException("Метод $methodName не существует");
     }
 
     /**
@@ -113,6 +112,6 @@ class AclessModelParent
      */
     public function __call(string $methodName, array $args): AclessModelResult
     {
-        return self::checkModelMethodEssence($methodName, $args, $this);
+        return self::checkModelMethodEssence($methodName, $args);
     }
 }

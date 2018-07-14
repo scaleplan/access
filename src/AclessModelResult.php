@@ -1,6 +1,7 @@
 <?php
 
 namespace avtomon;
+use phpDocumentor\Reflection\DocBlock;
 
 /**
  * Класс результата выполнения модели
@@ -60,7 +61,7 @@ class AclessModelResult extends DbResultItem
         \ReflectionClass $class,
         \ReflectionMethod $method = null,
         \ReflectionProperty $property = null,
-        array $args = null,
+        array $args = [],
         bool $isPlainArgs = true,
         $result = null
     )
@@ -130,6 +131,26 @@ class AclessModelResult extends DbResultItem
      */
     public function setRawResult(?DbResultItem $rawResult): void
     {
-        $this->result = $rawResult ? $rawResult->result : null;
+        $this->result = $rawResult->result ?? null;
+    }
+
+    /**
+     * Проверить тип возвращаемого значения по типам заданным в DOCBLOCK
+     *
+     * @throws AclessException
+     */
+    public function checkDocReturn()
+    {
+        $docBlock = new DocBlock($this->method ?? $this->property);
+        $denyFuzzy = $docBlock->hasTag(Acless::create()->getConfig('deny_fuzzy'));
+        $returnTypes = $docBlock->getTagsByName('return');
+        $returnTypes = end($returnTypes);
+        $returnTypes = array_map(function ($item) {
+            return trim($item, '\\\ \0');
+        }, explode('|', $returnTypes));
+
+        if (!AclessSanitize::typeCheck($this->result, $types)) {
+            throw new AclessException("Тип возвращаемого значения не соответствует заданному типу $returnTypes");
+        }
     }
 }

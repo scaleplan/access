@@ -47,7 +47,7 @@ class AclessModify extends AclessAbstract
         switch ($this->config['cache_storage']) {
             case 'redis':
                 if (empty($this->config['redis']['socket'])) {
-                    throw new AclessException('В конфигурации не задан путь к Redis-сокету', 34);
+                    throw new AclessException('В конфигурации не задан путь к Redis-сокету');
                 }
 
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
@@ -62,7 +62,7 @@ class AclessModify extends AclessAbstract
 
                     if (!$this->cs->hMset("user_id:{$this->userId}", $hashValue))
                     {
-                        throw new AclessException('Не удалось записать права доступа в Redis', 35);
+                        throw new AclessException('Не удалось записать права доступа в Redis');
                     }
                 }
 
@@ -73,7 +73,7 @@ class AclessModify extends AclessAbstract
                 break;
 
             default:
-                throw new AclessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой", 36);
+                throw new AclessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой");
         }
     }
 
@@ -101,7 +101,7 @@ class AclessModify extends AclessAbstract
     public function initPersistentStorage(): int
     {
         if (!$this->initSQLScheme()) {
-            throw new AclessException('Не удалось создать необходимые объекты базы данных', 37);
+            throw new AclessException('Не удалось создать необходимые объекты базы данных');
         }
 
         $urlsCount = 0;
@@ -197,15 +197,15 @@ class AclessModify extends AclessAbstract
     {
         $role = $role ?? $this->config['default_role'];
         if (!$role) {
-            throw new AclessException('Не задана роль по умолчанию', 38);
+            throw new AclessException('Не задана роль по умолчанию');
         }
 
         if (empty($this->config['roles'])) {
-            throw new AclessException('Список ролей пуст', 39);
+            throw new AclessException('Список ролей пуст');
         }
 
         if (!\in_array($role, $this->config['roles'], true)) {
-            throw new AclessException('Заданная роль не входит в список доступных ролей', 40);
+            throw new AclessException('Заданная роль не входит в список доступных ролей');
         }
 
         $sth = $this->getPSConnection()->prepare(
@@ -221,7 +221,7 @@ class AclessModify extends AclessAbstract
                           *');
         $sth->execute(
             [
-                'role'     => $role,
+                'role'    => $role,
                 'user_id' => $user_id
             ]
         );

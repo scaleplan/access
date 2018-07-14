@@ -138,19 +138,19 @@ abstract class AclessControllerParent
     {
         $args = reset($args);
         if (!\is_array($args)) {
-            throw new AclessException("Метод $methodName принимает параметры в виде массива", 18);
+            throw new AclessException("Метод $methodName принимает параметры в виде массива");
         }
 
         $refclass = new \ReflectionClass(static::class);
 
         if (!$refclass->hasMethod($methodName)) {
-            throw new AclessException("Метод $methodName не существует", 19);
+            throw new AclessException("Метод $methodName не существует");
         }
 
         $method = $refclass->getMethod($methodName);
         $acless = Acless::create();
         if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($acless->getConfig('acless_label')))) {
-            throw new AclessException("Метод $methodName не доступен", 20);
+            throw new AclessException("Метод $methodName не доступен");
         }
 
         $isPlainArgs = empty($docBlock->getTagsByName($acless->getConfig('acless_array_arg')));
@@ -162,7 +162,7 @@ abstract class AclessControllerParent
             $acless->checkMethodRights($method, $args, $refclass);
         }
 
-        $args = $isPlainArgs ? AclessHelper::sanitizeMethodArgs($method, $args) : $args;
+        $args = $isPlainArgs ? (new AclessSanitize($method, $args))->sanitizeArgs() : $args;
 
         self::executeBeforeHandlers($method, $args);
 

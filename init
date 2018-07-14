@@ -1,0 +1,21 @@
+#!/usr/bin/php
+
+<?php
+
+use avtomon\AclessModify;
+
+$am = AclessModify::create(0);
+
+if ($argv[1] === 'schema' || $argv[2] === 'schema') {
+    /**
+     * Иницализация схемы хранения
+     */
+    $am->initSQLScheme();
+}
+
+if ($argv[1] === 'data' || $argv[2] === 'data') {
+    /**
+     * Генерация
+     */
+    $am->initPersistentStorage();
+}

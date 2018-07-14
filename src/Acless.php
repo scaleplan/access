@@ -24,6 +24,16 @@ class AclessException extends CustomException
 class Acless extends AclessAbstract
 {
     /**
+     * Код ошибки Acless указывающий на закрытый доступ к ресурсу
+     */
+    public const ACLESS_403_ERROR_CODE = 43;
+
+    /**
+     * Код ошибки Acless указывающий на неразрешенный неавторизованный запрос
+     */
+    public const ACLESS_UNAUTH_ERROR_CODE = 47;
+
+    /**
      * Инстанс класса
      *
      * @var null|Acless
@@ -52,7 +62,7 @@ class Acless extends AclessAbstract
         switch ($this->config['cache_storage']) {
             case 'redis':
                 if (empty($this->config['redis']['socket'])) {
-                    throw new AclessException('В конфигурации не задан путь к Redis-сокету', 41);
+                    throw new AclessException('В конфигурации не задан путь к Redis-сокету');
                 }
 
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
@@ -68,7 +78,7 @@ class Acless extends AclessAbstract
                 return $url ? ($_SESSION['access_rights'][$url] ?? []) : array_filter($_SESSION['access_rights']);
 
             default:
-                throw new AclessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой", 42);
+                throw new AclessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой");
         }
     }
 
@@ -94,10 +104,10 @@ class Acless extends AclessAbstract
         $url = $this->methodToURL($className, $refMethod->getName());
         if (empty($accessRight = $this->getAccessRights($url))) {
             if ($this->getUserId() === $this->getConfig('guest_user_id')) {
-                throw new AclessException('Авторизуйтесь на сайте', 47);
+                throw new AclessException('Авторизуйтесь на сайте', self::ACLESS_UNAUTH_ERROR_CODE);
             }
 
-            throw new AclessException('Метод не разрешен Вам для выпонения', 43);
+            throw new AclessException('Метод не разрешен Вам для выпонения', self::ACLESS_403_ERROR_CODE);
         }
 
         if (empty($tag = $docBlock->getTagsByName($this->config['acless_filter_label']))) {
@@ -114,7 +124,7 @@ class Acless extends AclessAbstract
             }, json_decode($accessRight['values'], true));
 
             if (empty($args)) {
-                throw new AclessException('Список параметров выполнения действия пуст', 44);
+                throw new AclessException('Список параметров выполнения действия пуст');
             }
 
             $methodDefaults = null;
@@ -145,14 +155,14 @@ class Acless extends AclessAbstract
             }
 
             if (array_intersect($filters, array_keys($args)) !== $filters) {
-                throw new AclessException('Список параметров выполнения действия не содержит все фильтрующие параметры', 44);
+                throw new AclessException('Список параметров выполнения действия не содержит все фильтрующие параметры');
             }
 
             if (
                 ($accessRight['is_allow'] && !\in_array($checkValue, $accessRight['values'], true))
                 || (!$accessRight['is_allow'] && \in_array($checkValue, $accessRight['values'], true))
             ) {
-                throw new AclessException("Выполнение метода с такими параметрами $filters Вам не разрешено", 44);
+                throw new AclessException("Выполнение метода с такими параметрами $filters Вам не разрешено");
             }
         }
 
@@ -173,10 +183,10 @@ class Acless extends AclessAbstract
     {
         if (empty($accessRight = $this->getAccessRights($filePath))) {
             if ($this->getUserId() === $this->getConfig('guest_user_id')) {
-                throw new AclessException('Авторизуйтесь на сайте', 47);
+                throw new AclessException('Авторизуйтесь на сайте', self::ACLESS_UNAUTH_ERROR_CODE);
             }
 
-            throw new AclessException('Файл Вам не доступен', 43);
+            throw new AclessException('Файл Вам не доступен', self::ACLESS_403_ERROR_CODE);
         }
 
         return true;
@@ -196,7 +206,7 @@ class Acless extends AclessAbstract
     {
         foreach ($this->config['controllers'] as $controllerDir) {
             if (empty($controllerDir['path'])) {
-                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"', 45);
+                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
             }
 
             $className = str_replace($controllerDir['namespace'], '', $className);
@@ -253,7 +263,7 @@ class Acless extends AclessAbstract
         };
 
         foreach ($refClass->getMethods() as $method) {
-            if (empty($doc = $method->getDocComment()) || empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($this->config['acless_label']))) {
+            if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($this->config['acless_label']))) {
                 continue;
             }
 

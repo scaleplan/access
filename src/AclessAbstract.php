@@ -56,7 +56,7 @@ abstract class AclessAbstract
      *
      * @return AclessAbstract
      */
-    public static function create(int $userId = -1, string $confPath = __DIR__ . '/config.yml'): AclessAbstract
+    public static function create(int $userId = -1, string $confPath = __DIR__ . '../config.yml'): AclessAbstract
     {
         if (!static::$instance) {
             $className = static::class;
@@ -79,43 +79,43 @@ abstract class AclessAbstract
         $this->config = Yaml::parse(file_get_contents($confPath));
 
         if (empty($this->config)) {
-            throw new AclessException('Отсутствует конфигурация', 1);
+            throw new AclessException('Отсутствует конфигурация');
         }
 
         if (empty($this->config['persistent_storage'])) {
-            throw new AclessException('В конфирурациии отсутствует указание постоянного хранилища', 2);
+            throw new AclessException('В конфирурациии отсутствует указание постоянного хранилища');
         }
 
         if (empty($this->config[$this->config['persistent_storage']])){
-            throw new AclessException('В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав', 3);
+            throw new AclessException('В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав');
         }
 
         if (empty($this->config['cache_storage'])) {
-            throw new AclessException('В конфирурациии отсутствует указание кефирующего хранилища', 4);
+            throw new AclessException('В конфирурациии отсутствует указание кефирующего хранилища');
         }
 
         if (empty($this->config[$this->config['cache_storage']])){
-            throw new AclessException('В конфигурации отсутствуют данные о подключениие к кэширующему хранилищу прав', 5);
+            throw new AclessException('В конфигурации отсутствуют данные о подключениие к кэширующему хранилищу прав');
         }
 
         if (!\is_array($this->config['roles'])){
-            throw new AclessException('Список ролей должен быть задан списком', 6);
+            throw new AclessException('Список ролей должен быть задан списком');
         }
 
         if (empty($this->config['acless_filter_label'])) {
-            throw new AclessException('В конфигурации отсутствует имя для метки фильтрующего аргумента', 7);
+            throw new AclessException('В конфигурации отсутствует имя для метки фильтрующего аргумента');
         }
 
         if (empty($this->config['acless_label'])) {
-            throw new AclessException('В конфигурации отсутствует имя метки Acless', 8);
+            throw new AclessException('В конфигурации отсутствует имя метки Acless');
         }
 
         if (empty($this->config['acless_separator'])) {
-            throw new AclessException('В конфигурации отсутствует разделитель фильтров', 8);
+            throw new AclessException('В конфигурации отсутствует разделитель фильтров');
         }
 
         if ($userId < 0) {
-            throw new AclessException('Неверное задан идентификатор пользователя', 9);
+            throw new AclessException('Неверное задан идентификатор пользователя');
         }
 
         $this->userId = $userId;
@@ -147,7 +147,7 @@ abstract class AclessAbstract
         switch ($this->config['persistent_storage']) {
             case 'postgresql':
                 if (empty($this->config['postgresql']) || empty($this->config['postgresql']['dns']) || empty($this->config['postgresql']['user']) || empty($this->config['postgresql']['password'])) {
-                    throw new AclessException('Недостаточно данных для подключения к PostgreSQL', 10);
+                    throw new AclessException('Недостаточно данных для подключения к PostgreSQL');
                 }
 
                 $this->ps = $this->ps ?? new \PDO(
@@ -162,7 +162,7 @@ abstract class AclessAbstract
                 return $this->ps;
 
             default:
-                throw new AclessException("Драйвер {$this->config['persistent_storage']} постоянного хранилища не поддерживается системой", 11);
+                throw new AclessException("Драйвер {$this->config['persistent_storage']} постоянного хранилища не поддерживается системой");
         }
     }
 

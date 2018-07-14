@@ -16,13 +16,20 @@ Class Acless
 - **class**.
 - Является подклассом класса [`AclessAbstract`](../avtomon/AclessAbstract.md).
 
+Константы
+---------
+
+class устанавливает следующие константы:
+
+- [`ACLESS_403_ERROR_CODE`](#ACLESS_403_ERROR_CODE) &mdash; Код ошибки Acless указывающий на закрытый доступ к ресурсу
+- [`ACLESS_UNAUTH_ERROR_CODE`](#ACLESS_UNAUTH_ERROR_CODE) &mdash; Код ошибки Acless указывающий на неразрешенный неавторизованный запрос
+
 Свойства
 ----------
 
 class устанавливает следующие свойства:
 
 - [`$instance`](#$instance) &mdash; Инстанс класса
-- [`$docBlockFactory`](#$docBlockFactory) &mdash; Фабрика phpdoc-блоков
 - [`$filterSeparator`](#$filterSeparator) &mdash; Разделитель значений фильтров
 
 ### `$instance` <a name="instance"></a>
@@ -35,17 +42,6 @@ class устанавливает следующие свойства:
 - Может быть одного из следующих типов:
     - `null`
     - [`Acless`](../avtomon/Acless.md)
-
-### `$docBlockFactory` <a name="docBlockFactory"></a>
-
-Фабрика phpdoc-блоков
-
-#### Сигнатура
-
-- **public** property.
-- Может быть одного из следующих типов:
-    - `null`
-    - `phpDocumentor\Reflection\DocBlockFactory`
 
 ### `$filterSeparator` <a name="filterSeparator"></a>
 
