@@ -1,9 +1,9 @@
-<small>avtomon </small>
+the <small>avtomon</small>
 
 AclessException
 ===============
 
-Exclusion class
+Exception class
 
 Description
 -----------
@@ -13,5 +13,5 @@ Class AclessException
 Signature
 ---------
 
--** class**.
--It is a subclass of the class`avtomon\CustomException`.
+- **class**.
+- Is a subclass of the class `avtomon\CustomException`.

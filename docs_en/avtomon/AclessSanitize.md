@@ -1,9 +1,9 @@
-<small>avtomon </small>
+the <small>avtomon</small>
 
 AclessSanitize
 ==============
 
-RuntimeCheckerClass
+Execution argument validation class
 
 Description
 -----------
@@ -13,179 +13,179 @@ Class AclessSanitize
 Signature
 ---------
 
--** class**.
+- **class**.
 
 Properties
 ----------
 
-classsets the followingproperties:
+class sets the following properties:
 
--[`$reflector`](#$reflector) &mdash; Method Reflection or SQLProperties
--[`$args`](#$args) &mdash; Array ofarguments
--[`$sanitizedArgs`](#$sanitizedArgs) &mdash; Array of pointedarguments
+- ['$reflector`](#$reflector) &mdash; reflection method or SQL properties
+- ['$args'](#$args) &mdash; array of arguments
+- ['$sanitizedArgs'](#$sanitizedArgs) &mdash; array of arguments
 
-###`$reflector`<a name="reflector"></a>
+### '$reflector '<a name= "reflector" ></a>
 
-MethodReflection or SQLProperties
-
-#### Signature
-
--** protected **property.
--Can be one of the followingtypes:
-  - [`ReflectionMethod`](http://php.net/class.ReflectionMethod)
-  - [`ReflectionProperty`](http://php.net/class.ReflectionProperty)
-
-###`$args`<a name="args"></a>
-
-Arrayofarguments
+Reflection of a method or SQL property
 
 #### Signature
 
--** protected **property.
--The value of`array`.
+- **protected * * property.
+- Can be one of the following types:
+    - ['ReflectionMethod'](http://php.net/class.ReflectionMethod)
+    - ['ReflectionProperty'](http://php.net/class.ReflectionProperty)
 
-###`$sanitizedArgs`<a name="sanitizedArgs"></a>
+### '$args '<a name= "args" ></a>
 
-Arrayof pointedarguments
+Array of arguments
 
 #### Signature
 
--** protected **property.
--Can be one of the followingtypes:
-- array
-- `null`
+- **protected * * property.
+- Value 'array'.
+
+### '$sanitizedArgs '<a name= "sanitizedArgs" ></a>
+
+Cleaned an array of arguments
+
+#### Signature
+
+- **protected * * property.
+- Can be one of the following types:
+    - 'array`
+    - 'null`
 
 Methods
 -------
 
-Classmethodsclass:
+Class methods class:
 
--[`__construct()`](#__construct) &mdash;Constructor
--[`sanitizeArgs()`](#sanitizeArgs) &mdash; Check and cleararguments
--[`sanitizeMethodArgs()`](#sanitizeMethodArgs) &mdash; Check methodarguments
--[`sanitizeSQLPropertyArgs()`](#sanitizeSQLPropertyArgs) &mdash; Check the arguments for the methodproperty
--[`argAvailabilityCheck()`](#argAvailabilityCheck) &mdash; Checking forarguments
--[`getDocParams()`](#getDocParams) &mdash; Return an array of DOCBLOCK parameters and a subgroup of optionalparameters
--[`docTypeCheck()`](#docTypeCheck) &mdash; Checking the arguments to match thetype
--[`typeCheck()`](#typeCheck) &mdash; Checking the value for thetype
--[`getSQLParams()`](#getSQLParams) &mdash; Get all the parameters from the SQLquery
+  - [`__construct (`' ](#__construct) &mdash; Constructor
+- ['sanitizeArgs()'](#sanitizeArgs) &mdash; Check and clear arguments
+- ['sanitizeMethodArgs()'](#sanitizeMethodArgs) &mdash; Check method arguments
+  - [`sanitizeSQLPropertyArgs()`](#sanitizeSQLPropertyArgs) &mdash; Check the arguments to the property method
+- ['argAvailabilityCheck (`' ](#argAvailabilityCheck) &mdash; Check for arguments
+- ['getDocParams()'](#getDocParams) &mdash; Return an array of DOCBLOCK parameters and a subgroup of optional parameters
+  - [`docTypeCheck()`](#docTypeCheck) &mdash; Check arguments for compliance with the type
+- ['typeCheck (`' ](#typeCheck) &mdash; Check the value for type match
+- ['getSQLParams()'](#getSQLParams) &mdash; Get all parameters from SQL query
 
-###`__construct()`<a name="__construct"></a>
+### `__construct() '<a name= "__construct " ></a>
 
-Constructor
-
-#### Signature
-
--** public **method.
--It can take the following parameter(s):
--`$reflector`([`Reflector`](http://php.net/class.Reflector)) &mdash; - method reflection or SQLproperties
--`$args`(`array`) &mdash; - array ofarguments
--Returnsnothing.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
-
-###`sanitizeArgs()`<a name="sanitizeArgs"></a>
-
-Checkand cleararguments
+Designer
 
 #### Signature
 
--** public **method.
-Returnsthe `array`value.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **public * * method.
+- Can take the following parameter (s):
+    - '$reflector ' (['Reflector']) (http://php.net/class.Reflector)) &mdash; - reflection of a method or SQL property
+    - '$args ' ('array`) &mdash; - array of arguments
+- It doesn't make it back.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 
-###`sanitizeMethodArgs()`<a name="sanitizeMethodArgs"></a>
+### 'sanitizeArgs()' <a name= "sanitizeArgs" ></a>
 
-Checkmethodarguments
-
-#### Signature
-
--** public static **method.
--It can take the following parameter(s):
--`$method`([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) &mdash; - Reflection wrapper formethod
--`$args`(`array`) &mdash; - array ofarguments
-Returnsthe `array`value.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
-
-###`sanitizeSQLPropertyArgs()`<a name="sanitizeSQLPropertyArgs"></a>
-
-Checkthe arguments for the methodproperty
+Check and clear arguments
 
 #### Signature
 
--** public static **method.
--It can take the following parameter(s):
--`$property`([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) &mdash; - Reflection-wrapper forSQL-property
--`$args`(`array`) &mdash; - array ofarguments
-Returnsthe `array`value.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **public * * method.
+- Returns 'array' value.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 
-###`argAvailabilityCheck()`<a name="argAvailabilityCheck"></a>
+### 'sanitizeMethodArgs()' <a name= "sanitizeMethodArgs" ></a>
 
-Checkingforarguments
+Check method arguments
 
 #### Signature
 
--** protected static **method.
--It can take the following parameter(s):
--`$paramName`(`string`) &mdash; - parametername
--`$args`(`array`) &mdash; - array ofarguments
--`$optionParams`(`array`) &mdash; - array of optionalparameters
--Returnsnothing.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **public static * * method.
+- Can take the following parameter (s):
+    - '$method ' (['ReflectionMethod']) (http://php.net/class.ReflectionMethod)) &mdash; - Reflection-wrapper for the method
+    - '$args ' ('array`) &mdash; - array of arguments
+- Returns 'array' value.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 
-###`getDocParams()`<a name="getDocParams"></a>
+### 'sanitizeSQLPropertyArgs()' <a name= "sanitizeSQLPropertyArgs" ></a>
 
-Returnan array of DOCBLOCK parameters and a subgroup of optionalparameters
-
-#### Signature
-
--** protected static **method.
--It can take the following parameter(s):
--`$docParams`(`array`) &mdash; - source array ofparameters
-Returnsthe `array`value.
-
-###`docTypeCheck()`<a name="docTypeCheck"></a>
-
-Checkingthe arguments to match thetype
+Check the arguments for the method property
 
 #### Signature
 
--** protected static **method.
--It can take the following parameter(s):
--`$arg`&mdash; - the value of theargument
--`$paramName`(`string`) &mdash; - name of theargument/parameter
--`$paramType`(`string`) &mdash; - required type or group oftypes
--`$docBlock`(`phpDocumentor\Reflection\DocBlock`) &mdash; - reference to the DOCBLOCK object of the method orproperty
--Returnsnothing.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **public static * * method.
+- Can take the following parameter (s):
+    - '$property ' (['ReflectionProperty']) (http://php.net/class.ReflectionProperty)) &mdash; - Reflection-wrapper for SQL properties
+    - '$args ' ('array`) &mdash; - array of arguments
+- Returns 'array' value.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 
-###`typeCheck()`<a name="typeCheck"></a>
+### 'argAvailabilityCheck (`'<a name= "argAvailabilityCheck" ></a>
 
-Checkingthe value for thetype
+Checking for arguments
 
 #### Signature
 
--** public static **method.
--It can take the following parameter(s):
--`$value`&mdash; -value
--`$types`(`array`) &mdash; - acceptedtypes
--`$denyFuzzy`(`bool`) &mdash; - Is a strict comparisonused?
--Returns the `bool`value.
+- **protected static * * method.
+- Can take the following parameter (s):
+    - '$paramName ' ('string`) &mdash; - parameter name
+    - '$args ' ('array`) &mdash; - array of arguments
+    - '$optionParams ' ('array`) &mdash; - array of optional parameters
+- It doesn't make it back.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 
-###`getSQLParams()`<a name="getSQLParams"></a>
+### 'getDocParams()' <a name= "getDocParams" ></a>
 
-Getall the parameters from the SQLquery
+Return an array of DOCBLOCK parameters and a subgroup of optional parameters
 
 #### Signature
 
--** public static **method.
--It can take the following parameter(s):
--`$sql`
-Returnsthe `array`value.
+- **protected static * * method.
+- Can take the following parameter (s):
+    - '$docParams ' ('array`) &mdash; - initial array of parameters
+- Returns 'array' value.
+
+### 'docTypeCheck()' <a name= "docTypeCheck" ></a>
+
+Check arguments for compliance with the type
+
+#### Signature
+
+- **protected static * * method.
+- Can take the following parameter (s):
+    - '$arg ' &mdash; - argument value
+    - '$paramName ' ('string`) &mdash; - argument/parameter name
+    - '$paramType ' ('string`) &mdash; - required type or group of types
+    - '$docBlock ' ('phpDocumentor\Reflection\DocBlock') &mdash; - reference the DOCBLOCK object of a method or property
+- It doesn't make it back.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+
+### 'typeCheck()' <a name= "typeCheck" ></a>
+
+Check the values for conformity to type
+
+#### Signature
+
+- **public static * * method.
+- Can take the following parameter (s):
+    - '$value ' &mdash; - value
+    - '$types ' ('array`) &mdash; - accepted types
+    - '$denyFuzzy ' ('bool`) &mdash; - whether strict comparison is used
+- Returns `bool ' value.
+
+### 'getSQLParams()' <a name= "getSQLParams" ></a>
+
+Get all parameters from SQL query
+
+#### Signature
+
+- **public static * * method.
+- Can take the following parameter (s):
+    - '$sql`
+- Returns 'array' value.
 

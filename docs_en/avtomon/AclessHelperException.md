@@ -1,4 +1,4 @@
-<small>avtomon </small>
+the <small>avtomon</small>
 
 AclessHelperException
 =====================
@@ -13,5 +13,5 @@ Class AclessHelperException
 Signature
 ---------
 
--** class**.
--It is a subclass of the class`avtomon\CustomException`.
+- **class**.
+- Is a subclass of the class `avtomon\CustomException`.

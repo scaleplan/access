@@ -1,9 +1,9 @@
-<small>avtomon </small>
+the <small>avtomon</small>
 
 AclessModify
 ============
 
-Classofchange
+Class of changes
 
 Description
 -----------
@@ -13,128 +13,128 @@ Class AclessModify
 Signature
 ---------
 
--** class**.
--It is a subclass of the class [`AclessAbstract`](../avtomon/AclessAbstract.md).
+- **class**.
+- Is a subclass of the class ['AclessAbstract'](../avtomon/AclessAbstract.md).
 
 Properties
 ----------
 
-classsets the followingproperties:
+class sets the following properties:
 
--[`$instance`](#$instance) &mdash; Instanceclass
+- ['$instance'](#$instance) &mdash; class Instance
 
-###`$instance`<a name="instance"></a>
+### '$instance '<a name= "instance" ></a>
 
-Instance class
+An instance of the class
 
 #### Signature
 
-**protected static **property.
--Can be one of the followingtypes:
-- `null`
--[`AclessModify`](../avtomon/AclessModify.md)
+- **protected static * * property.
+- Can be one of the following types:
+    - 'null`
+    - ['AclessModify'](../avtomon/AclessModify.md)
 
 Methods
 -------
 
-Classmethodsclass:
+Class methods class:
 
--[`loadAclessRights()`](#loadAclessRights) &mdash; Load the current user's access rights into thecache
--[initSQLScheme() `](#initSQLScheme) &mdash; Fill in the database the scheme for working withAcless
--[`initPersistentStorage()`](#initPersistentStorage) &mdash; Initiate a persistent storage of access rightsdata
--[`addRoleAccessRight()`](#addRoleAccessRight) &mdash; Add/change the default permissions for therole
--[`addUserToRole()`](#addUserToRole) &mdash; Give the role to theuser
--[`addAccessRight()`](#addAccessRight) &mdash; Add/change right ofgrant
--[`shiftAccessRightFromRole()`](#shiftAccessRightFromRole) &mdash; Create an access right for a rights-based user for itsrole
+  - [`loadAclessRights()`](#loadAclessRights) &mdash; Retrieve access rights for the current user in the cache
+  - [`initSQLScheme()'](#initSQLScheme) &mdash; Fill in the database schema to work with Acless
+- ['initPersistentStorage()'](#initPersistentStorage) &mdash; Initialize persistent storage of access rights data
+- ['addRoleAccessRight()'](#addRoleAccessRight) &mdash; check/change the default permissions for the role
+- ['addUserToRole()'](#addUserToRole) &mdash; Give role to user
+- ['addAccessRight()'](#addAccessRight) &mdash; Add/change dotup's right
+  - [`shiftAccessRightFromRole()`](#shiftAccessRightFromRole) &mdash; to Create a right of access for the user based on the rights for his role
 
-###`loadAclessRights()`<a name="loadAclessRights"></a>
+### 'loadAclessRights()' <a name= "loadAclessRights" ></a>
 
-Loadthe current user's access rights into thecache
-
-#### Signature
-
--** public **method.
--Returnsnothing.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
-- `avtomon\RedisSingletonException`
-
-###`initSQLScheme()`<a name="initSQLScheme"></a>
-
-Fillin the database the scheme for working withAcless
+Load permissions for the current user to the cache
 
 #### Signature
 
--** protected **method.
-Returnsthe intvalue.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **public * * method.
+- It doesn't make it back.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+    - `avtomon\RedisSingletonException`
 
-###`initPersistentStorage()`<a name="initPersistentStorage"></a>
+### `initSQLScheme() '<a name= "initSQLScheme" ></a>
 
-Initiatea persistent storage of access rightsdata
-
-#### Signature
-
--** public **method.
-Returnsthe intvalue.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
-
-###`addRoleAccessRight()`<a name="addRoleAccessRight"></a>
-
-Add/changethe default permissions for therole
+Fill in the database scheme to work with Acless
 
 #### Signature
 
--** public **method.
--It can take the following parameter(s):
--`$url_id`(`int`) &mdash; - identifierURL
--`$role`(`string`) &mdash; - name of therole
-Returnsthe `array`value.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **protected * * method.
+- Returns ' int ' value.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 
-###`addUserToRole()`<a name="addUserToRole"></a>
+### `initPersistentStorage() '<a name= "initPersistentStorage" ></a>
 
-Givethe role to theuser
+Inicializirati to the persistent data store access rights
 
 #### Signature
 
--** public **method.
--It can take the following parameter(s):
--`$user_id`(`int`) &mdash; - userID
--`$role`(`string`) &mdash; - name of therole
-Returnsthe `array`value.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **public * * method.
+- Returns ' int ' value.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 
-###`addAccessRight()`<a name="addAccessRight"></a>
+### 'addRoleAccessRight()' <a name= "addRoleAccessRight" ></a>
 
-Add/changeright ofgrant
+set/change default permissions for the role
 
 #### Signature
 
--** public **method.
--It can take the following parameter(s):
--`$url_id`(`int`) &mdash; - identifierURL
--`$user_id`(`int`) &mdash; - userID
--`$is_allow`(`bool`) &mdash; - $values ​​will be permissive orprohibitive
--`$values`(`array`) &mdash; - with what filter values ​​to allow/denyaccess
-Returnsthe `array`value.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **public * * method.
+- Can take the following parameter (s):
+    - '$url_id ' ('int`) &mdash; - url identifier
+    - '$role ' ('string`) &mdash; - role name
+- Returns 'array' value.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 
-###`shiftAccessRightFromRole()`<a name="shiftAccessRightFromRole"></a>
+### 'addUserToRole()' <a name= "addUserToRole" ></a>
 
-Createan access right for a rights-based user for itsrole
+To give a role to a user
 
 #### Signature
 
--** public **method.
--It can take the following parameter(s):
--`$userId`(`int`) &mdash; - userID
-Returnsthe `array`value.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **public * * method.
+- Can take the following parameter (s):
+    - '$user_id ' ('int`) &mdash; - user ID
+    - '$role ' ('string`) &mdash; - role name
+- Returns 'array' value.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+
+### 'addAccessRight()' <a name= "addAccessRight" ></a>
+
+Add/change dotup's right
+
+#### Signature
+
+- **public * * method.
+- Can take the following parameter (s):
+    - '$url_id ' ('int`) &mdash; - url identifier
+    - '$user_id ' ('int`) &mdash; - user ID
+    - '$is_allow ' ('bool`) &mdash; - $values will be allow or deny
+    - '$values ' ('array`) &mdash; - which filter values to allow/deny access to
+- Returns 'array' value.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+
+### `shiftAccessRightFromRole (`'<a name= "shiftAccessRightFromRole" ></a>
+
+Create an access right for a user based on the rights for its role
+
+#### Signature
+
+- **public * * method.
+- Can take the following parameter (s):
+    - '$userId ' ('int`) &mdash; - user ID
+- Returns 'array' value.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 

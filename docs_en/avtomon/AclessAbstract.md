@@ -1,150 +1,150 @@
-<small>avtomon </small>
+the <small>avtomon</small>
 
 AclessAbstract
 ==============
 
-Super class
+Superclass
 
 Description
 -----------
 
-Class AbstractAcless
+Class Abstracless
 
 Signature
 ---------
 
--** abstract class**.
+- **abstract class**.
 
 Properties
 ----------
 
-Theabstract class sets the followingproperties:
+the abstract class sets the following properties:
 
--[`$config`](#$config) &mdash;Configuration
--[`$userId`](#$userId) &mdash; UserID
--[`$ps`](#$ps) &mdash; Connecting toRDBMS
--[`$cs`](#$cs) &mdash; Connecting to thecache
--[`$instance`](#$instance) &mdash; Instanceclass
+- ['$config'](#$config) &mdash; Configuration
+- ['$userId'](#$userId) &mdash; user ID
+- ['$ps'](#$ps) &mdash; connection to RDBMS
+- ['$cs'](#$cs) &mdash; connect to cache
+- ['$instance'](#$instance) &mdash; class Instance
 
-###`$config`<a name="config"></a>
+### '$config '<a name= "config" ></a>
 
 Configuration
 
 #### Signature
 
--** protected **property.
--The value of`array`.
+- **protected * * property.
+- Value 'array'.
 
-###`$userId`<a name="userId"></a>
+### '$userId '<a name= "userId" ></a>
 
-User ID
-
-#### Signature
-
--** protected **property.
--The value of`int`.
-
-###`$ps`<a name="ps"></a>
-
-ConnectingtoRDBMS
+user ID
 
 #### Signature
 
--** protected **property.
--Can be one of the followingtypes:
-- `null`
-  - [`PDO`](http://php.net/class.PDO)
+- **protected * * property.
+- The value `int`.
 
-###`$cs`<a name="cs"></a>
+### '$ps '<a name= " ps " ></a>
 
-Connectingto thecache
+Connecting to RDBMS
 
 #### Signature
 
--** protected **property.
--Can be one of the followingtypes:
-- `null`
-- `Redis`
+- **protected * * property.
+- Can be one of the following types:
+    - 'null`
+    - ['PDO'](http://php.net/class.PDO)
 
-###`$instance`<a name="instance"></a>
+### '$cs '<a name= " cs " ></a>
 
-Instance class
+Connect to cache
 
 #### Signature
 
-**protected static **property.
--Can be one of the followingtypes:
-- `null`
--[`AclessAbstract`](../avtomon/AclessAbstract.md)
+- **protected * * property.
+- Can be one of the following types:
+    - 'null`
+    - 'Redis`
+
+### '$instance '<a name= "instance" ></a>
+
+An instance of the class
+
+#### Signature
+
+- **protected static * * property.
+- Can be one of the following types:
+    - 'null`
+    - ['AclessAbstract'](../avtomon/AclessAbstract.md)
 
 Methods
 -------
 
-Abstractclassmethods:
+Methods of the abstract class:
 
--[`create()`](#create) &mdash;Singleton
--[`__construct()`](#__construct) &mdash; AclessAbstractconstructor
--[`getUserId()`](#getUserId) &mdash; Returns the userID
--[`getPSConnection()`](#getPSConnection) &mdash; Return connection toRDBMS
--[`getConfig()`](#getConfig) &mdash; Return configuration or part ofit
+- ['create()'](#create) &mdash; singleton
+  - [`__construct (`' ](#__construct) &mdash; AclessAbstract constructor
+  - [`getUserId()`](#getUserId) &mdash; Returns the ID of the user
+- ['getPSConnection()'](#getPSConnection) &mdash; Return connection to RDBMS
+- ['getConfig (`' ](#getConfig) &mdash; Return the configuration or part of it
 
-###`create()`<a name="create"></a>
+### 'create()' <a name= 'create' ></a>
 
 Singleton
 
 #### Signature
 
--** public static **method.
--It can take the following parameter(s):
--`$userId`(`int`) &mdash; - userID
--`$confPath`(`string`) &mdash; - path to the configurationfile
--Returns [`AclessAbstract`](../ avtomon/AclessAbstract.md)value.
+- **public static * * method.
+- Can take the following parameter (s):
+    - '$userId ' ('int`) &mdash; - user ID
+    - '$confPath ' ('string`) &mdash; - path to configuration file
+- Return [`AclessAbstract`](../avtomon/AclessAbstract.md) value.
 
-###`__construct()`<a name="__construct"></a>
+### `__construct() '<a name= "__construct " ></a>
 
 AclessAbstract constructor
 
 #### Signature
 
--** private **method.
--It can take the following parameter(s):
--`$userId`(`int`) &mdash; - userID
--`$confPath`(`string`) &mdash; - even to theconfiguration
--Returnsnothing.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **private * * method.
+- Can take the following parameter (s):
+    - '$userId ' ('int`) &mdash; - user ID
+    - '$confPath ' ('string`) &mdash; - let to configuration
+- It doesn't make it back.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 
-###`getUserId()`<a name="getUserId"></a>
+### 'getUserId()' <a name= 'getUserId' ></a>
 
-Returnsthe userID
-
-#### Signature
-
--** public **method.
-Returnsthe intvalue.
-
-###`getPSConnection()`<a name="getPSConnection"></a>
-
-Returnconnection toRDBMS
+Returns the user ID
 
 #### Signature
 
--** protected **method.
--Returns [`PDO`](http://php.net/class.PDO)value.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **public * * method.
+- Returns ' int ' value.
 
-###`getConfig()`<a name="getConfig"></a>
+### 'getPSConnection()' <a name= "getPSConnection" ></a>
 
-Returnconfiguration or part ofit
+To return the connection to the RDBMS
 
 #### Signature
 
--** public **method.
--It can take the following parameter(s):
--`$key`(`string`) &mdash; - configurationkey
--Can return one of the followingvalues:
-- array
-- `mixed`
-- `null`
+- **protected * * method.
+- Returns ['PDO'](http://php.net/class.PDO) value.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+
+### 'getConfig()' <a name= "getConfig" ></a>
+
+Return the configuration or part of it
+
+#### Signature
+
+- **public * * method.
+- Can take the following parameter (s):
+    - '$key ' ('string`) &mdash; - configuration key
+- Can return one of the following values:
+    - 'array`
+    - 'mixed`
+    - 'null`
 

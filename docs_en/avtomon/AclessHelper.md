@@ -1,9 +1,9 @@
-<small>avtomon </small>
+the <small>avtomon</small>
 
 AclessHelper
 ============
 
-AuxiliaryMethodsClass
+Class of auxiliary methods
 
 Description
 -----------
@@ -13,23 +13,23 @@ Class AclessHelper
 Signature
 ---------
 
--** class**.
+- **class**.
 
 Methods
 -------
 
-Classmethodsclass:
+Class methods class:
 
--[`camel2dashed()`](#camel2dashed) &mdash; Convert a string as camelCase to a string of the form dashed (camelCase - & gt;camel-case)
+  - [`camel2dashed()`](#camel2dashed) &mdash; Convert a string in camelCase to dashed string (camelCase - > camel-case)
 
-###`camel2dashed()`<a name="camel2dashed"></a>
+### 'camel2dashed()' <a name= "camel2dashed" ></a>
 
-Converta string as camelCase to a string of the form dashed (camelCase ->camel-case)
+Turn a camelCase string into a dashed string (camelCase -> camel-case)
 
 #### Signature
 
--** public static **method.
--It can take the following parameter(s):
--`$str`(`string`) &mdash; - string incamelCase
-Returns`string`value.
+- **public static * * method.
+- Can take the following parameter (s):
+    - '$str ' ('string`) &mdash; - camelCase string
+- Returns 'string' value.
 

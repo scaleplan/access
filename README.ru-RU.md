@@ -114,7 +114,7 @@ ARRAY['<значение для первого фильтра><разделит�
  protected static function setRole(int $id, string $role): void
 ``
  
-    Если же мы хотим типизацию с несколькими типами как, например, в C# или TypeScript:
+Если же мы хотим типизацию с несколькими типами как, например, в C# или TypeScript:
  
 ```
  setMultiData(object: HTMLElement | NodeList, data: Object | Object[] | string = this.data): HTMLElement | NodeList

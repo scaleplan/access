@@ -1,9 +1,9 @@
-<small>avtomon </small>
+the <small>avtomon</small>
 
 AclessModelResult
 =================
 
-Theresult class of themodel
+Class the result of running the model
 
 Description
 -----------
@@ -13,175 +13,175 @@ Class AclessModelResult
 Signature
 ---------
 
--** class**.
--It is a subclass of the class`avtomon\DbResultItem`.
+- **class**.
+- Is a subclass of the class `avtomon\DbResultItem`.
 
 Properties
 ----------
 
-classsets the followingproperties:
+class sets the following properties:
 
--[`$class`](#$class) &mdash; Reflection of the modelclass
--[`$method`](#$method) &mdash; Reflection of the modelmethod
--[`$property`](#$property) &mdash; Reflecting the modelproperty
--[`$args`](#$args) &mdash; ExecutionArguments
--[`$isPlainArgs`](#$isPlainArgs) &mdash; true - the model method takes arguments as aset
-false- as an associativearray
+- ['$class'](#$class) &mdash; Reflection of model class
+- ['$method'](#$method) &mdash; Reflection of the model method
+  - [`$property`](#$property) &mdash; a reflection of the properties of the model
+- ['$args'](#$args) &mdash; execution Arguments
+- ['$isPlainArgs'](#$isPlainArgs) &mdash; true-model method takes arguments as a set
+false - in the form of an associative array
 
-###`$class`<a name="class"></a>
+### '$class '<a name= "class" ></a>
 
-Reflectionof the modelclass
-
-#### Signature
-
--** protected **property.
--Can be one of the followingtypes:
-- `null`
-  - [`ReflectionClass`](http://php.net/class.ReflectionClass)
-
-###`$method`<a name="method"></a>
-
-Reflectionof the modelmethod
+The reflection of the model class
 
 #### Signature
 
--** protected **property.
--Can be one of the followingtypes:
-- `null`
-  - [`ReflectionMethod`](http://php.net/class.ReflectionMethod)
+- **protected * * property.
+- Can be one of the following types:
+    - 'null`
+    - ['ReflectionClass'](http://php.net/class.ReflectionClass)
 
-###`$property`<a name="property"></a>
+### '$method '<a name= "method" ></a>
 
-Reflectingthe modelproperty
-
-#### Signature
-
--** protected **property.
--Can be one of the followingtypes:
-- `null`
-  - [`ReflectionProperty`](http://php.net/class.ReflectionProperty)
-
-###`$args`<a name="args"></a>
-
-Execution Arguments
+Reflection of the model method
 
 #### Signature
 
--** protected **property.
--The value of`array`.
+- **protected * * property.
+- Can be one of the following types:
+    - 'null`
+    - ['ReflectionMethod'](http://php.net/class.ReflectionMethod)
 
-###`$isPlainArgs`<a name="isPlainArgs"></a>
+### '$property '<a name= "property" ></a>
 
-true- the model method takes arguments as aset
-false- as an associativearray
+The reflection properties of the model
 
 #### Signature
 
--** protected **property.
--The value of`bool`.
+- **protected * * property.
+- Can be one of the following types:
+    - 'null`
+    - ['ReflectionProperty'](http://php.net/class.ReflectionProperty)
+
+### '$args '<a name= "args" ></a>
+
+Execution arguments
+
+#### Signature
+
+- **protected * * property.
+- Value 'array'.
+
+### '$isPlainArgs '<a name= "isPlainArgs" ></a>
+
+true - model method takes arguments in the form of a set
+false - in the form of an associative array
+
+#### Signature
+
+- **protected * * property.
+- `Bool ' value.
 
 Methods
 -------
 
-Classmethodsclass:
+Class methods class:
 
--[`__construct()`](#__construct) &mdash; AclessModelResultconstructor
--[`getClass()`](#getClass) &mdash; Getter for reflecting the modelclass
--[`getMethod()`](#getMethod) &mdash; Getter to reflect the method of themodel
--[`getProperty()`](#getProperty) &mdash; Getter to reflect modelproperties
--[`getArgs()`](#getArgs) &mdash; Getter for executionarguments
--[`getIsPlainArgs()`](#getIsPlainArgs) &mdash; Will the execution parameters be loaded as a sequence ofarguments
--[`setRawResult()`](#setRawResult) &mdash; Add result from another objectDbResultItem
--[`checkDocReturn()`](#checkDocReturn) &mdash; Check the return type for the types specified inDOCBLOCK
+  - [`__construct (`' ](#__construct) &mdash; AclessModelResult constructor
+- ['getClass()'](#getClass) &mdash; Getter to reflect model class
+- ['getMethod()'](#getMethod) &mdash; Getter to reflect model method
+  - [`getProperty()`](#getProperty) &mdash; a Getter to reflect the properties of the model
+- ['getArgs()'](#getArgs) &mdash; Getter for execution arguments
+- ['getIsPlainArgs()'](#getIsPlainArgs) &mdash; Will the execution parameters be loaded as a sequence of arguments
+- ['setRawResult()'](#setRawResult) &mdash; Add result from other DbResultItem object
+- ['checkDocReturn()'](#checkDocReturn) &mdash; Check the return type by the types specified in DOCBLOCK
 
-###`__construct()`<a name="__construct"></a>
+### `__construct() '<a name= "__construct " ></a>
 
 AclessModelResult constructor
 
 #### Signature
 
--** public **method.
--It can take the following parameter(s):
--`$class`([`ReflectionClass`](http://php.net/class.ReflectionClass)) &mdash; - reflection of the modelclass
--`$method`([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) &mdash; - reflection of the modelmethod
--`$property`([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) &mdash; - reflection of the modelproperty
--`$args`(`array`) &mdash; - executionarguments
--`$isPlainArgs`(`bool`) &mdash; - true - the model method takes arguments as a set, false - as an associativearray
--`$result`(`null`| `mixed`) &mdash;result
--Returnsnothing.
+- **public * * method.
+- Can take the following parameter (s):
+    - '$class ' (['ReflectionClass']) (http://php.net/class.ReflectionClass)) &mdash; - reflection of the model class
+    - '$method ' (['ReflectionMethod']) (http://php.net/class.ReflectionMethod)) &mdash; - reflection of the model method
+    - '$property ' (['ReflectionProperty']) (http://php.net/class.ReflectionProperty)) &mdash; - reflection of the model property
+    - '$args ' ('array`) &mdash; - execution arguments
+    - '$isPlainArgs ' ('bool`) &mdash; - true-the model method takes arguments as a set, false-as an associative array
+    	- `$result`(`null`|`mixed`) &mdash; is the result
+- It doesn't make it back.
 
-###`getClass()`<a name="getClass"></a>
+### 'getClass()' <a name= 'getClass' ></a>
 
-Getterfor reflecting the modelclass
-
-#### Signature
-
--** public **method.
--Can return one of the followingvalues:
-- `null`
-  - [`ReflectionClass`](http://php.net/class.ReflectionClass)
-
-###`getMethod()`<a name="getMethod"></a>
-
-Getterto reflect the method of themodel
+Getter to reflect model class
 
 #### Signature
 
--** public **method.
--Can return one of the followingvalues:
-- `null`
-  - [`ReflectionMethod`](http://php.net/class.ReflectionMethod)
+- **public * * method.
+- Can return one of the following values:
+    - 'null`
+    - ['ReflectionClass'](http://php.net/class.ReflectionClass)
 
-###`getProperty()`<a name="getProperty"></a>
+### 'getMethod()' <a name= "getMethod" ></a>
 
-Getterto reflect modelproperties
-
-#### Signature
-
--** public **method.
--Can return one of the followingvalues:
-- `null`
-  - [`ReflectionProperty`](http://php.net/class.ReflectionProperty)
-
-###`getArgs()`<a name="getArgs"></a>
-
-Getterfor executionarguments
+Getter to reflect the model method
 
 #### Signature
 
--** public **method.
--Can return one of the followingvalues:
-- array
-- `null`
+- **public * * method.
+- Can return one of the following values:
+    - 'null`
+    - ['ReflectionMethod'](http://php.net/class.ReflectionMethod)
 
-###`getIsPlainArgs()`<a name="getIsPlainArgs"></a>
+### 'getProperty()' <a name= 'getProperty' ></a>
 
-Willthe execution parameters be loaded as a sequence ofarguments
-
-#### Signature
-
--** public **method.
--Returns the `bool`value.
-
-###`setRawResult()`<a name="setRawResult"></a>
-
-Addresult from another objectDbResultItem
+Getter to reflect model properties
 
 #### Signature
 
--** public **method.
--It can take the following parameter(s):
--`$rawResult`(`avtomon\DbResultItem`|`null`)
--Returnsnothing.
+- **public * * method.
+- Can return one of the following values:
+    - 'null`
+    - ['ReflectionProperty'](http://php.net/class.ReflectionProperty)
 
-###`checkDocReturn()`<a name="checkDocReturn"></a>
+### 'getArgs()' <a name= "getArgs" ></a>
 
-Checkthe return type for the types specified inDOCBLOCK
+Getter for execution arguments
 
 #### Signature
 
--** public **method.
--Returnsnothing.
--Throws one of the followingexceptions:
--[`avtomon\AclessException`](../avtomon/AclessException.md)
+- **public * * method.
+- Can return one of the following values:
+    - 'array`
+    - 'null`
+
+### 'getIsPlainArgs()' <a name= 'getIsPlainArgs' ></a>
+
+Will the execution parameters be loaded as a sequence of arguments
+
+#### Signature
+
+- **public * * method.
+- Returns `bool ' value.
+
+### 'setRawResult()' <a name= "setRawResult" ></a>
+
+Add result from another DbResultItem object
+
+#### Signature
+
+- **public * * method.
+- Can take the following parameter (s):
+    - '$rawResult ' ('avtomon\DbResultItem`|' null`)
+- It doesn't make it back.
+
+### `checkDocReturn() '<a name= 'checkDocReturn' ></a>
+
+Check the return type by the types specified in DOCBLOCK
+
+#### Signature
+
+- **public * * method.
+- It doesn't make it back.
+- Throws one of the following exceptions:
+      - [`avtomon\AclessException'](../avtomon/AclessException.md)
 
