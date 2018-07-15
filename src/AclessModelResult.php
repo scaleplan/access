@@ -131,7 +131,7 @@ class AclessModelResult extends DbResultItem
      */
     public function setRawResult(?DbResultItem $rawResult): void
     {
-        $this->result = $rawResult->result ?? null;
+        $this->result = $rawResult ? $rawResult->result : null;
     }
 
     /**
@@ -139,7 +139,7 @@ class AclessModelResult extends DbResultItem
      *
      * @throws AclessException
      */
-    public function checkDocReturn()
+    public function checkDocReturn(): void
     {
         $docBlock = new DocBlock($this->method ?? $this->property);
         $denyFuzzy = $docBlock->hasTag(Acless::create()->getConfig('deny_fuzzy'));
@@ -149,7 +149,7 @@ class AclessModelResult extends DbResultItem
             return trim($item, '\\\ \0');
         }, explode('|', $returnTypes));
 
-        if (!AclessSanitize::typeCheck($this->result, $types)) {
+        if (!AclessSanitize::typeCheck($this->result, $returnTypes, $denyFuzzy)) {
             throw new AclessException("Тип возвращаемого значения не соответствует заданному типу $returnTypes");
         }
     }

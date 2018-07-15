@@ -57,8 +57,6 @@ class AclessSanitize
      * Проверить и очистить аргументы
      *
      * @return array - массив очищенных аргументов
-     *
-     * @throws AclessException
      */
     public function sanitizeArgs(): array
     {
@@ -66,7 +64,7 @@ class AclessSanitize
             return $this->sanitizedArgs;
         }
 
-        if ($reflector instanceof \ReflectionMethod) {
+        if ($this->reflector instanceof \ReflectionMethod) {
             return $this->sanitizedArgs = self::sanitizeMethodArgs($this->reflector, $this->args);
         }
 
@@ -134,8 +132,6 @@ class AclessSanitize
      * @param array $args - массив аргументов
      *
      * @return array
-     *
-     * @throws AclessException
      */
     public static function sanitizeSQLPropertyArgs(\ReflectionProperty $property, array $args): array
     {
@@ -181,10 +177,8 @@ class AclessSanitize
      */
     protected static function argAvailabilityCheck(string $paramName, array $args, array $optionParams): void
     {
-        if (!array_key_exists($paramName, $args)) {
-            if (!array_key_exists($paramName, $optionParams)) {
-                throw new AclessException("Не хватает параметра $paramName");
-            }
+        if (!array_key_exists($paramName, $args) && !array_key_exists($paramName, $optionParams)) {
+            throw new AclessException("Не хватает параметра $paramName");
         }
     }
 
@@ -219,7 +213,7 @@ class AclessSanitize
      *
      * @throws AclessException
      */
-    protected static function docTypeCheck(&$arg, string $paramName, string $paramType, DocBlock &$docBlock): void
+    protected static function docTypeCheck(&$arg, string $paramName, string $paramType, DocBlock $docBlock): void
     {
         if (!$paramType) {
             return;
@@ -245,35 +239,33 @@ class AclessSanitize
      *
      * @return bool
      */
-    public static function typeCheck($value, array $types, $denyFuzzy = true): bool
+    public static function typeCheck(&$value, array $types, $denyFuzzy = true): bool
     {
         if (!$types && \in_array('mixed', $types, true)) {
             return true;
         }
 
         $argType = \gettype($value);
-        if ($argType === 'object') {
-            if(!array_filter($types, function ($type) use ($value, $denyFuzzy) {
+        if ($argType === 'object' && !array_filter($types, function ($type) use ($value, $denyFuzzy, $argType) {
                 $result = $value instanceof $type;
-                if (!$denyFuzzy) {
+                if (!$result && !$denyFuzzy) {
                     $result = preg_match("/^(\w+\\)*$type$/", $argType);
                 }
 
                 return $result;
-            })) {
-                return false;
-            }
+        })) {
+            return false;
         }
 
         if ($denyFuzzy) {
             return false;
         }
 
-        foreach ($acceptTypes as $type) {
-            $tmp = $arg;
+        foreach ($types as $type) {
+            $tmp = $value;
             settype($tmp, $type);
-            if ($tmp == $arg) {
-                $arg = $tmp;
+            if ($tmp == $value) {
+                $value = $tmp;
                 return true;
             }
         }
@@ -300,17 +292,5 @@ class AclessSanitize
         }
 
         return [$all, $optional];
-    }
-
-    /**
-     * Превратить строку в виде camelCase в строку вида dashed (camelCase -> camel-case)
-     *
-     * @param string $str - строка в camelCase
-     *
-     * @return string
-     */
-    public static function camel2dashed(string $str): string
-    {
-        return strtolower(preg_replace('/([a-zA-Z])(?=[A-Z])/', '$1-', $str));
     }
 }

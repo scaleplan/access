@@ -223,10 +223,6 @@ abstract class устанавливает следующие свойства:
     - `$methodName` (`string`) &mdash; - имя метода или SQL-свойства
     - `$args` (`array`) &mdash; - массив аргументов
 - Возвращает `avtomon\AbstractResult` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
-    - `avtomon\DbResultItemException`
-    - [`ReflectionException`](http://php.net/class.ReflectionException)
 
 ### `__call()` <a name="__call"></a>
 
@@ -239,8 +235,4 @@ abstract class устанавливает следующие свойства:
     - `$methodName` (`string`) &mdash; - имя метода или SQL-свойства
     - `$args` (`array`) &mdash; - массив аргументов
 - Возвращает `avtomon\AbstractResult` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
-    - `avtomon\DbResultItemException`
-    - [`ReflectionException`](http://php.net/class.ReflectionException)
 

@@ -40,7 +40,7 @@ class AclessModelParent
         if ($refclass->hasMethod($methodName)) {
             $method = $refclass->getMethod($methodName);
 
-            if (empty(empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
+            if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
                 throw new AclessException("Метод $methodName не доступен");
             }
 
@@ -90,9 +90,6 @@ class AclessModelParent
      * @param array $args - массив аргументов
      *
      * @return AclessModelResult
-     *
-     * @throws AclessException
-     * @throws \ReflectionException
      */
     public static function __callStatic(string $methodName, array $args): AclessModelResult
     {
@@ -106,9 +103,6 @@ class AclessModelParent
      * @param array $args - массив аргументов
      *
      * @return AclessModelResult
-     *
-     * @throws AclessException
-     * @throws \ReflectionException
      */
     public function __call(string $methodName, array $args): AclessModelResult
     {

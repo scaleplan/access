@@ -67,8 +67,6 @@ class устанавливает следующие свойства:
 
 - **protected** method.
 - Возвращает `int` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
 ### `initPersistentStorage()` <a name="initPersistentStorage"></a>
 
@@ -92,8 +90,6 @@ class устанавливает следующие свойства:
     - `$url_id` (`int`) &mdash; - идентификатор урла
     - `$role` (`string`) &mdash; - наименование роли
 - Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
 ### `addUserToRole()` <a name="addUserToRole"></a>
 
@@ -122,8 +118,6 @@ class устанавливает следующие свойства:
     - `$is_allow` (`bool`) &mdash; - $values будут разрешающими или запрещающими
     - `$values` (`array`) &mdash; - с какими значения фильтра разрешать/запрещать доступ
 - Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
 ### `shiftAccessRightFromRole()` <a name="shiftAccessRightFromRole"></a>
 
@@ -135,6 +129,4 @@ class устанавливает следующие свойства:
 - Может принимать следующий параметр(ы):
     - `$userId` (`int`) &mdash; - идентификатор пользователя
 - Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
 

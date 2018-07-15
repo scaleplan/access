@@ -33,19 +33,19 @@ For example:
 ```
 class User
 {
-/ **
-* Get user object
-*
-* @aclessMethod
-*
-* @param int $id - user identifier
-*
-* @return UserAbstract
-* /
-protected static function get (int $id): UserAbstract
-{
-// ...
-}
+    / **
+    * Get user object
+    *
+    * @aclessMethod
+    *
+    * @param int $id - user identifier
+    *
+    * @return UserAbstract
+    * /
+    protected static function get (int $id): UserAbstract
+    {
+        // ...
+    }
 }
 ```
 
@@ -140,7 +140,7 @@ The Acless type checking subsystem can target * PHPDOC * and check the values â€
 * /
 protected static function actionSetRole (int $id, string $role)
 {
-
+    // ...
 }
 ```
 

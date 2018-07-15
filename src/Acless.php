@@ -3,7 +3,6 @@
 namespace avtomon;
 
 use phpDocumentor\Reflection\DocBlock;
-use PhpParser\Comment\Doc;
 
 /**
  * Класс исключений
@@ -92,7 +91,6 @@ class Acless extends AclessAbstract
      * @return bool
      *
      * @throws AclessException
-     * @throws RedisSingletonException
      */
     public function checkMethodRights(\Reflector $refMethod, array $args, \ReflectionClass $refClass = null): bool
     {
@@ -177,7 +175,6 @@ class Acless extends AclessAbstract
      * @return bool
      *
      * @throws AclessException
-     * @throws RedisSingletonException
      */
     public function checkFileRights(string $filePath): bool
     {
@@ -225,7 +222,6 @@ class Acless extends AclessAbstract
      *
      * @return array
      *
-     * @throws AclessException
      * @throws \ReflectionException
      */
     protected function generateControllerURLs(string $controllerFileName, string $controllerNamespace = null): array
@@ -330,7 +326,6 @@ class Acless extends AclessAbstract
      * @return array
      *
      * @throws AclessException
-     * @throws \ReflectionException
      */
     public function getControllerURLs(): array
     {
@@ -404,9 +399,6 @@ class Acless extends AclessAbstract
      * Возращает все собранные урлы
      *
      * @return array
-     *
-     * @throws AclessException
-     * @throws \ReflectionException
      */
     public function getAllURLs(): array
     {

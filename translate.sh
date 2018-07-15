@@ -7,7 +7,7 @@ TRANS_PATH="/var/www/trans"
 CURRENT_PATH="$3"
 
 mkdir -p "$DESC_DIR"
-cp -r $SRC_DIR/* $DESC_DIR/
+cp -r "$SRC_DIR/*" "$DESC_DIR/"
 
 find "$SRC_DIR/" -name '*.md' -type f -printf '%P\0' |
 while IFS= read -r -d '' file; do
@@ -17,7 +17,7 @@ done
 
 UPPER_LANG=`echo "$TO_LANG" | awk '{print toupper($0)}'`
 
-if [[ $TO_LANG = "en" ]]; then
+if [[ "$TO_LANG" = "en" ]]; then
     DESC_FILE="$CURRENT_PATH/README.md"
 else
     DESC_FILE="$CURRENT_PATH/README.$TO_LANG-$UPPER_LANG.md"

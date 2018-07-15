@@ -69,7 +69,6 @@ class устанавливает следующие свойства:
 - [`docTypeCheck()`](#docTypeCheck) &mdash; Проверка аргументов на соответствие типу
 - [`typeCheck()`](#typeCheck) &mdash; Проверка значения на соответствие типу
 - [`getSQLParams()`](#getSQLParams) &mdash; Получить из SQL-запроса все параметры
-- [`camel2dashed()`](#camel2dashed) &mdash; Превратить строку в виде camelCase в строку вида dashed (camelCase -&gt; camel-case)
 
 ### `__construct()` <a name="__construct"></a>
 
@@ -94,8 +93,6 @@ class устанавливает следующие свойства:
 - **public** method.
 - _Возвращает:_ - массив очищенных аргументов
     - `array`
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
 ### `sanitizeMethodArgs()` <a name="sanitizeMethodArgs"></a>
 
@@ -122,8 +119,6 @@ class устанавливает следующие свойства:
     - `$property` ([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) &mdash; - Reflection-обертка для SQL-свойства
     - `$args` (`array`) &mdash; - массив аргументов
 - Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
 ### `argAvailabilityCheck()` <a name="argAvailabilityCheck"></a>
 
@@ -190,15 +185,4 @@ class устанавливает следующие свойства:
 - Может принимать следующий параметр(ы):
     - `$sql`
 - Возвращает `array` value.
-
-### `camel2dashed()` <a name="camel2dashed"></a>
-
-Превратить строку в виде camelCase в строку вида dashed (camelCase -> camel-case)
-
-#### Сигнатура
-
-- **public static** method.
-- Может принимать следующий параметр(ы):
-    - `$str` (`string`) &mdash; - строка в camelCase
-- Возвращает `string` value.
 

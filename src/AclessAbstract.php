@@ -2,7 +2,6 @@
 
 namespace avtomon;
 
-use phpDocumentor\Reflection\DocBlock;
 use Symfony\Component\Yaml\Yaml;
 
 /**

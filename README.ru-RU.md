@@ -140,7 +140,7 @@ ARRAY['<значение для первого фильтра><разделит�
      */
     protected static function actionSetRole(int $id, string $role)
     {
-        
+        // ...
     }
 ```
 
