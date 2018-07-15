@@ -81,6 +81,8 @@ class AclessModify extends AclessAbstract
      * Залить в базу данных схему для работы с Acless
      *
      * @return int
+     *
+     * @throws AclessException
      */
     protected function initSQLScheme(): int
     {
@@ -147,12 +149,14 @@ class AclessModify extends AclessAbstract
     }
 
     /**
-     * Добавить/изменить права доступа по умолчанию для роли
+     * обавить/изменить права доступа по умолчанию для роли
      *
      * @param int $url_id - идентификатор урла
      * @param string $role - наименование роли
      *
      * @return array
+     *
+     * @throws AclessException
      */
     public function addRoleAccessRight(int $url_id, string $role): array
     {
@@ -234,6 +238,8 @@ class AclessModify extends AclessAbstract
      * @param array $values - с какими значения фильтра разрешать/запрещать доступ
      *
      * @return array
+     *
+     * @throws AclessException
      */
     public function addAccessRight(int $url_id, int $user_id, bool $is_allow, array $values): array
     {
@@ -273,6 +279,8 @@ class AclessModify extends AclessAbstract
      * @param int $userId - идентификатор пользователя
      *
      * @return array
+     *
+     * @throws AclessException
      */
     public function shiftAccessRightFromRole(int $userId): array
     {

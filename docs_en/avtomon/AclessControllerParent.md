@@ -1,9 +1,9 @@
-<small> avtomon </small>
+<small>avtomon </small>
 
 AclessControllerParent
 ======================
 
-Parent for controllers - checking access rights, filtering parameters
+Parentfor controllers - checking access rights, filteringparameters
 
 Description
 -----------
@@ -13,234 +13,234 @@ Class AclessControllerParent
 Signature
 ---------
 
-- **abstract class**.
+-** abstract class**.
 
 Properties
 ----------
 
-The abstract class sets the following properties:
+Theabstract class sets the followingproperties:
 
-  - [`$before`](#$before) &mdash; Functions to execute before executing the controller method
-  - [`$beforeDefaultResult`](#$beforeDefaultResult) &mdash; The result of the default before function
-  - [`$after`](#$after) &mdash; Functions for execution after execution of the controller method
-  - [`$afterDefaultResult`](#$afterDefaultResult) &mdash; Result of performing the after-function by default
+-[`$before`](#$before) &mdash; Functions to execute before executing the controllermethod
+-[`$beforeDefaultResult`](#$beforeDefaultResult) &mdash; The result of the default beforefunction
+-[`$after`](#$after) &mdash; Functions for execution after execution of the controllermethod
+-[`$afterDefaultResult`](#$afterDefaultResult) &mdash; Result of performing the after-function bydefault
 
-### `$before`<a name="before"> </a>
+###`$before`<a name="before"></a>
 
-Functions to execute before executing the controller method
-
-#### Signature
-
-**protected static** property.
-- The value of `array`.
-
-### `$beforeDefaultResult`<a name="beforeDefaultResult"> </a>
-
-The result of the default before function
+Functionsto execute before executing the controllermethod
 
 #### Signature
 
-- **public static** property.
-- The value of `mixed`.
+**protected static **property.
+-The value of`array`.
 
-### `$after`<a name="after"> </a>
+###`$beforeDefaultResult`<a name="beforeDefaultResult"></a>
 
-Functions for execution after execution of the controller method
-
-#### Signature
-
-**protected static** property.
-- The value of `array`.
-
-### `$afterDefaultResult`<a name="afterDefaultResult"> </a>
-
-Result of performing the after-function by default
+Theresult of the default beforefunction
 
 #### Signature
 
-- **public static** property.
-- The value of `mixed`.
+-** public static **property.
+-The value of`mixed`.
+
+###`$after`<a name="after"></a>
+
+Functionsfor execution after execution of the controllermethod
+
+#### Signature
+
+**protected static **property.
+-The value of`array`.
+
+###`$afterDefaultResult`<a name="afterDefaultResult"></a>
+
+Resultof performing the after-function bydefault
+
+#### Signature
+
+-** public static **property.
+-The value of`mixed`.
 
 Methods
 -------
 
-Abstract class methods:
+Abstractclassmethods:
 
-  - [`pushBefore()`](#pushBefore) &mdash; Add a function to the end of the array of functions performed before the execution of the controller method
-  - [`unshiftBefore()`](#unshiftBefore) &mdash; Add a function to the beginning of the array of functions performed before the execution of the controller method
-  - [`insertBefore()`](#insertBefore) &mdash; Add a function to the specified position of the array of functions performed before the execution of the controller method
-  - [`pushAfter()`](#pushAfter) &mdash; Add a function to the end of an array of functions executed after the execution of the controller method
-  - [`unshiftAfter()`](#unshiftAfter) &mdash; Add a function to the beginning of an array of functions executed after the execution of the controller method
-  - [`insertAfter()`](#insertAfter) &mdash; Add the function to the specified position of the array of functions executed after the execution of the controller method
-  - [`removeBefore()`](#removeBefore) &mdash; Delete a function or all functions that must be performed before executing the controller method
-  - [`removeAfter()`](#removeAfter) &mdash; Delete a function or all functions that must be performed after the execution of the controller method
-  - [`checkControllerMethod()`](#checkControllerMethod) &mdash; Verifying access rights and input for the method
-  - [`executeBeforeHandlers()`](#executeBeforeHandlers) &mdash; Execute handlers for starting the query execution
-  - [`executeAfterHandlers()`](#executeAfterHandlers) &mdash; Execute output handlers for the execution of the request
-  - [`__callStatic()`](#__callStatic) &mdash; Validating access rights and input data for static methods
-  - [`__call()`](#__call) &mdash; Validating access rights and input data for non-static methods
+-[`pushBefore()`](#pushBefore) &mdash; Add a function to the end of the array of functions performed before the execution of the controllermethod
+-[`unshiftBefore()`](#unshiftBefore) &mdash; Add a function to the beginning of the array of functions performed before the execution of the controllermethod
+-[`insertBefore()`](#insertBefore) &mdash; Add a function to the specified position of the array of functions performed before the execution of the controllermethod
+-[`pushAfter()`](#pushAfter) &mdash; Add a function to the end of an array of functions executed after the execution of the controllermethod
+-[`unshiftAfter()`](#unshiftAfter) &mdash; Add a function to the beginning of an array of functions executed after the execution of the controllermethod
+-[`insertAfter()`](#insertAfter) &mdash; Add the function to the specified position of the array of functions executed after the execution of the controllermethod
+-[`removeBefore()`](#removeBefore) &mdash; Delete a function or all functions that must be performed before executing the controllermethod
+-[`removeAfter()`](#removeAfter) &mdash; Delete a function or all functions that must be performed after the execution of the controllermethod
+-[`checkControllerMethod()`](#checkControllerMethod) &mdash; Verifying access rights and input for themethod
+-[`executeBeforeHandlers()`](#executeBeforeHandlers) &mdash; Execute handlers for starting the queryexecution
+-[`executeAfterHandlers()`](#executeAfterHandlers) &mdash; Execute output handlers for the execution of therequest
+-[`__callStatic()`](#__callStatic) &mdash; Validating access rights and input data for staticmethods
+-[`__call()`](#__call) &mdash; Validating access rights and input data for non-staticmethods
 
-### `pushBefore()`<a name="pushBefore"> </a>
+###`pushBefore()`<a name="pushBefore"></a>
 
-Add a function to the end of the array of functions performed before the execution of the controller method
-
-#### Signature
-
-- **public static** method.
-- It can take the following parameter (s):
-	- `$function`(`callable`) &mdash; - function
-- Returns nothing.
-
-### `unshiftBefore()`<a name="unshiftBefore"> </a>
-
-Add a function to the beginning of the array of functions performed before the execution of the controller method
+Adda function to the end of the array of functions performed before the execution of the controllermethod
 
 #### Signature
 
-- **public static** method.
-- It can take the following parameter (s):
-	- `$function`(`callable`) &mdash; - function
-- Returns nothing.
+-** public static **method.
+-It can take the following parameter(s):
+-`$function`(`callable`) &mdash; -function
+-Returnsnothing.
 
-### `insertBefore()`<a name="insertBefore"> </a>
+###`unshiftBefore()`<a name="unshiftBefore"></a>
 
-Add a function to the specified position of the array of functions performed before the execution of the controller method
-
-#### Signature
-
-- **public static** method.
-- It can take the following parameter (s):
-	- `$index`(`int`) &mdash; - Insertion position
-	- `$function`(`callable`) &mdash; - function
-- Returns nothing.
-
-### `pushAfter()`<a name="pushAfter"> </a>
-
-Add a function to the end of an array of functions executed after the execution of the controller method
+Adda function to the beginning of the array of functions performed before the execution of the controllermethod
 
 #### Signature
 
-- **public static** method.
-- It can take the following parameter (s):
-	- `$function`(`callable`) &mdash; - function
-- Returns nothing.
+-** public static **method.
+-It can take the following parameter(s):
+-`$function`(`callable`) &mdash; -function
+-Returnsnothing.
 
-### `unshiftAfter()`<a name="unshiftAfter"> </a>
+###`insertBefore()`<a name="insertBefore"></a>
 
-Add a function to the beginning of an array of functions executed after the execution of the controller method
-
-#### Signature
-
-- **public static** method.
-- It can take the following parameter (s):
-	- `$function`(`callable`) &mdash; - function
-- Returns nothing.
-
-### `insertAfter()`<a name="insertAfter"> </a>
-
-Add the function to the specified position of the array of functions executed after the execution of the controller method
+Adda function to the specified position of the array of functions performed before the execution of the controllermethod
 
 #### Signature
 
-- **public static** method.
-- It can take the following parameter (s):
-	- `$index`(`int`) &mdash; - Insertion position
-	- `$function`(`callable`) &mdash; - function
-- Returns nothing.
+-** public static **method.
+-It can take the following parameter(s):
+-`$index`(`int`) &mdash; - Insertionposition
+-`$function`(`callable`) &mdash; -function
+-Returnsnothing.
 
-### `removeBefore()`<a name="removeBefore"> </a>
+###`pushAfter()`<a name="pushAfter"></a>
 
-Delete a function or all functions that must be performed before executing the controller method
-
-#### Signature
-
-- **public static** method.
-- It can take the following parameter (s):
-	- `$index`(`int`) &mdash; - delete position
-- Returns nothing.
-
-### `removeAfter()`<a name="removeAfter"> </a>
-
-Delete a function or all functions that must be performed after the execution of the controller method
+Adda function to the end of an array of functions executed after the execution of the controllermethod
 
 #### Signature
 
-- **public static** method.
-- It can take the following parameter (s):
-	- `$index`(`int`) &mdash; - delete position
-- Returns nothing.
+-** public static **method.
+-It can take the following parameter(s):
+-`$function`(`callable`) &mdash; -function
+-Returnsnothing.
 
-### `checkControllerMethod()`<a name="checkControllerMethod"> </a>
+###`unshiftAfter()`<a name="unshiftAfter"></a>
 
-Verifying access rights and input for the method
+Adda function to the beginning of an array of functions executed after the execution of the controllermethod
 
 #### Signature
 
-- **protected static** method.
-- It can take the following parameter (s):
-	- `$methodName`(`string`) &mdash; - method name
-	- `$args`(`array`) &mdash; - execution arguments
-	- `$obj`(`object`) &mdash; - an object to the context of which the method should be executed (if not static)
-- Returns `avtomon\AbstractResult`value.
-- Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+-** public static **method.
+-It can take the following parameter(s):
+-`$function`(`callable`) &mdash; -function
+-Returnsnothing.
+
+###`insertAfter()`<a name="insertAfter"></a>
+
+Addthe function to the specified position of the array of functions executed after the execution of the controllermethod
+
+#### Signature
+
+-** public static **method.
+-It can take the following parameter(s):
+-`$index`(`int`) &mdash; - Insertionposition
+-`$function`(`callable`) &mdash; -function
+-Returnsnothing.
+
+###`removeBefore()`<a name="removeBefore"></a>
+
+Deletea function or all functions that must be performed before executing the controllermethod
+
+#### Signature
+
+-** public static **method.
+-It can take the following parameter(s):
+-`$index`(`int`) &mdash; - deleteposition
+-Returnsnothing.
+
+###`removeAfter()`<a name="removeAfter"></a>
+
+Deletea function or all functions that must be performed after the execution of the controllermethod
+
+#### Signature
+
+-** public static **method.
+-It can take the following parameter(s):
+-`$index`(`int`) &mdash; - deleteposition
+-Returnsnothing.
+
+###`checkControllerMethod()`<a name="checkControllerMethod"></a>
+
+Verifyingaccess rights and input for themethod
+
+#### Signature
+
+-** protected static **method.
+-It can take the following parameter(s):
+-`$methodName`(`string`) &mdash; - methodname
+-`$args`(`array`) &mdash; - executionarguments
+-`$obj`(`object`) &mdash; - an object to the context of which the method should be executed (if notstatic)
+-Returns `avtomon\AbstractResult`value.
+-Throws one of the followingexceptions:
+-[`avtomon\AclessException`](../avtomon/AclessException.md)
 - `avtomon\DbResultItemException`
   - [`ReflectionException`](http://php.net/class.ReflectionException)
 
-### `executeBeforeHandlers()`<a name="executeBeforeHandlers"> </a>
+###`executeBeforeHandlers()`<a name="executeBeforeHandlers"></a>
 
-Execute handlers for starting the query execution
-
-#### Signature
-
-- **public static** method.
-- It can take the following parameter (s):
-	- `$method`([`ReflectionMethod`](http://php.net/class.ReflectionMethod) | `null`) &mdash; - reflection of the method to be performed
-	- `$args`(`array`) &mdash; - his arguments
-Returns the `mixed`value.
-
-### `executeAfterHandlers()`<a name="executeAfterHandlers"> </a>
-
-Execute output handlers for the execution of the request
+Executehandlers for starting the queryexecution
 
 #### Signature
 
-- **public static** method.
-- It can take the following parameter (s):
-	- `$method`([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) &mdash; - Reflection of the executed method of the Constellor
-	- `$args`(`array`) &mdash; - his arguments
-	- `$result`(`null`) &mdash; - result of performance
-Returns the `mixed`value.
+-** public static **method.
+-It can take the following parameter(s):
+-`$method`([`ReflectionMethod`](http://php.net/class.ReflectionMethod) | `null`) &mdash; - reflection of the method to beperformed
+-`$args`(`array`) &mdash; - hisarguments
+Returnsthe `mixed`value.
 
-### `__callStatic()`<a name="__callStatic"> </a>
+###`executeAfterHandlers()`<a name="executeAfterHandlers"></a>
 
-Validating access rights and input data for static methods
+Executeoutput handlers for the execution of therequest
 
 #### Signature
 
-- **public static** method.
-- It can take the following parameter (s):
-	- `$methodName`(`string`) &mdash; - method name or SQL properties
-	- `$args`(`array`) &mdash; - array of arguments
-- Returns `avtomon\AbstractResult`value.
-- Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+-** public static **method.
+-It can take the following parameter(s):
+-`$method`([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) &mdash; - Reflection of the executed method of theConstellor
+-`$args`(`array`) &mdash; - hisarguments
+-`$result`(`null`) &mdash; - result ofperformance
+Returnsthe `mixed`value.
+
+###`__callStatic()`<a name="__callStatic"></a>
+
+Validatingaccess rights and input data for staticmethods
+
+#### Signature
+
+-** public static **method.
+-It can take the following parameter(s):
+-`$methodName`(`string`) &mdash; - method name or SQLproperties
+-`$args`(`array`) &mdash; - array ofarguments
+-Returns `avtomon\AbstractResult`value.
+-Throws one of the followingexceptions:
+-[`avtomon\AclessException`](../avtomon/AclessException.md)
 - `avtomon\DbResultItemException`
   - [`ReflectionException`](http://php.net/class.ReflectionException)
 
-### `__call()`<a name="__call"> </a>
+###`__call()`<a name="__call"></a>
 
-Validating access rights and input data for non-static methods
+Validatingaccess rights and input data for non-staticmethods
 
 #### Signature
 
-- **public** method.
-- It can take the following parameter (s):
-	- `$methodName`(`string`) &mdash; - method name or SQL properties
-	- `$args`(`array`) &mdash; - array of arguments
-- Returns `avtomon\AbstractResult`value.
-- Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+-** public **method.
+-It can take the following parameter(s):
+-`$methodName`(`string`) &mdash; - method name or SQLproperties
+-`$args`(`array`) &mdash; - array ofarguments
+-Returns `avtomon\AbstractResult`value.
+-Throws one of the followingexceptions:
+-[`avtomon\AclessException`](../avtomon/AclessException.md)
 - `avtomon\DbResultItemException`
   - [`ReflectionException`](http://php.net/class.ReflectionException)
 

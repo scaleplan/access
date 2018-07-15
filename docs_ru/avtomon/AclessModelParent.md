@@ -50,6 +50,9 @@ Class AclessModelParent
     - `$methodName` (`string`) &mdash; - имя метода или SQL-свойства
     - `$args` (`array`) &mdash; - массив аргументов
 - Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Выбрасывает одно из следующих исключений:
+    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+    - [`ReflectionException`](http://php.net/class.ReflectionException)
 
 ### `__call()` <a name="__call"></a>
 
@@ -62,4 +65,7 @@ Class AclessModelParent
     - `$methodName` (`string`) &mdash; - имя метода или SQL-свойства
     - `$args` (`array`) &mdash; - массив аргументов
 - Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Выбрасывает одно из следующих исключений:
+    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+    - [`ReflectionException`](http://php.net/class.ReflectionException)
 

@@ -56,7 +56,9 @@ class AclessSanitize
     /**
      * Проверить и очистить аргументы
      *
-     * @return array - массив очищенных аргументов
+     * @return array
+     *
+     * @throws AclessException
      */
     public function sanitizeArgs(): array
     {
@@ -99,7 +101,7 @@ class AclessSanitize
                 $sanArgs = array_merge($sanArgs, array_map(function ($arg) use ($paramType, $paramName, $docBlock) {
                     self::docTypeCheck($arg, $paramName, $paramType, $docBlock);
 
-                    return $item;
+                    return $arg;
                 }, $args));
                 break;
             }
@@ -132,6 +134,8 @@ class AclessSanitize
      * @param array $args - массив аргументов
      *
      * @return array
+     *
+     * @throws AclessException
      */
     public static function sanitizeSQLPropertyArgs(\ReflectionProperty $property, array $args): array
     {

@@ -96,6 +96,7 @@ class устанавливает следующие свойства:
 - Возвращает `bool` value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
+    - `avtomon\RedisSingletonException`
 
 ### `checkFileRights()` <a name="checkFileRights"></a>
 
@@ -109,6 +110,7 @@ class устанавливает следующие свойства:
 - Возвращает `bool` value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
+    - `avtomon\RedisSingletonException`
 
 ### `methodToURL()` <a name="methodToURL"></a>
 
@@ -136,6 +138,7 @@ class устанавливает следующие свойства:
     - `$controllerNamespace` (`string`) &mdash; - пространство имен для конроллера, если есть
 - Возвращает `array` value.
 - Выбрасывает одно из следующих исключений:
+    - [`avtomon\AclessException`](../avtomon/AclessException.md)
     - [`ReflectionException`](http://php.net/class.ReflectionException)
 
 ### `getRecursivePaths()` <a name="getRecursivePaths"></a>
@@ -159,6 +162,7 @@ class устанавливает следующие свойства:
 - Возвращает `array` value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
+    - [`ReflectionException`](http://php.net/class.ReflectionException)
 
 ### `getFilesURLs()` <a name="getFilesURLs"></a>
 
@@ -186,4 +190,7 @@ class устанавливает следующие свойства:
 
 - **public** method.
 - Возвращает `array` value.
+- Выбрасывает одно из следующих исключений:
+    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+    - [`ReflectionException`](http://php.net/class.ReflectionException)
 

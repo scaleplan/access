@@ -90,6 +90,9 @@ class AclessModelParent
      * @param array $args - массив аргументов
      *
      * @return AclessModelResult
+     *
+     * @throws AclessException
+     * @throws \ReflectionException
      */
     public static function __callStatic(string $methodName, array $args): AclessModelResult
     {
@@ -103,6 +106,9 @@ class AclessModelParent
      * @param array $args - массив аргументов
      *
      * @return AclessModelResult
+     *
+     * @throws AclessException
+     * @throws \ReflectionException
      */
     public function __call(string $methodName, array $args): AclessModelResult
     {

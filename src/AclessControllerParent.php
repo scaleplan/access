@@ -228,6 +228,10 @@ abstract class AclessControllerParent
      * @param array $args - массив аргументов
      *
      * @return AbstractResult
+     *
+     * @throws AclessException
+     * @throws DbResultItemException
+     * @throws \ReflectionException
      */
     public static function __callStatic(string $methodName, array $args): AbstractResult
     {
@@ -241,6 +245,10 @@ abstract class AclessControllerParent
      * @param array $args - массив аргументов
      *
      * @return AbstractResult
+     *
+     * @throws AclessException
+     * @throws DbResultItemException
+     * @throws \ReflectionException
      */
     public function __call(string $methodName, array $args): AbstractResult
     {

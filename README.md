@@ -1,11 +1,11 @@
 # Acless
 
-The system of access rights management + checking the types of arguments.
+Thesystem of access rights management + checking the types ofarguments.
 
 ### Installation
 
 ``
-composer reqire avtomon/acless
+composerreqireavtomon/acless
 ``
 <br>
 ### Initialization
@@ -13,145 +13,145 @@ composer reqire avtomon/acless
 ```
 cd vendor/avtomon/Acless
 
-./init schema data
+./initschemadata
 ```
 
-where schema and data are optional parameters indicating the need to generate the Acless schema in the database and APIs, the files and entered in the configuration respectively.
+whereschema and data are optional parameters indicating the need to generate the Acless schema in the database and APIs, the files and entered in the configurationrespectively.
 
 <br>
 
-### Mechanics of operation
+###Mechanics ofoperation
 
-The controller method is called from outside the controller class. How this happens does not matter.
+Thecontroller method is called from outside the controller class. How this happens does notmatter.
 
-If the method is public, or in the comment, the method's value is specified in the method * acless_no_rights_check *
-configuration, the system is not enabled and execution occurs as usual.
-If the method is private (access modifiers private and protected) and if a special phpdoc-tag of the method's processing is specified by the system Acless (the value of the acless_label configuration directive), then a query is made to the database, which checks whether the method can execute with the parameters arrived and for a specific user (user ID is set when creating Acless objects).
+Ifthe method is public, or in the comment, the method's value is specified in the method * acless_no_rights_check*
+configuration,the system is not enabled and execution occurs asusual.
+Ifthe method is private (access modifiers private and protected) and if a special phpdoc-tag of the method's processing is specified by the system Acless (the value of the acless_label configuration directive), then a query is made to the database, which checks whether the method can execute with the parameters arrived and for a specific user (user ID is set when creating Aclessobjects).
 
 For example:
 
 ```
 class User
 {
-    / **
-    * Get user object
-    *
-    * @aclessMethod
-    *
-    * @param int $id - user identifier
-    *
-    * @return UserAbstract
-    * /
-    protected static function get (int $id): UserAbstract
-    {
-        // ...
-    }
-}
-```
-
-In this example, the current user's access to the static get method of the User class will be checked for any values ​​of the $id argument.
-
-However, you can define access to execute a method with certain arguments:
-
-```
 / **
-* Get user object
+*Get userobject
 *
 * @aclessMethod
 *
-* @aclessFilter id
+*@param int $id - useridentifier
 *
-* @param int $id - user identifier
-*
-* @return UserAbstract
+*@returnUserAbstract
 * /
-protected static function actionGet (int $id): UserAbstract
+protectedstatic function get (int $id):UserAbstract
+{
+// ...
+}
+}
+```
+
+Inthis example, the current user's access to the static get method of the User class will be checked for any values ​​of the $idargument.
+
+However,you can define access to execute a method with certainarguments:
+
+```
+/ **
+*Get userobject
+*
+* @aclessMethod
+*
+*@aclessFilterid
+*
+*@param int $id - useridentifier
+*
+*@returnUserAbstract
+* /
+protectedstatic function actionGet (int $id):UserAbstract
 {
 // ...
 }
 ```
 
-In this example, access is allowed only if the value of the filter argument $id is included in the list of allowed values ​​stored in the database (the * values ​​* column of the table * access_right *). A list in the database will look like:
+Inthis example, access is allowed only if the value of the filter argument $id is included in the list of allowed values ​​stored in the database (the * values ​​* column of the table * access_right *). A list in the database will looklike:
 
 ``
-ARRAY ['<filter value 1>, <filter value 2', ...]
+ARRAY['<filter value 1>, <filter value 2',...]
 ``
 
-You can filter by several arguments:
+Youcan filter by severalarguments:
 
 ```
 / **
-* Set user role
+*Set userrole
 *
 * @aclessMethod
 *
-* @aclessFilter id, role
+*@aclessFilter id,role
 *
-* @param int $id - user identifier
-* @param string $role - user role
+*@param int $id - useridentifier
+*@param string $role - userrole
 *
-* @return void
+*@returnvoid
 * /
-protected static function actionSetRole (int $id, string $role): void
+protectedstatic function actionSetRole (int $id, string $role):void
 {
 // ...
 }
 ```
 
-In this case, the list of allowed occurrences will have the format:
+Inthis case, the list of allowed occurrences will have theformat:
 
 ```
-ARRAY ['<value for the first filter> <separator> <value for the second filter> ...', ...]
+ARRAY['<value for the first filter> <separator> <value for the second filter> ...',...]
 ```
 
-Thus, in order to allow the execution of the method ```User :: setRole (21, 'Moderator')```it is necessary that the list of allowed values ​​be set to `21: Moderator`, for the default splitter <b>: </b >
+Thus,in order to allow the execution of the method ```User :: setRole (21, 'Moderator')```it is necessary that the list of allowed values ​​be set to `21: Moderator`, for the default splitter <b>: </b>
 
-The module supports checking the types of input parameters. Php 7 supports type hinting for type checking, however, Acless acts more intelligently:
+Themodule supports checking the types of input parameters. Php 7 supports type hinting for type checking, however, Acless acts moreintelligently:
 
-1. In PHP, the method arguments and the return type can have only one type:
+1.In PHP, the method arguments and the return type can have only onetype:
 
 ``
-protected static function setRole (int $id, string $role): void
+protectedstatic function setRole (int $id, string $role):void
 ``
 
-If we want to type with several types, such as in C # or TypeScript:
+Ifwe want to type with several types, such as in C # orTypeScript:
 
 ```
-setMultiData (object: HTMLElement | NodeList, data: Object | Object [] | string = this.data): HTMLElement | NodeList
+setMultiData(object: HTMLElement | NodeList, data: Object | Object [] | string = this.data): HTMLElement |NodeList
 
 ```
 
-then native PHP will not allow you to do this.
+thennative PHP will not allow you to dothis.
 
-The Acless type checking subsystem can target * PHPDOC * and check the values ​​for matching to several types if they are specified in * PHPDOC *:
+TheAcless type checking subsystem can target * PHPDOC * and check the values ​​for matching to several types if they are specified in * PHPDOC*:
 
 ```
 / **
-* Set user role
+*Set userrole
 *
 * @aclessMethod
 *
-* @aclessFilter id, role
+*@aclessFilter id,role
 *
-* @param int | string $id - user identifier
-* @param string | IRole $role - user role
+*@param int | string $id - useridentifier
+*@param string | IRole $role - userrole
 *
-* @return UserAbstract | void
+*@return UserAbstract |void
 * /
-protected static function actionSetRole (int $id, string $role)
+protectedstatic function actionSetRole (int $id, string $role)
 {
-    // ...
+// ...
 }
 ```
 
-2. By default, the value of the argument can be considered "correct", even if its type does not match the expected one, but the value returned to the expected type (or to one of the expected ones) does not differ from the original in the case of fuzzy comparison (==). This behavior can be turned off by setting a tag from the * deny_fuzzy * configuration directive for the method.
+2.By default, the value of the argument can be considered "correct", even if its type does not match the expected one, but the value returned to the expected type (or to one of the expected ones) does not differ from the original in the case of fuzzy comparison (==). This behavior can be turned off by setting a tag from the * deny_fuzzy * configuration directive for themethod.
 
-This functionality is available. As for the methods of controllers, this is for the methods of models.
+Thisfunctionality is available. As for the methods of controllers, this is for the methods ofmodels.
 <br>
 
-The module supports the generation of URLs to API methods from controller files.
+Themodule supports the generation of URLs to API methods from controllerfiles.
 
-To do this, you only need to specify the necessary configuration directives in the Acless configuration file.
+Todo this, you only need to specify the necessary configuration directives in the Acless configurationfile.
 
 ```
 controllers:
@@ -160,30 +160,30 @@ method_prefix: action
 namespace: app\controllers
 ```
 
-After generation, the table * acless.url *
+Aftergeneration, the table * acless.url*
 <br>
 
-In the configuration file, you can specify the roles of the users of the system
+Inthe configuration file, you can specify the roles of the users of thesystem
 
 ```
 roles:
 - Administrator
 - Moderator
 - Listener
-- A guest
+-Aguest
 ```
-Why these roles can be linked to existing users registered in the system and set the default access rights for each role.
+Whythese roles can be linked to existing users registered in the system and set the default access rights for eachrole.
 
-In spite of this, further access rights for any user can be changed irrespective of the initial set of rights - access rights by default exist only to specify it was possible to automatically give out a set of rights to the user.
+Inspite of this, further access rights for any user can be changed irrespective of the initial set of rights - access rights by default exist only to specify it was possible to automatically give out a set of rights to theuser.
 
-The module supports the management of access rights for private files. The mechanism of operation is the same as for the API. In fact, the system still works with URLs for methods of controllers or with corners of private files. To generate links to files, you only need to specify in the config directory where these files are stored:
+Themodule supports the management of access rights for private files. The mechanism of operation is the same as for the API. In fact, the system still works with URLs for methods of controllers or with corners of private files. To generate links to files, you only need to specify in the config directory where these files arestored:
 
 ```
 files:
 -/var/www/project/view/private/materials
 ```
 
-Additional URLs for verification can be specified simply by writing them to the configuration file in the urls directive:
+AdditionalURLs for verification can be specified simply by writing them to the configuration file in the urlsdirective:
 
 ```
 urls:
@@ -193,22 +193,22 @@ urls:
 
 <br>
 
-To work correctly with the methods of controllers, it is necessary that the classes of controllers to be processed are inherited from the class AclessControllerParent. To test the arguments of the model methods, you need to inherit the classes of models from the class AclessModelParent.
+Towork correctly with the methods of controllers, it is necessary that the classes of controllers to be processed are inherited from the class AclessControllerParent. To test the arguments of the model methods, you need to inherit the classes of models from the classAclessModelParent.
 <br>
 
-The main data store of the system is PostgreSQL. However, the data needed to verify access rights is cached in the Redis repository. To increase productivity.
+Themain data store of the system is PostgreSQL. However, the data needed to verify access rights is cached in the Redis repository. To increaseproductivity.
 
-When data is changed in the main repository (PostgreSQL), the data in the cache (Redis) is automatically updated by the trigger. In order for the trigger to be executed correctly by the user of the process, PostgreSQL must have access to the Redis repository.
+Whendata is changed in the main repository (PostgreSQL), the data in the cache (Redis) is automatically updated by the trigger. In order for the trigger to be executed correctly by the user of the process, PostgreSQL must have access to the Redisrepository.
 
 <br>
 
-#### Additional Features:
+####AdditionalFeatures:
 
-1. Supports the addition of collbacks that run before and after the successful execution of the controller method. In this case, these bulbs can change the input data and the resulting result, respectively.
+1.Supports the addition of collbacks that run before and after the successful execution of the controller method. In this case, these bulbs can change the input data and the resulting result,respectively.
 
-2. During initialization, the module downloads the name of all the database tables from the database. In the future, access to these tables will be handled by the rights checking subsystem. You can either edit this information in the database.
+2.During initialization, the module downloads the name of all the database tables from the database. In the future, access to these tables will be handled by the rights checking subsystem. You can either edit this information in thedatabase.
 
-3. In addition to the database, you can specify the type of controller method, the same type of API methods to know which method will be modifying, deleting, creating or reading, it can be convenient for filtering the methods of controllers in the user interface.
+3.In addition to the database, you can specify the type of controller method, the same type of API methods to know which method will be modifying, deleting, creating or reading, it can be convenient for filtering the methods of controllers in the userinterface.
 
 <br>
 

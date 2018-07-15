@@ -1,9 +1,9 @@
-<small> avtomon </small>
+<small>avtomon </small>
 
 Acless
 ======
 
-Class of formation of the list of URLs and verification of rights
+Classof formation of the list of URLs and verification ofrights
 
 Description
 -----------
@@ -13,184 +13,184 @@ Class Acless
 Signature
 ---------
 
-- **class**.
-- It is a subclass of the class [`AclessAbstract`](../ avtomon/AclessAbstract.md).
+-** class**.
+-It is a subclass of the class [`AclessAbstract`](../avtomon/AclessAbstract.md).
 
 Constants
 ---------
 
-class sets the following constants:
+classsets the followingconstants:
 
-  - [`ACLESS_403_ERROR_CODE`](#ACLESS_403_ERROR_CODE) &mdash; Acless error code indicating private access to the resource
-  - [`ACLESS_UNAUTH_ERROR_CODE`](#ACLESS_UNAUTH_ERROR_CODE) &mdash; Acless error code indicating unresolved unauthorized request
+-[`ACLESS_403_ERROR_CODE`](#ACLESS_403_ERROR_CODE) &mdash; Acless error code indicating private access to theresource
+-[`ACLESS_UNAUTH_ERROR_CODE`](#ACLESS_UNAUTH_ERROR_CODE) &mdash; Acless error code indicating unresolved unauthorizedrequest
 
 Properties
 ----------
 
-class sets the following properties:
+classsets the followingproperties:
 
-  - [`$instance`](#$instance) &mdash; Instance class
-  - [`$filterSeparator`](#$filterSeparator) &mdash; Separator of filter values
+-[`$instance`](#$instance) &mdash; Instanceclass
+-[`$filterSeparator`](#$filterSeparator) &mdash; Separator of filtervalues
 
-### `$instance`<a name="instance"> </a>
+###`$instance`<a name="instance"></a>
 
 Instance class
 
 #### Signature
 
-**protected static** property.
-- Can be one of the following types:
+**protected static **property.
+-Can be one of the followingtypes:
 - `null`
-  - [`Acless`](../ avtomon/Acless.md)
+-[`Acless`](../avtomon/Acless.md)
 
-### `$filterSeparator`<a name="filterSeparator"> </a>
+###`$filterSeparator`<a name="filterSeparator"></a>
 
-Separator of filter values
+Separatorof filtervalues
 
 #### Signature
 
-- **protected** property.
-- The value of `string`.
+-** protected **property.
+-The value of`string`.
 
 Methods
 -------
 
-Class methods class:
+Classmethodsclass:
 
-  - [`getAccessRights()`](#getAccessRights) &mdash; Return information about all available URLs or about a specific URL
-  - [`checkMethodRights()`](#checkMethodRights) &mdash; Check access to the method
-  - [`checkFileRights()`](#checkFileRights) &mdash; Check access to the file
-  - [`methodToURL()`](#methodToURL) &mdash; Generate URL from controller name and method name
-  - [`generateControllerURLs()`](#generateControllerURLs) &mdash; Generate array of controllers' URLs
-  - [`getRecursivePaths()`](#getRecursivePaths) &mdash; Find all files in the directory, including subdirectories
-  - [`getControllerURLs()`](#getControllerURLs) &mdash; Returns all controller controls
-  - [`getFilesURLs()`](#getFilesURLs) &mdash; Returns all file paths
-  - [`getPlainURLs()`](#getPlainURLs) &mdash; Returns the URLs specified in the configuration file
-  - [`getAllURLs()`](#getAllURLs) &mdash; Returns all collected URLs
+-[`getAccessRights()`](#getAccessRights) &mdash; Return information about all available URLs or about a specificURL
+-[`checkMethodRights()`](#checkMethodRights) &mdash; Check access to themethod
+-[`checkFileRights()`](#checkFileRights) &mdash; Check access to thefile
+-[`methodToURL()`](#methodToURL) &mdash; Generate URL from controller name and methodname
+-[`generateControllerURLs()`](#generateControllerURLs) &mdash; Generate array of controllers'URLs
+-[`getRecursivePaths()`](#getRecursivePaths) &mdash; Find all files in the directory, includingsubdirectories
+-[`getControllerURLs()`](#getControllerURLs) &mdash; Returns all controllercontrols
+-[`getFilesURLs()`](#getFilesURLs) &mdash; Returns all filepaths
+-[`getPlainURLs()`](#getPlainURLs) &mdash; Returns the URLs specified in the configurationfile
+-[`getAllURLs()`](#getAllURLs) &mdash; Returns all collectedURLs
 
-### `getAccessRights()`<a name="getAccessRights"> </a>
+###`getAccessRights()`<a name="getAccessRights"></a>
 
-Return information about all available URLs or about a specific URL
+Returninformation about all available URLs or about a specificURL
 
 #### Signature
 
-- **public** method.
-- It can take the following parameter (s):
-	- `$url`(`string`) &mdash; - text url
-Returns the `array`value.
-- Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+-** public **method.
+-It can take the following parameter(s):
+-`$url`(`string`) &mdash; - texturl
+Returnsthe `array`value.
+-Throws one of the followingexceptions:
+-[`avtomon\AclessException`](../avtomon/AclessException.md)
 - `avtomon\RedisSingletonException`
 
-### `checkMethodRights()`<a name="checkMethodRights"> </a>
+###`checkMethodRights()`<a name="checkMethodRights"></a>
 
-Check access to the method
+Checkaccess to themethod
 
 #### Signature
 
-- **public** method.
-- It can take the following parameter (s):
-	- `$refMethod`([`Reflector`](http://php.net/class.Reflector)) &mdash; - Reflection wrapper for method
-	- `$args`(`array`) &mdash; - execution parameters
-	- `$refClass`([`ReflectionClass`](http://php.net/class.ReflectionClass)) &mdash; - method class
-- Returns the `bool`value.
-- Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+-** public **method.
+-It can take the following parameter(s):
+-`$refMethod`([`Reflector`](http://php.net/class.Reflector)) &mdash; - Reflection wrapper formethod
+-`$args`(`array`) &mdash; - executionparameters
+-`$refClass`([`ReflectionClass`](http://php.net/class.ReflectionClass)) &mdash; - methodclass
+-Returns the `bool`value.
+-Throws one of the followingexceptions:
+-[`avtomon\AclessException`](../avtomon/AclessException.md)
 - `avtomon\RedisSingletonException`
 
-### `checkFileRights()`<a name="checkFileRights"> </a>
+###`checkFileRights()`<a name="checkFileRights"></a>
 
-Check access to the file
+Checkaccess to thefile
 
 #### Signature
 
-- **public** method.
-- It can take the following parameter (s):
-	- `$filePath`(`string`) &mdash; - the path to the file
-- Returns the `bool`value.
-- Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+-** public **method.
+-It can take the following parameter(s):
+-`$filePath`(`string`) &mdash; - the path to thefile
+-Returns the `bool`value.
+-Throws one of the followingexceptions:
+-[`avtomon\AclessException`](../avtomon/AclessException.md)
 - `avtomon\RedisSingletonException`
 
-### `methodToURL()`<a name="methodToURL"> </a>
+###`methodToURL()`<a name="methodToURL"></a>
 
-Generate URL from controller name and method name
-
-#### Signature
-
-- **public** method.
-- It can take the following parameter (s):
-	- `$className`(`string`) &mdash; - class name
-	- `$methodName`(`string`) &mdash; - method name
-Returns `string`value.
-- Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
-
-### `generateControllerURLs()`<a name="generateControllerURLs"> </a>
-
-Generate array of controllers' URLs
+GenerateURL from controller name and methodname
 
 #### Signature
 
-- **protected** method.
-- It can take the following parameter (s):
-	- `$controllerFileName`(`string`) &mdash; - controller file name
-	- `$controllerNamespace`(`string`) &mdash; - namespace for the controller, if any
-Returns the `array`value.
-- Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+-** public **method.
+-It can take the following parameter(s):
+-`$className`(`string`) &mdash; - classname
+-`$methodName`(`string`) &mdash; - methodname
+Returns`string`value.
+-Throws one of the followingexceptions:
+-[`avtomon\AclessException`](../avtomon/AclessException.md)
+
+###`generateControllerURLs()`<a name="generateControllerURLs"></a>
+
+Generatearray of controllers'URLs
+
+#### Signature
+
+-** protected **method.
+-It can take the following parameter(s):
+-`$controllerFileName`(`string`) &mdash; - controller filename
+-`$controllerNamespace`(`string`) &mdash; - namespace for the controller, ifany
+Returnsthe `array`value.
+-Throws one of the followingexceptions:
+-[`avtomon\AclessException`](../avtomon/AclessException.md)
   - [`ReflectionException`](http://php.net/class.ReflectionException)
 
-### `getRecursivePaths()`<a name="getRecursivePaths"> </a>
+###`getRecursivePaths()`<a name="getRecursivePaths"></a>
 
-Find all files in the directory, including subdirectories
-
-#### Signature
-
-- **protected** method.
-- It can take the following parameter (s):
-	- `$dir`(`string`) &mdash; - path to the catalog
-Returns the `array`value.
-
-### `getControllerURLs()`<a name="getControllerURLs"> </a>
-
-Returns all controller controls
+Findall files in the directory, includingsubdirectories
 
 #### Signature
 
-- **public** method.
-Returns the `array`value.
-- Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+-** protected **method.
+-It can take the following parameter(s):
+-`$dir`(`string`) &mdash; - path to thecatalog
+Returnsthe `array`value.
+
+###`getControllerURLs()`<a name="getControllerURLs"></a>
+
+Returnsall controllercontrols
+
+#### Signature
+
+-** public **method.
+Returnsthe `array`value.
+-Throws one of the followingexceptions:
+-[`avtomon\AclessException`](../avtomon/AclessException.md)
   - [`ReflectionException`](http://php.net/class.ReflectionException)
 
-### `getFilesURLs()`<a name="getFilesURLs"> </a>
+###`getFilesURLs()`<a name="getFilesURLs"></a>
 
-Returns all file paths
-
-#### Signature
-
-- **public** method.
-Returns the `array`value.
-
-### `getPlainURLs()`<a name="getPlainURLs"> </a>
-
-Returns the URLs specified in the configuration file
+Returnsall filepaths
 
 #### Signature
 
-- **public** method.
-Returns the `array`value.
+-** public **method.
+Returnsthe `array`value.
 
-### `getAllURLs()`<a name="getAllURLs"> </a>
+###`getPlainURLs()`<a name="getPlainURLs"></a>
 
-Returns all collected URLs
+Returnsthe URLs specified in the configurationfile
 
 #### Signature
 
-- **public** method.
-Returns the `array`value.
-- Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+-** public **method.
+Returnsthe `array`value.
+
+###`getAllURLs()`<a name="getAllURLs"></a>
+
+Returnsall collectedURLs
+
+#### Signature
+
+-** public **method.
+Returnsthe `array`value.
+-Throws one of the followingexceptions:
+-[`avtomon\AclessException`](../avtomon/AclessException.md)
   - [`ReflectionException`](http://php.net/class.ReflectionException)
 

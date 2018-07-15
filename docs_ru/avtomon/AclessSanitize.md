@@ -91,8 +91,9 @@ class устанавливает следующие свойства:
 #### Сигнатура
 
 - **public** method.
-- _Возвращает:_ - массив очищенных аргументов
-    - `array`
+- Возвращает `array` value.
+- Выбрасывает одно из следующих исключений:
+    - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
 ### `sanitizeMethodArgs()` <a name="sanitizeMethodArgs"></a>
 
@@ -119,6 +120,8 @@ class устанавливает следующие свойства:
     - `$property` ([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) &mdash; - Reflection-обертка для SQL-свойства
     - `$args` (`array`) &mdash; - массив аргументов
 - Возвращает `array` value.
+- Выбрасывает одно из следующих исключений:
+    - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
 ### `argAvailabilityCheck()` <a name="argAvailabilityCheck"></a>
 

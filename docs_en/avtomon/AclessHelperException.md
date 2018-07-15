@@ -1,14 +1,14 @@
 <small>avtomon </small>
 
-AclessException
-===============
+AclessHelperException
+=====================
 
-Exclusion class
+Error class
 
 Description
 -----------
 
-Class AclessException
+Class AclessHelperException
 
 Signature
 ---------
