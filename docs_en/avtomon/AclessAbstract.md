@@ -52,7 +52,7 @@ Connecting to RDBMS
 
 - **protected** property.
 - Can be one of the following types:
-- `null`
+  - `null`
   - [`PDO`](http://php.net/class.PDO)
 
 ### `$cs`<a name="cs"> </a>
@@ -63,8 +63,8 @@ Connecting to the cache
 
 - **protected** property.
 - Can be one of the following types:
-- `null`
-- `Redis`
+  - `null`
+  - `Redis`
 
 ### `$instance`<a name="instance"> </a>
 
@@ -74,8 +74,8 @@ Instance class
 
 **protected static** property.
 - Can be one of the following types:
-- `null`
-  - [`AclessAbstract`](../ avtomon/AclessAbstract.md)
+  - `null`
+  - [`AclessAbstract`](../avtomon/AclessAbstract.md)
 
 Methods
 -------
@@ -96,9 +96,9 @@ Singleton
 
 - **public static** method.
 - It can take the following parameter (s):
-	- `$userId`(`int`) &mdash; - user ID
-	- `$confPath`(`string`) &mdash; - path to the configuration file
-- Returns [`AclessAbstract`](../ avtomon/AclessAbstract.md) value.
+  - `$userId`(`int`) - user identifier
+  - `$confPath`(`string`) - the path to the configuration file
+- Returns [`AclessAbstract`](../avtomon/AclessAbstract.md) value.
 
 ### `__construct()`<a name="__construct"> </a>
 
@@ -108,11 +108,11 @@ AclessAbstract constructor
 
 - **private** method.
 - It can take the following parameter (s):
-	- `$userId`(`int`) &mdash; - user ID
-	- `$confPath`(`string`) &mdash; - even to the configuration
+  - `$userId`(`int`) - user identifier
+  - `$confPath`(`string`) - even to the configuration
 - Returns nothing.
 - Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
 ### `getUserId()`<a name="getUserId"> </a>
 
@@ -132,7 +132,7 @@ Return connection to RDBMS
 - **protected** method.
 - Returns [`PDO`](http://php.net/class.PDO) value.
 - Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
 ### `getConfig()`<a name="getConfig"> </a>
 
@@ -142,9 +142,9 @@ Return configuration or part of it
 
 - **public** method.
 - It can take the following parameter (s):
-	- `$key`(`string`) &mdash; - configuration key
+  - `$key`(`string`) - configuration key
 - Can return one of the following values:
 - array
-- `mixed`
-- `null`
+  - `mixed`
+  - `null`
 

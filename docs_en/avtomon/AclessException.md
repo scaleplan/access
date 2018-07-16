@@ -1,17 +1,17 @@
-<small> avtomon </small>
+<small>avtomon</small>
 
 AclessException
 ===============
 
-Exclusion class
+Класс исключений
 
-Description
+Описание
 -----------
 
 Class AclessException
 
-Signature
+Сигнатура
 ---------
 
 - **class**.
-- It is a subclass of the class `avtomon\CustomException`.
+- Является подклассом класса `avtomon\CustomException`.

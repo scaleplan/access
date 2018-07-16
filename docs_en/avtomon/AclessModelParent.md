@@ -1,71 +1,71 @@
-the <small>avtomon</small>
+<small>avtomon</small>
 
 AclessModelParent
 =================
 
-Parent for models-to test arguments
+Родитель для моделей - для проверки аргументов
 
-Description
+Описание
 -----------
 
 Class AclessModelParent
 
-Signature
+Сигнатура
 ---------
 
 - **class**.
 
-Methods
+Методы
 -------
 
-Class methods class:
+Методы класса class:
 
-  - [`checkModelMethodEssence()`](#checkModelMethodEssence) &mdash; the Audit method or property, and the implementation for the methods
-- ['__callStatic()'](#___callStatic) &mdash; Check the passed arguments for a method or SQL property in a static context
-- ['__call (`' ](#___call) &mdash; Check the passed arguments for a method or SQL property
+- [`checkModelMethodEssence()`](#checkModelMethodEssence) &mdash; Аудит метода или свойства, и выполнение для методов
+- [`__callStatic()`](#__callStatic) &mdash; Проверка переданных аргументов для метода или SQL-свойства в статическом контексте
+- [`__call()`](#__call) &mdash; Проверка переданных аргументов для метода или SQL-свойства
 
-### `checkModelMethodEssence (`'<a name= "checkModelMethodEssence" ></a>
+### `checkModelMethodEssence()` <a name="checkModelMethodEssence"></a>
 
-The audit method or property, and the implementation for the methods
+Аудит метода или свойства, и выполнение для методов
 
-#### Signature
+#### Сигнатура
 
-- **protected static * * method.
-- Can take the following parameter (s):
-    - '$methodName ' ('string`) &mdash; - method name
-    	- `$args `(`array') &mdash; - arguments
-- Return [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
-- Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
-    - ['ReflectionException'](http://php.net/class.ReflectionException)
+- **protected static** method.
+- Может принимать следующий параметр(ы):
+    - `$methodName` (`string`) - имя метода
+    - `$args` (`array`) - аргументы
+- Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Выбрасывает одно из следующих исключений:
+    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+    - [`ReflectionException`](http://php.net/class.ReflectionException)
 
-### `__callStatic() '<a name= "__callStatic " ></a>
+### `__callStatic()` <a name="__callStatic"></a>
 
-Checking the passed arguments for a method or SQL property in a static context
+Проверка переданных аргументов для метода или SQL-свойства в статическом контексте
 
-#### Signature
+#### Сигнатура
 
-- **public static * * method.
-- Can take the following parameter (s):
-    - '$methodName ' ('string`) &mdash; - method name or SQL property
-    - '$args ' ('array`) &mdash; - array of arguments
-- Return [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
-- Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
-    - ['ReflectionException'](http://php.net/class.ReflectionException)
+- **public static** method.
+- Может принимать следующий параметр(ы):
+    - `$methodName` (`string`) - имя метода или SQL-свойства
+    - `$args` (`array`) - массив аргументов
+- Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Выбрасывает одно из следующих исключений:
+    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+    - [`ReflectionException`](http://php.net/class.ReflectionException)
 
-### `__call`) '<a name= "__call " ></a>
+### `__call()` <a name="__call"></a>
 
-Check the passed arguments for a method or SQL property
+Проверка переданных аргументов для метода или SQL-свойства
 
-#### Signature
+#### Сигнатура
 
-- **public * * method.
-- Can take the following parameter (s):
-    - '$methodName ' ('string`) &mdash; - method name or SQL property
-    - '$args ' ('array`) &mdash; - array of arguments
-- Return [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
-- Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
-    - ['ReflectionException'](http://php.net/class.ReflectionException)
+- **public** method.
+- Может принимать следующий параметр(ы):
+    - `$methodName` (`string`) - имя метода или SQL-свойства
+    - `$args` (`array`) - массив аргументов
+- Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Выбрасывает одно из следующих исключений:
+    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+    - [`ReflectionException`](http://php.net/class.ReflectionException)
 

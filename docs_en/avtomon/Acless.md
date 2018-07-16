@@ -14,7 +14,7 @@ Signature
 ---------
 
 - **class**.
-- It is a subclass of the class [`AclessAbstract`](../ avtomon/AclessAbstract.md).
+- It is a subclass of the class [`AclessAbstract`](../avtomon/AclessAbstract.md).
 
 Constants
 ---------
@@ -40,8 +40,8 @@ Instance class
 
 **protected static** property.
 - Can be one of the following types:
-- `null`
-  - [`Acless`](../ avtomon/Acless.md)
+  - `null`
+  - [`Acless`](../avtomon/Acless.md)
 
 ### `$filterSeparator`<a name="filterSeparator"> </a>
 
@@ -76,11 +76,11 @@ Return information about all available URLs or about a specific URL
 
 - **public** method.
 - It can take the following parameter (s):
-	- `$url`(`string`) &mdash; - text url
+  - `$url`(`string`) - text Urla
 Returns the `array`value.
 - Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
-- `avtomon\RedisSingletonException`
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
+  - `avtomon\RedisSingletonException`
 
 ### `checkMethodRights()`<a name="checkMethodRights"> </a>
 
@@ -90,13 +90,13 @@ Check access to the method
 
 - **public** method.
 - It can take the following parameter (s):
-	- `$refMethod`([`Reflector`](http://php.net/class.Reflector)) &mdash; - Reflection wrapper for method
-	- `$args`(`array`) &mdash; - execution parameters
-	- `$refClass`([`ReflectionClass`](http://php.net/class.ReflectionClass)) &mdash; - method class
+  - `$refMethod`([`Reflector`](http://php.net/class.Reflector)) - Reflection-wrapper for the method
+  - `$args`(`array`) - options for running
+  - `$refClass`([`ReflectionClass`](http://php.net/class.ReflectionClass)) - method, class
 - Returns the `bool`value.
 - Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
-- `avtomon\RedisSingletonException`
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
+  - `avtomon\RedisSingletonException`
 
 ### `checkFileRights()`<a name="checkFileRights"> </a>
 
@@ -106,11 +106,11 @@ Check access to the file
 
 - **public** method.
 - It can take the following parameter (s):
-	- `$filePath`(`string`) &mdash; - the path to the file
+  - `$filePath`(`string`) - path to the file
 - Returns the `bool`value.
 - Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
-- `avtomon\RedisSingletonException`
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
+  - `avtomon\RedisSingletonException`
 
 ### `methodToURL()`<a name="methodToURL"> </a>
 
@@ -120,11 +120,11 @@ Generate URL from controller name and method name
 
 - **public** method.
 - It can take the following parameter (s):
-	- `$className`(`string`) &mdash; - class name
-	- `$methodName`(`string`) &mdash; - method name
+  - `$className`(`string`) - class name
+  - `$methodName`(`string`) - method name
 Returns `string`value.
 - Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
 ### `generateControllerURLs()`<a name="generateControllerURLs"> </a>
 
@@ -134,11 +134,11 @@ Generate array of controllers' URLs
 
 - **protected** method.
 - It can take the following parameter (s):
-	- `$controllerFileName`(`string`) &mdash; - controller file name
-	- `$controllerNamespace`(`string`) &mdash; - namespace for the controller, if any
+  - `$controllerFileName`(`string`) - controller file name
+  - `$controllerNamespace`(`string`) - namespace for the controller, if any
 Returns the `array`value.
 - Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
   - [`ReflectionException`](http://php.net/class.ReflectionException)
 
 ### `getRecursivePaths()`<a name="getRecursivePaths"> </a>
@@ -149,7 +149,7 @@ Find all files in the directory, including subdirectories
 
 - **protected** method.
 - It can take the following parameter (s):
-	- `$dir`(`string`) &mdash; - path to the catalog
+  - `$dir`(`string`) - directory path
 Returns the `array`value.
 
 ### `getControllerURLs()`<a name="getControllerURLs"> </a>
@@ -161,7 +161,7 @@ Returns all controller controls
 - **public** method.
 Returns the `array`value.
 - Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
   - [`ReflectionException`](http://php.net/class.ReflectionException)
 
 ### `getFilesURLs()`<a name="getFilesURLs"> </a>
@@ -191,6 +191,6 @@ Returns all collected URLs
 - **public** method.
 Returns the `array`value.
 - Throws one of the following exceptions:
-  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
   - [`ReflectionException`](http://php.net/class.ReflectionException)
 
