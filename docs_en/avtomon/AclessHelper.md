@@ -1,35 +1,35 @@
-<small>avtomon</small>
+<small> avtomon </small>
 
 AclessHelper
 ============
 
-Класс вспомогательных методов
+Auxiliary Methods Class
 
-Описание
+Description
 -----------
 
 Class AclessHelper
 
-Сигнатура
+Signature
 ---------
 
 - **class**.
 
-Методы
+Methods
 -------
 
-Методы класса class:
+Class methods class:
 
-- [`camel2dashed()`](#camel2dashed) &mdash; Превратить строку в виде camelCase в строку вида dashed (camelCase -&gt; camel-case)
+  - [`camel2dashed()`](#camel2dashed) &mdash; Convert a string as camelCase to a string of the form dashed (camelCase - & gt; camel-case)
 
-### `camel2dashed()` <a name="camel2dashed"></a>
+### `camel2dashed()`<a name="camel2dashed"> </a>
 
-Превратить строку в виде camelCase в строку вида dashed (camelCase -> camel-case)
+Convert a string as camelCase to a string of the form dashed (camelCase -> camel-case)
 
-#### Сигнатура
+#### Signature
 
 - **public static** method.
-- Может принимать следующий параметр(ы):
-    - `$str` (`string`) - строка в camelCase
-- Возвращает `string` value.
+- It can take the following parameter (s):
+  - `$str`(`string`) - line in camelCase
+Returns `string`value.
 

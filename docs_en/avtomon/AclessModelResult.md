@@ -1,187 +1,187 @@
-<small>avtomon</small>
+<small> avtomon </small>
 
 AclessModelResult
 =================
 
-Класс результата выполнения модели
+The result class of the model
 
-Описание
+Description
 -----------
 
 Class AclessModelResult
 
-Сигнатура
+Signature
 ---------
 
 - **class**.
-- Является подклассом класса `avtomon\DbResultItem`.
+- It is a subclass of the class `avtomon\DbResultItem`.
 
-Свойства
+Properties
 ----------
 
-class устанавливает следующие свойства:
+class sets the following properties:
 
-- [`$class`](#$class) &mdash; Отражение класса модели
-- [`$method`](#$method) &mdash; Отражение метода модели
-- [`$property`](#$property) &mdash; Отражение свойства модели
-- [`$args`](#$args) &mdash; Аргументы выполнения
-- [`$isPlainArgs`](#$isPlainArgs) &mdash; true - метод модели принимает аргументы в виде набора
-false - в виде ассоциативного массива
+  - [`$class`](#$class) &mdash; Reflection of the model class
+  - [`$method`](#$method) &mdash; Reflection of the model method
+  - [`$property`](#$property) &mdash; Reflecting the model property
+  - [`$args`](#$args) &mdash; Execution Arguments
+  - [`$isPlainArgs`](#$isPlainArgs) &mdash; true - the model method takes arguments as a set
+false - as an associative array
 
-### `$class` <a name="class"></a>
+### `$class`<a name="class"> </a>
 
-Отражение класса модели
+Reflection of the model class
 
-#### Сигнатура
-
-- **protected** property.
-- Может быть одного из следующих типов:
-    - `null`
-    - [`ReflectionClass`](http://php.net/class.ReflectionClass)
-
-### `$method` <a name="method"></a>
-
-Отражение метода модели
-
-#### Сигнатура
+#### Signature
 
 - **protected** property.
-- Может быть одного из следующих типов:
-    - `null`
-    - [`ReflectionMethod`](http://php.net/class.ReflectionMethod)
+- Can be one of the following types:
+  - `null`
+  - [`ReflectionClass`](http://php.net/class.ReflectionClass)
 
-### `$property` <a name="property"></a>
+### `$method`<a name="method"> </a>
 
-Отражение свойства модели
+Reflection of the model method
 
-#### Сигнатура
-
-- **protected** property.
-- Может быть одного из следующих типов:
-    - `null`
-    - [`ReflectionProperty`](http://php.net/class.ReflectionProperty)
-
-### `$args` <a name="args"></a>
-
-Аргументы выполнения
-
-#### Сигнатура
+#### Signature
 
 - **protected** property.
-- Значение `array`.
+- Can be one of the following types:
+  - `null`
+  - [`ReflectionMethod`](http://php.net/class.ReflectionMethod)
 
-### `$isPlainArgs` <a name="isPlainArgs"></a>
+### `$property`<a name="property"> </a>
 
-true - метод модели принимает аргументы в виде набора
-false - в виде ассоциативного массива
+Reflecting the model property
 
-#### Сигнатура
+#### Signature
 
 - **protected** property.
-- Значение `bool`.
+- Can be one of the following types:
+  - `null`
+  - [`ReflectionProperty`](http://php.net/class.ReflectionProperty)
 
-Методы
+### `$args`<a name="args"> </a>
+
+Execution Arguments
+
+#### Signature
+
+- **protected** property.
+- The value of `array`.
+
+### `$isPlainArgs`<a name="isPlainArgs"> </a>
+
+true - the model method takes arguments as a set
+false - as an associative array
+
+#### Signature
+
+- **protected** property.
+- The value of `bool`.
+
+Methods
 -------
 
-Методы класса class:
+Class methods class:
 
-- [`__construct()`](#__construct) &mdash; AclessModelResult constructor
-- [`getClass()`](#getClass) &mdash; Геттер для отражения класса модели
-- [`getMethod()`](#getMethod) &mdash; Геттер для отражения метода модели
-- [`getProperty()`](#getProperty) &mdash; Геттер для отражения свойства модели
-- [`getArgs()`](#getArgs) &mdash; Геттер для аргументов выполнения
-- [`getIsPlainArgs()`](#getIsPlainArgs) &mdash; Будут ли параметры выполнения загружаться в виде последовательности аргументов
-- [`setRawResult()`](#setRawResult) &mdash; Добавить результат из другого объекта DbResultItem
-- [`checkDocReturn()`](#checkDocReturn) &mdash; Проверить тип возвращаемого значения по типам заданным в DOCBLOCK
+  - [`__construct()`](#__construct) &mdash; AclessModelResult constructor
+  - [`getClass()`](#getClass) &mdash; Getter for reflecting the model class
+  - [`getMethod()`](#getMethod) &mdash; Getter to reflect the method of the model
+  - [`getProperty()`](#getProperty) &mdash; Getter to reflect model properties
+  - [`getArgs()`](#getArgs) &mdash; Getter for execution arguments
+  - [`getIsPlainArgs()`](#getIsPlainArgs) &mdash; Will the execution parameters be loaded as a sequence of arguments
+  - [`setRawResult()`](#setRawResult) &mdash; Add result from another object DbResultItem
+  - [`checkDocReturn()`](#checkDocReturn) &mdash; Check the return type for the types specified in DOCBLOCK
 
-### `__construct()` <a name="__construct"></a>
+### `__construct()`<a name="__construct"> </a>
 
 AclessModelResult constructor
 
-#### Сигнатура
+#### Signature
 
 - **public** method.
-- Может принимать следующий параметр(ы):
-    - `$class` ([`ReflectionClass`](http://php.net/class.ReflectionClass)) - отражение класса модели
-    - `$method` ([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) - отражение метода модели
-    - `$property` ([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) - отражение свойства модели
-    - `$args` (`array`) - аргументы выполнения
-    - `$isPlainArgs` (`bool`) - true - метод модели принимает аргументы в виде набора, false - в виде ассоциативного массива
-    - `$result` (`null`|`mixed`) - результат
-- Ничего не возвращает.
+- It can take the following parameter (s):
+  - `$class`([`ReflectionClass`](http://php.net/class.ReflectionClass)) - reflection of the model class
+  - `$method`([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) - reflection of the model method
+  - `$property`([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) - reflection of the model property
+  - `$args`(`array`) - execution arguments
+  - `$isPlainArgs`(`bool`) - true - model method takes arguments as a set, false - as an associative array
+  - `$result`(`null`| `mixed`) - result
+- Returns nothing.
 
-### `getClass()` <a name="getClass"></a>
+### `getClass()`<a name="getClass"> </a>
 
-Геттер для отражения класса модели
+Getter for reflecting the model class
 
-#### Сигнатура
-
-- **public** method.
-- Может возвращать одно из следующих значений:
-    - `null`
-    - [`ReflectionClass`](http://php.net/class.ReflectionClass)
-
-### `getMethod()` <a name="getMethod"></a>
-
-Геттер для отражения метода модели
-
-#### Сигнатура
+#### Signature
 
 - **public** method.
-- Может возвращать одно из следующих значений:
-    - `null`
-    - [`ReflectionMethod`](http://php.net/class.ReflectionMethod)
+- Can return one of the following values:
+  - `null`
+  - [`ReflectionClass`](http://php.net/class.ReflectionClass)
 
-### `getProperty()` <a name="getProperty"></a>
+### `getMethod()`<a name="getMethod"> </a>
 
-Геттер для отражения свойства модели
+Getter to reflect the method of the model
 
-#### Сигнатура
-
-- **public** method.
-- Может возвращать одно из следующих значений:
-    - `null`
-    - [`ReflectionProperty`](http://php.net/class.ReflectionProperty)
-
-### `getArgs()` <a name="getArgs"></a>
-
-Геттер для аргументов выполнения
-
-#### Сигнатура
+#### Signature
 
 - **public** method.
-- Может возвращать одно из следующих значений:
-    - `array`
-    - `null`
+- Can return one of the following values:
+  - `null`
+  - [`ReflectionMethod`](http://php.net/class.ReflectionMethod)
 
-### `getIsPlainArgs()` <a name="getIsPlainArgs"></a>
+### `getProperty()`<a name="getProperty"> </a>
 
-Будут ли параметры выполнения загружаться в виде последовательности аргументов
+Getter to reflect model properties
 
-#### Сигнатура
-
-- **public** method.
-- Возвращает `bool` value.
-
-### `setRawResult()` <a name="setRawResult"></a>
-
-Добавить результат из другого объекта DbResultItem
-
-#### Сигнатура
+#### Signature
 
 - **public** method.
-- Может принимать следующий параметр(ы):
-    - `$rawResult` (`avtomon\DbResultItem`|`null`)
-- Ничего не возвращает.
+- Can return one of the following values:
+  - `null`
+  - [`ReflectionProperty`](http://php.net/class.ReflectionProperty)
 
-### `checkDocReturn()` <a name="checkDocReturn"></a>
+### `getArgs()`<a name="getArgs"> </a>
 
-Проверить тип возвращаемого значения по типам заданным в DOCBLOCK
+Getter for execution arguments
 
-#### Сигнатура
+#### Signature
 
 - **public** method.
-- Ничего не возвращает.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+- Can return one of the following values:
+- array
+  - `null`
+
+### `getIsPlainArgs()`<a name="getIsPlainArgs"> </a>
+
+Will the execution parameters be loaded as a sequence of arguments
+
+#### Signature
+
+- **public** method.
+- Returns the `bool`value.
+
+### `setRawResult()`<a name="setRawResult"> </a>
+
+Add result from another object DbResultItem
+
+#### Signature
+
+- **public** method.
+- It can take the following parameter (s):
+  - `$rawResult`(`avtomon\DbResultItem`| `null`)
+- Returns nothing.
+
+### `checkDocReturn()`<a name="checkDocReturn"> </a>
+
+Check the return type for the types specified in DOCBLOCK
+
+#### Signature
+
+- **public** method.
+- Returns nothing.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
 

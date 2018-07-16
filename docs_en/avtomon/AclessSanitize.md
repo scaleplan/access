@@ -1,191 +1,191 @@
-<small>avtomon</small>
+<small> avtomon </small>
 
 AclessSanitize
 ==============
 
-Класс проверки аргументов выполнения
+Runtime Checker Class
 
-Описание
+Description
 -----------
 
 Class AclessSanitize
 
-Сигнатура
+Signature
 ---------
 
 - **class**.
 
-Свойства
+Properties
 ----------
 
-class устанавливает следующие свойства:
+class sets the following properties:
 
-- [`$reflector`](#$reflector) &mdash; Отражение метода или SQL-свойства
-- [`$args`](#$args) &mdash; Массив аргументов
-- [`$sanitizedArgs`](#$sanitizedArgs) &mdash; Массив очещенных аргументов
+  - [`$reflector`](#$reflector) &mdash; Method Reflection or SQL Properties
+  - [`$args`](#$args) &mdash; Array of arguments
+  - [`$sanitizedArgs`](#$sanitizedArgs) &mdash; Array of pointed arguments
 
-### `$reflector` <a name="reflector"></a>
+### `$reflector`<a name="reflector"> </a>
 
-Отражение метода или SQL-свойства
+Method Reflection or SQL Properties
 
-#### Сигнатура
-
-- **protected** property.
-- Может быть одного из следующих типов:
-    - [`ReflectionMethod`](http://php.net/class.ReflectionMethod)
-    - [`ReflectionProperty`](http://php.net/class.ReflectionProperty)
-
-### `$args` <a name="args"></a>
-
-Массив аргументов
-
-#### Сигнатура
+#### Signature
 
 - **protected** property.
-- Значение `array`.
+- Can be one of the following types:
+  - [`ReflectionMethod`](http://php.net/class.ReflectionMethod)
+  - [`ReflectionProperty`](http://php.net/class.ReflectionProperty)
 
-### `$sanitizedArgs` <a name="sanitizedArgs"></a>
+### `$args`<a name="args"> </a>
 
-Массив очещенных аргументов
+Array of arguments
 
-#### Сигнатура
+#### Signature
 
 - **protected** property.
-- Может быть одного из следующих типов:
-    - `array`
-    - `null`
+- The value of `array`.
 
-Методы
+### `$sanitizedArgs`<a name="sanitizedArgs"> </a>
+
+Array of pointed arguments
+
+#### Signature
+
+- **protected** property.
+- Can be one of the following types:
+- array
+  - `null`
+
+Methods
 -------
 
-Методы класса class:
+Class methods class:
 
-- [`__construct()`](#__construct) &mdash; Конструктор
-- [`sanitizeArgs()`](#sanitizeArgs) &mdash; Проверить и очистить аргументы
-- [`sanitizeMethodArgs()`](#sanitizeMethodArgs) &mdash; Проверить аргументы метода
-- [`sanitizeSQLPropertyArgs()`](#sanitizeSQLPropertyArgs) &mdash; Проверить аргументы для свойства-метода
-- [`argAvailabilityCheck()`](#argAvailabilityCheck) &mdash; Проверка наличия аргументов
-- [`getDocParams()`](#getDocParams) &mdash; Вернуть массив DOCBLOCK-параметров и подгруппу необязательных параметров
-- [`docTypeCheck()`](#docTypeCheck) &mdash; Проверка аргументов на соответствие типу
-- [`typeCheck()`](#typeCheck) &mdash; Проверка значения на соответствие типу
-- [`getSQLParams()`](#getSQLParams) &mdash; Получить из SQL-запроса все параметры
+  - [`__construct()`](#__construct) &mdash; Constructor
+  - [`sanitizeArgs()`](#sanitizeArgs) &mdash; Check and clear arguments
+  - [`sanitizeMethodArgs()`](#sanitizeMethodArgs) &mdash; Check method arguments
+  - [`sanitizeSQLPropertyArgs()`](#sanitizeSQLPropertyArgs) &mdash; Check the arguments for the method property
+  - [`argAvailabilityCheck()`](#argAvailabilityCheck) &mdash; Checking for arguments
+  - [`getDocParams()`](#getDocParams) &mdash; Return an array of DOCBLOCK parameters and a subgroup of optional parameters
+  - [`docTypeCheck()`](#docTypeCheck) &mdash; Checking the arguments to match the type
+  - [`typeCheck()`](#typeCheck) &mdash; Checking the value for the type
+  - [`getSQLParams()`](#getSQLParams) &mdash; Get all the parameters from the SQL query
 
-### `__construct()` <a name="__construct"></a>
+### `__construct()`<a name="__construct"> </a>
 
-Конструктор
+Constructor
 
-#### Сигнатура
-
-- **public** method.
-- Может принимать следующий параметр(ы):
-    - `$reflector` ([`Reflector`](http://php.net/class.Reflector)) - отражение метода или SQL-свойства
-    - `$args` (`array`) - массив аргументов
-- Ничего не возвращает.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
-
-### `sanitizeArgs()` <a name="sanitizeArgs"></a>
-
-Проверить и очистить аргументы
-
-#### Сигнатура
+#### Signature
 
 - **public** method.
-- Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+- It can take the following parameter (s):
+  - `$reflector`([`Reflector`](http://php.net/class.Reflector)) - a reflection method or SQL-properties
+  - `$args`(`array`) - array of arguments
+- Returns nothing.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
-### `sanitizeMethodArgs()` <a name="sanitizeMethodArgs"></a>
+### `sanitizeArgs()`<a name="sanitizeArgs"> </a>
 
-Проверить аргументы метода
+Check and clear arguments
 
-#### Сигнатура
+#### Signature
+
+- **public** method.
+Returns the `array`value.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
+
+### `sanitizeMethodArgs()`<a name="sanitizeMethodArgs"> </a>
+
+Check method arguments
+
+#### Signature
 
 - **public static** method.
-- Может принимать следующий параметр(ы):
-    - `$method` ([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) - Reflection-обертка для метода
-    - `$args` (`array`) - массив аргументов
-- Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+- It can take the following parameter (s):
+  - `$method`([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) - Reflection-wrapper for the method
+  - `$args`(`array`) - array of arguments
+Returns the `array`value.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
-### `sanitizeSQLPropertyArgs()` <a name="sanitizeSQLPropertyArgs"></a>
+### `sanitizeSQLPropertyArgs()`<a name="sanitizeSQLPropertyArgs"> </a>
 
-Проверить аргументы для свойства-метода
+Check the arguments for the method property
 
-#### Сигнатура
+#### Signature
 
 - **public static** method.
-- Может принимать следующий параметр(ы):
-    - `$property` ([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) - Reflection-обертка для SQL-свойства
-    - `$args` (`array`) - массив аргументов
-- Возвращает `array` value.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+- It can take the following parameter (s):
+  - `$property`([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) - Reflection-wrapper for SQL-property
+  - `$args`(`array`) - array of arguments
+Returns the `array`value.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
-### `argAvailabilityCheck()` <a name="argAvailabilityCheck"></a>
+### `argAvailabilityCheck()`<a name="argAvailabilityCheck"> </a>
 
-Проверка наличия аргументов
+Checking for arguments
 
-#### Сигнатура
+#### Signature
 
 - **protected static** method.
-- Может принимать следующий параметр(ы):
-    - `$paramName` (`string`) - имя параметра
-    - `$args` (`array`) - массив аргументов
-    - `$optionParams` (`array`) - массив опциональных параметров
-- Ничего не возвращает.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+- It can take the following parameter (s):
+  - `$paramName`(`string`) - the parameter name
+  - `$args`(`array`) - array of arguments
+  - `$optionParams`(`array`) - an array of optional parameters
+- Returns nothing.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
-### `getDocParams()` <a name="getDocParams"></a>
+### `getDocParams()`<a name="getDocParams"> </a>
 
-Вернуть массив DOCBLOCK-параметров и подгруппу необязательных параметров
+Return an array of DOCBLOCK parameters and a subgroup of optional parameters
 
-#### Сигнатура
-
-- **protected static** method.
-- Может принимать следующий параметр(ы):
-    - `$docParams` (`array`) - исходный массив параметров
-- Возвращает `array` value.
-
-### `docTypeCheck()` <a name="docTypeCheck"></a>
-
-Проверка аргументов на соответствие типу
-
-#### Сигнатура
+#### Signature
 
 - **protected static** method.
-- Может принимать следующий параметр(ы):
-    - `$arg` - значение аргумента
-    - `$paramName` (`string`) - имя аргумента/параметра
-    - `$paramType` (`string`) - требуемый тип или группа типов
-    - `$docBlock` (`phpDocumentor\Reflection\DocBlock`) - ссылка объект DOCBLOCK метода или свойства
-- Ничего не возвращает.
-- Выбрасывает одно из следующих исключений:
-    - [`avtomon\AclessException`](../avtomon/AclessException.md)
+- It can take the following parameter (s):
+  - `$docParams`(`array`) - the original array parameters
+Returns the `array`value.
 
-### `typeCheck()` <a name="typeCheck"></a>
+### `docTypeCheck()`<a name="docTypeCheck"> </a>
 
-Проверка значения на соответствие типу
+Checking the arguments to match the type
 
-#### Сигнатура
+#### Signature
 
-- **public static** method.
-- Может принимать следующий параметр(ы):
-    - `$value` - значение
-    - `$types` (`array`) - принимаемые типы
-    - `$denyFuzzy` (`bool`) - строгое ли сравнение используется
-- Возвращает `bool` value.
+- **protected static** method.
+- It can take the following parameter (s):
+  - `$arg`- the value of the argument
+  - `$paramName`(`string`) - the name of the argument/parameter
+  - `$paramType`(`string`) - the required type or group of types
+  - `$docBlock`(`phpDocumentor\Reflection\DocBlock`) - reference to the DOCBLOCK object of the method or property
+- Returns nothing.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../avtomon/AclessException.md)
 
-### `getSQLParams()` <a name="getSQLParams"></a>
+### `typeCheck()`<a name="typeCheck"> </a>
 
-Получить из SQL-запроса все параметры
+Checking the value for the type
 
-#### Сигнатура
+#### Signature
 
 - **public static** method.
-- Может принимать следующий параметр(ы):
-    - `$sql`
-- Возвращает `array` value.
+- It can take the following parameter (s):
+  - `$value`- value
+  - `$types`(`array`) - accepted types
+  - `$denyFuzzy`(`bool`) - if a strict comparison is used
+- Returns the `bool`value.
+
+### `getSQLParams()`<a name="getSQLParams"> </a>
+
+Get all the parameters from the SQL query
+
+#### Signature
+
+- **public static** method.
+- It can take the following parameter (s):
+  - `$sql`
+Returns the `array`value.
 

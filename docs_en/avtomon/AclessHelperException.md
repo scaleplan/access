@@ -1,17 +1,17 @@
-<small>avtomon</small>
+<small> avtomon </small>
 
 AclessHelperException
 =====================
 
-Класс ошибок
+Error class
 
-Описание
+Description
 -----------
 
 Class AclessHelperException
 
-Сигнатура
+Signature
 ---------
 
 - **class**.
-- Является подклассом класса `avtomon\CustomException`.
+- It is a subclass of the class `avtomon\CustomException`.
