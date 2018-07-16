@@ -78,8 +78,8 @@ class устанавливает следующие свойства:
 
 - **public** method.
 - Может принимать следующий параметр(ы):
-    - `$reflector` ([`Reflector`](http://php.net/class.Reflector)) &mdash; - отражение метода или SQL-свойства
-    - `$args` (`array`) &mdash; - массив аргументов
+    - `$reflector` ([`Reflector`](http://php.net/class.Reflector)) - отражение метода или SQL-свойства
+    - `$args` (`array`) - массив аргументов
 - Ничего не возвращает.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -103,8 +103,8 @@ class устанавливает следующие свойства:
 
 - **public static** method.
 - Может принимать следующий параметр(ы):
-    - `$method` ([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) &mdash; - Reflection-обертка для метода
-    - `$args` (`array`) &mdash; - массив аргументов
+    - `$method` ([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) - Reflection-обертка для метода
+    - `$args` (`array`) - массив аргументов
 - Возвращает `array` value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -117,8 +117,8 @@ class устанавливает следующие свойства:
 
 - **public static** method.
 - Может принимать следующий параметр(ы):
-    - `$property` ([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) &mdash; - Reflection-обертка для SQL-свойства
-    - `$args` (`array`) &mdash; - массив аргументов
+    - `$property` ([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) - Reflection-обертка для SQL-свойства
+    - `$args` (`array`) - массив аргументов
 - Возвращает `array` value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -131,9 +131,9 @@ class устанавливает следующие свойства:
 
 - **protected static** method.
 - Может принимать следующий параметр(ы):
-    - `$paramName` (`string`) &mdash; - имя параметра
-    - `$args` (`array`) &mdash; - массив аргументов
-    - `$optionParams` (`array`) &mdash; - массив опциональных параметров
+    - `$paramName` (`string`) - имя параметра
+    - `$args` (`array`) - массив аргументов
+    - `$optionParams` (`array`) - массив опциональных параметров
 - Ничего не возвращает.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -146,7 +146,7 @@ class устанавливает следующие свойства:
 
 - **protected static** method.
 - Может принимать следующий параметр(ы):
-    - `$docParams` (`array`) &mdash; - исходный массив параметров
+    - `$docParams` (`array`) - исходный массив параметров
 - Возвращает `array` value.
 
 ### `docTypeCheck()` <a name="docTypeCheck"></a>
@@ -157,10 +157,10 @@ class устанавливает следующие свойства:
 
 - **protected static** method.
 - Может принимать следующий параметр(ы):
-    - `$arg` &mdash; - значение аргумента
-    - `$paramName` (`string`) &mdash; - имя аргумента/параметра
-    - `$paramType` (`string`) &mdash; - требуемый тип или группа типов
-    - `$docBlock` (`phpDocumentor\Reflection\DocBlock`) &mdash; - ссылка объект DOCBLOCK метода или свойства
+    - `$arg` - значение аргумента
+    - `$paramName` (`string`) - имя аргумента/параметра
+    - `$paramType` (`string`) - требуемый тип или группа типов
+    - `$docBlock` (`phpDocumentor\Reflection\DocBlock`) - ссылка объект DOCBLOCK метода или свойства
 - Ничего не возвращает.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -173,9 +173,9 @@ class устанавливает следующие свойства:
 
 - **public static** method.
 - Может принимать следующий параметр(ы):
-    - `$value` &mdash; - значение
-    - `$types` (`array`) &mdash; - принимаемые типы
-    - `$denyFuzzy` (`bool`) &mdash; - строгое ли сравнение используется
+    - `$value` - значение
+    - `$types` (`array`) - принимаемые типы
+    - `$denyFuzzy` (`bool`) - строгое ли сравнение используется
 - Возвращает `bool` value.
 
 ### `getSQLParams()` <a name="getSQLParams"></a>

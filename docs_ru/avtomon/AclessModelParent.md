@@ -32,8 +32,8 @@ Class AclessModelParent
 
 - **protected static** method.
 - Может принимать следующий параметр(ы):
-    - `$methodName` (`string`) &mdash; - имя метода
-    - `$args` (`array`) &mdash; - аргументы
+    - `$methodName` (`string`) - имя метода
+    - `$args` (`array`) - аргументы
 - Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -47,8 +47,8 @@ Class AclessModelParent
 
 - **public static** method.
 - Может принимать следующий параметр(ы):
-    - `$methodName` (`string`) &mdash; - имя метода или SQL-свойства
-    - `$args` (`array`) &mdash; - массив аргументов
+    - `$methodName` (`string`) - имя метода или SQL-свойства
+    - `$args` (`array`) - массив аргументов
 - Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -62,8 +62,8 @@ Class AclessModelParent
 
 - **public** method.
 - Может принимать следующий параметр(ы):
-    - `$methodName` (`string`) &mdash; - имя метода или SQL-свойства
-    - `$args` (`array`) &mdash; - массив аргументов
+    - `$methodName` (`string`) - имя метода или SQL-свойства
+    - `$args` (`array`) - массив аргументов
 - Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)

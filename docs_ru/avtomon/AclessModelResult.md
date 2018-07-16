@@ -102,12 +102,12 @@ AclessModelResult constructor
 
 - **public** method.
 - Может принимать следующий параметр(ы):
-    - `$class` ([`ReflectionClass`](http://php.net/class.ReflectionClass)) &mdash; - отражение класса модели
-    - `$method` ([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) &mdash; - отражение метода модели
-    - `$property` ([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) &mdash; - отражение свойства модели
-    - `$args` (`array`) &mdash; - аргументы выполнения
-    - `$isPlainArgs` (`bool`) &mdash; - true - метод модели принимает аргументы в виде набора, false - в виде ассоциативного массива
-    - `$result` (`null`|`mixed`) &mdash; - результат
+    - `$class` ([`ReflectionClass`](http://php.net/class.ReflectionClass)) - отражение класса модели
+    - `$method` ([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) - отражение метода модели
+    - `$property` ([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) - отражение свойства модели
+    - `$args` (`array`) - аргументы выполнения
+    - `$isPlainArgs` (`bool`) - true - метод модели принимает аргументы в виде набора, false - в виде ассоциативного массива
+    - `$result` (`null`|`mixed`) - результат
 - Ничего не возвращает.
 
 ### `getClass()` <a name="getClass"></a>

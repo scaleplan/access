@@ -1,14 +1,14 @@
-the <small>avtomon</small>
+<small> avtomon </small>
 
 AclessAbstract
 ==============
 
-Superclass
+Super class
 
 Description
 -----------
 
-Class Abstracless
+Class AbstractAcless
 
 Signature
 ---------
@@ -18,133 +18,133 @@ Signature
 Properties
 ----------
 
-the abstract class sets the following properties:
+The abstract class sets the following properties:
 
-- ['$config'](#$config) &mdash; Configuration
-- ['$userId'](#$userId) &mdash; user ID
-- ['$ps'](#$ps) &mdash; connection to RDBMS
-- ['$cs'](#$cs) &mdash; connect to cache
-- ['$instance'](#$instance) &mdash; class Instance
+  - [`$config`](#$config) &mdash; Configuration
+  - [`$userId`](#$userId) &mdash; User ID
+  - [`$ps`](#$ps) &mdash; Connecting to RDBMS
+  - [`$cs`](#$cs) &mdash; Connecting to the cache
+  - [`$instance`](#$instance) &mdash; Instance class
 
-### '$config '<a name= "config" ></a>
+### `$config`<a name="config"> </a>
 
 Configuration
 
 #### Signature
 
-- **protected * * property.
-- Value 'array'.
+- **protected** property.
+- The value of `array`.
 
-### '$userId '<a name= "userId" ></a>
+### `$userId`<a name="userId"> </a>
 
-user ID
+User ID
 
 #### Signature
 
-- **protected * * property.
-- The value `int`.
+- **protected** property.
+- The value of `int`.
 
-### '$ps '<a name= " ps " ></a>
+### `$ps`<a name="ps"> </a>
 
 Connecting to RDBMS
 
 #### Signature
 
-- **protected * * property.
+- **protected** property.
 - Can be one of the following types:
-    - 'null`
-    - ['PDO'](http://php.net/class.PDO)
+- `null`
+  - [`PDO`](http://php.net/class.PDO)
 
-### '$cs '<a name= " cs " ></a>
+### `$cs`<a name="cs"> </a>
 
-Connect to cache
+Connecting to the cache
 
 #### Signature
 
-- **protected * * property.
+- **protected** property.
 - Can be one of the following types:
-    - 'null`
-    - 'Redis`
+- `null`
+- `Redis`
 
-### '$instance '<a name= "instance" ></a>
+### `$instance`<a name="instance"> </a>
 
-An instance of the class
+Instance class
 
 #### Signature
 
-- **protected static * * property.
+**protected static** property.
 - Can be one of the following types:
-    - 'null`
-    - ['AclessAbstract'](../avtomon/AclessAbstract.md)
+- `null`
+  - [`AclessAbstract`](../ avtomon/AclessAbstract.md)
 
 Methods
 -------
 
-Methods of the abstract class:
+Abstract class methods:
 
-- ['create()'](#create) &mdash; singleton
-  - [`__construct (`' ](#__construct) &mdash; AclessAbstract constructor
-  - [`getUserId()`](#getUserId) &mdash; Returns the ID of the user
-- ['getPSConnection()'](#getPSConnection) &mdash; Return connection to RDBMS
-- ['getConfig (`' ](#getConfig) &mdash; Return the configuration or part of it
+  - [`create()`](#create) &mdash; Singleton
+  - [`__construct()`](#__construct) &mdash; AclessAbstract constructor
+  - [`getUserId()`](#getUserId) &mdash; Returns the user ID
+  - [`getPSConnection()`](#getPSConnection) &mdash; Return connection to RDBMS
+  - [`getConfig()`](#getConfig) &mdash; Return configuration or part of it
 
-### 'create()' <a name= 'create' ></a>
+### `create()`<a name="create"> </a>
 
 Singleton
 
 #### Signature
 
-- **public static * * method.
-- Can take the following parameter (s):
-    - '$userId ' ('int`) &mdash; - user ID
-    - '$confPath ' ('string`) &mdash; - path to configuration file
-- Return [`AclessAbstract`](../avtomon/AclessAbstract.md) value.
+- **public static** method.
+- It can take the following parameter (s):
+	- `$userId`(`int`) &mdash; - user ID
+	- `$confPath`(`string`) &mdash; - path to the configuration file
+- Returns [`AclessAbstract`](../ avtomon/AclessAbstract.md) value.
 
-### `__construct() '<a name= "__construct " ></a>
+### `__construct()`<a name="__construct"> </a>
 
 AclessAbstract constructor
 
 #### Signature
 
-- **private * * method.
-- Can take the following parameter (s):
-    - '$userId ' ('int`) &mdash; - user ID
-    - '$confPath ' ('string`) &mdash; - let to configuration
-- It doesn't make it back.
+- **private** method.
+- It can take the following parameter (s):
+	- `$userId`(`int`) &mdash; - user ID
+	- `$confPath`(`string`) &mdash; - even to the configuration
+- Returns nothing.
 - Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 
-### 'getUserId()' <a name= 'getUserId' ></a>
+### `getUserId()`<a name="getUserId"> </a>
 
 Returns the user ID
 
 #### Signature
 
-- **public * * method.
-- Returns ' int ' value.
+- **public** method.
+Returns the int value.
 
-### 'getPSConnection()' <a name= "getPSConnection" ></a>
+### `getPSConnection()`<a name="getPSConnection"> </a>
 
-To return the connection to the RDBMS
+Return connection to RDBMS
 
 #### Signature
 
-- **protected * * method.
-- Returns ['PDO'](http://php.net/class.PDO) value.
+- **protected** method.
+- Returns [`PDO`](http://php.net/class.PDO) value.
 - Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 
-### 'getConfig()' <a name= "getConfig" ></a>
+### `getConfig()`<a name="getConfig"> </a>
 
-Return the configuration or part of it
+Return configuration or part of it
 
 #### Signature
 
-- **public * * method.
-- Can take the following parameter (s):
-    - '$key ' ('string`) &mdash; - configuration key
+- **public** method.
+- It can take the following parameter (s):
+	- `$key`(`string`) &mdash; - configuration key
 - Can return one of the following values:
-    - 'array`
-    - 'mixed`
-    - 'null`
+- array
+- `mixed`
+- `null`
 

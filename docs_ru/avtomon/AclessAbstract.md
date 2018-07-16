@@ -96,8 +96,8 @@ abstract class устанавливает следующие свойства:
 
 - **public static** method.
 - Может принимать следующий параметр(ы):
-    - `$userId` (`int`) &mdash; - идентификатор пользователя
-    - `$confPath` (`string`) &mdash; - путь в файлу конфигурации
+    - `$userId` (`int`) - идентификатор пользователя
+    - `$confPath` (`string`) - путь в файлу конфигурации
 - Возвращает [`AclessAbstract`](../avtomon/AclessAbstract.md) value.
 
 ### `__construct()` <a name="__construct"></a>
@@ -108,8 +108,8 @@ AclessAbstract constructor
 
 - **private** method.
 - Может принимать следующий параметр(ы):
-    - `$userId` (`int`) &mdash; - идентификатор пользователя
-    - `$confPath` (`string`) &mdash; - пусть к конфигурации
+    - `$userId` (`int`) - идентификатор пользователя
+    - `$confPath` (`string`) - пусть к конфигурации
 - Ничего не возвращает.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -142,7 +142,7 @@ AclessAbstract constructor
 
 - **public** method.
 - Может принимать следующий параметр(ы):
-    - `$key` (`string`) &mdash; - ключ конфигурации
+    - `$key` (`string`) - ключ конфигурации
 - Может возвращать одно из следующих значений:
     - `array`
     - `mixed`

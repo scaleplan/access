@@ -1,9 +1,9 @@
-the <small>avtomon</small>
+<small> avtomon </small>
 
 AclessModify
 ============
 
-Class of changes
+Class of change
 
 Description
 -----------
@@ -14,127 +14,127 @@ Signature
 ---------
 
 - **class**.
-- Is a subclass of the class ['AclessAbstract'](../avtomon/AclessAbstract.md).
+- It is a subclass of the class [`AclessAbstract`](../ avtomon/AclessAbstract.md).
 
 Properties
 ----------
 
 class sets the following properties:
 
-- ['$instance'](#$instance) &mdash; class Instance
+  - [`$instance`](#$instance) &mdash; Instance class
 
-### '$instance '<a name= "instance" ></a>
+### `$instance`<a name="instance"> </a>
 
-An instance of the class
+Instance class
 
 #### Signature
 
-- **protected static * * property.
+**protected static** property.
 - Can be one of the following types:
-    - 'null`
-    - ['AclessModify'](../avtomon/AclessModify.md)
+- `null`
+  - [`AclessModify`](../ avtomon/AclessModify.md)
 
 Methods
 -------
 
 Class methods class:
 
-  - [`loadAclessRights()`](#loadAclessRights) &mdash; Retrieve access rights for the current user in the cache
-  - [`initSQLScheme()'](#initSQLScheme) &mdash; Fill in the database schema to work with Acless
-- ['initPersistentStorage()'](#initPersistentStorage) &mdash; Initialize persistent storage of access rights data
-- ['addRoleAccessRight()'](#addRoleAccessRight) &mdash; check/change the default permissions for the role
-- ['addUserToRole()'](#addUserToRole) &mdash; Give role to user
-- ['addAccessRight()'](#addAccessRight) &mdash; Add/change dotup's right
-  - [`shiftAccessRightFromRole()`](#shiftAccessRightFromRole) &mdash; to Create a right of access for the user based on the rights for his role
+  - [`loadAclessRights()`](#loadAclessRights) &mdash; Load the current user's access rights into the cache
+- [initSQLScheme() `](#initSQLScheme) &mdash; Fill in the database the scheme for working with Acless
+  - [`initPersistentStorage()`](#initPersistentStorage) &mdash; Initiate a persistent storage of access rights data
+  - [`addRoleAccessRight()`](#addRoleAccessRight) &mdash; Add/Change the default permissions for the role
+  - [`addUserToRole()`](#addUserToRole) &mdash; Give the role to the user
+  - [`addAccessRight()`](#addAccessRight) &mdash; Add/change right of grant
+  - [`shiftAccessRightFromRole()`](#shiftAccessRightFromRole) &mdash; Create an access right for a rights-based user for its role
 
-### 'loadAclessRights()' <a name= "loadAclessRights" ></a>
+### `loadAclessRights()`<a name="loadAclessRights"> </a>
 
-Load permissions for the current user to the cache
-
-#### Signature
-
-- **public * * method.
-- It doesn't make it back.
-- Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
-    - `avtomon\RedisSingletonException`
-
-### `initSQLScheme() '<a name= "initSQLScheme" ></a>
-
-Fill in the database scheme to work with Acless
+Load the current user's access rights into the cache
 
 #### Signature
 
-- **protected * * method.
-- Returns ' int ' value.
+- **public** method.
+- Returns nothing.
 - Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+- `avtomon\RedisSingletonException`
 
-### `initPersistentStorage() '<a name= "initPersistentStorage" ></a>
+### `initSQLScheme()`<a name="initSQLScheme"> </a>
 
-Inicializirati to the persistent data store access rights
+Fill in the database the scheme for working with Acless
 
 #### Signature
 
-- **public * * method.
-- Returns ' int ' value.
+- **protected** method.
+Returns the int value.
 - Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 
-### 'addRoleAccessRight()' <a name= "addRoleAccessRight" ></a>
+### `initPersistentStorage()`<a name="initPersistentStorage"> </a>
 
-set/change default permissions for the role
+Initiate a persistent storage of access rights data
 
 #### Signature
 
-- **public * * method.
-- Can take the following parameter (s):
-    - '$url_id ' ('int`) &mdash; - url identifier
-    - '$role ' ('string`) &mdash; - role name
-- Returns 'array' value.
+- **public** method.
+Returns the int value.
 - Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 
-### 'addUserToRole()' <a name= "addUserToRole" ></a>
+### `addRoleAccessRight()`<a name="addRoleAccessRight"> </a>
 
-To give a role to a user
+Add/Change the default permissions for the role
 
 #### Signature
 
-- **public * * method.
-- Can take the following parameter (s):
-    - '$user_id ' ('int`) &mdash; - user ID
-    - '$role ' ('string`) &mdash; - role name
-- Returns 'array' value.
+- **public** method.
+- It can take the following parameter (s):
+	- `$url_id`(`int`) &mdash; - identifier URL
+	- `$role`(`string`) &mdash; - name of the role
+Returns the `array`value.
 - Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 
-### 'addAccessRight()' <a name= "addAccessRight" ></a>
+### `addUserToRole()`<a name="addUserToRole"> </a>
 
-Add/change dotup's right
+Give the role to the user
 
 #### Signature
 
-- **public * * method.
-- Can take the following parameter (s):
-    - '$url_id ' ('int`) &mdash; - url identifier
-    - '$user_id ' ('int`) &mdash; - user ID
-    - '$is_allow ' ('bool`) &mdash; - $values will be allow or deny
-    - '$values ' ('array`) &mdash; - which filter values to allow/deny access to
-- Returns 'array' value.
+- **public** method.
+- It can take the following parameter (s):
+	- `$user_id`(`int`) &mdash; - user ID
+	- `$role`(`string`) &mdash; - name of the role
+Returns the `array`value.
 - Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 
-### `shiftAccessRightFromRole (`'<a name= "shiftAccessRightFromRole" ></a>
+### `addAccessRight()`<a name="addAccessRight"> </a>
 
-Create an access right for a user based on the rights for its role
+Add/change right of grant
 
 #### Signature
 
-- **public * * method.
-- Can take the following parameter (s):
-    - '$userId ' ('int`) &mdash; - user ID
-- Returns 'array' value.
+- **public** method.
+- It can take the following parameter (s):
+	- `$url_id`(`int`) &mdash; - identifier URL
+	- `$user_id`(`int`) &mdash; - user ID
+	- `$is_allow`(`bool`) &mdash; - $values ​​will be permissive or prohibitive
+	- `$values`(`array`) &mdash; - with what filter values ​​to allow/deny access
+Returns the `array`value.
 - Throws one of the following exceptions:
-      - [`avtomon\AclessException'](../avtomon/AclessException.md)
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
+
+### `shiftAccessRightFromRole()`<a name="shiftAccessRightFromRole"> </a>
+
+Create an access right for a rights-based user for its role
+
+#### Signature
+
+- **public** method.
+- It can take the following parameter (s):
+	- `$userId`(`int`) &mdash; - user ID
+Returns the `array`value.
+- Throws one of the following exceptions:
+  - [`avtomon\AclessException`](../ avtomon/AclessException.md)
 

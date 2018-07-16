@@ -30,6 +30,6 @@ Class AclessHelper
 
 - **public static** method.
 - Может принимать следующий параметр(ы):
-    - `$str` (`string`) &mdash; - строка в camelCase
+    - `$str` (`string`) - строка в camelCase
 - Возвращает `string` value.
 

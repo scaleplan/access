@@ -76,7 +76,7 @@ class устанавливает следующие свойства:
 
 - **public** method.
 - Может принимать следующий параметр(ы):
-    - `$url` (`string`) &mdash; - текст урла
+    - `$url` (`string`) - текст урла
 - Возвращает `array` value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -90,9 +90,9 @@ class устанавливает следующие свойства:
 
 - **public** method.
 - Может принимать следующий параметр(ы):
-    - `$refMethod` ([`Reflector`](http://php.net/class.Reflector)) &mdash; - Reflection-обертка для метода
-    - `$args` (`array`) &mdash; - параметры выполнения
-    - `$refClass` ([`ReflectionClass`](http://php.net/class.ReflectionClass)) &mdash; - класс метода
+    - `$refMethod` ([`Reflector`](http://php.net/class.Reflector)) - Reflection-обертка для метода
+    - `$args` (`array`) - параметры выполнения
+    - `$refClass` ([`ReflectionClass`](http://php.net/class.ReflectionClass)) - класс метода
 - Возвращает `bool` value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -106,7 +106,7 @@ class устанавливает следующие свойства:
 
 - **public** method.
 - Может принимать следующий параметр(ы):
-    - `$filePath` (`string`) &mdash; - путь к файлу
+    - `$filePath` (`string`) - путь к файлу
 - Возвращает `bool` value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -120,8 +120,8 @@ class устанавливает следующие свойства:
 
 - **public** method.
 - Может принимать следующий параметр(ы):
-    - `$className` (`string`) &mdash; - имя класса
-    - `$methodName` (`string`) &mdash; - имя метода
+    - `$className` (`string`) - имя класса
+    - `$methodName` (`string`) - имя метода
 - Возвращает `string` value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -134,8 +134,8 @@ class устанавливает следующие свойства:
 
 - **protected** method.
 - Может принимать следующий параметр(ы):
-    - `$controllerFileName` (`string`) &mdash; - имя файла контроллера
-    - `$controllerNamespace` (`string`) &mdash; - пространство имен для конроллера, если есть
+    - `$controllerFileName` (`string`) - имя файла контроллера
+    - `$controllerNamespace` (`string`) - пространство имен для конроллера, если есть
 - Возвращает `array` value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -149,7 +149,7 @@ class устанавливает следующие свойства:
 
 - **protected** method.
 - Может принимать следующий параметр(ы):
-    - `$dir` (`string`) &mdash; - путь к каталогу
+    - `$dir` (`string`) - путь к каталогу
 - Возвращает `array` value.
 
 ### `getControllerURLs()` <a name="getControllerURLs"></a>
