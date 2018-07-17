@@ -24,7 +24,7 @@ where schema and data are optional parameters indicating the need to generate Ac
 
 The controller method is called from outside the controller class. How this happens is unimportant. 
 
-If the method is public, or the comment in the method indicates the value of the *acless_no_rights_check Directive*
+If the method is public, or the comment in the method indicates the value of the <I>acless_no_rights_check</i>Directive
 the configuration, the system is not involved and the execution occurs as usual. 
 If the method is private (access modifiers private and protected) and if you specify a special phpdoc tag treatment method system Acless (value Directive acless_label configuration), then the database query that checks the possibility of execution of the method with the come settings for a specific user (user ID is specified when you create objects Acless).
 
@@ -71,7 +71,7 @@ However, access can be defined to execute a method with specific arguments:
     }
 ```
 
-In this example, access will be allowed only if the value of the $id filter argument is included in the list of allowed values stored in the database (column *values*of the*access_right*table). A list in the database will look like:
+In this example, access will be allowed only if the value of the $id filter argument is included in the list of allowed values stored in the database (column <I>values</I> of the table <I>access_right</i>). A list in the database will look like:
 
 `
 ARRAY ['<filter value 1>, <filter value 2',...]
@@ -123,7 +123,7 @@ If we want a multi-type typesetting like in C# or TypeScript:
  
 then native PHP will not allow you to do this.
  
-Subsystem type checking Acless can focus on *PHPDOC*and test values for multiple types if they are specified in*PHPDOC*:
+Subsystem type checking Acless can focus on <i>PHPDOC</i> and test values for multiple types if they are specified in <i>PHPDOC</i>:
 
 ```
 /**
@@ -144,7 +144,7 @@ Subsystem type checking Acless can focus on *PHPDOC*and test values for multiple
     }
 ```
 
-2. By default, the value of an argument can be considered "correct" even if its type does not match the expected type, but the value cast to the expected type (or one of the expected) does not differ from the original in a fuzzy comparison (==). This behavior can be disabled by specifying a tag from the *deny_fuzzy* configuration Directive for the method.
+2. By default, the value of an argument can be considered "correct" even if its type does not match the expected type, but the value cast to the expected type (or one of the expected) does not differ from the original in a fuzzy comparison (==). This behavior can be disabled by specifying a tag from the <I>deny_fuzzy</I> configuration Directive for the method.
 
 This functionality is available For both controller methods such for model methods.
 <br>
@@ -160,7 +160,7 @@ controllers:
     namespace: app\controllers
 ```
 
-After generating the automatically populated table *acless.url*
+After generating automatically filled in table <i>acless.url</i>
 <br>
 
 In the configuration file, you can specify the roles of system users

@@ -89,7 +89,7 @@ Add/change the default permissions for the role
 
 - **public** method.
 - It can take the following parameter (s):
-  - `$url_id`(`int`) - ID Urla
+  - `$url_id`(`int`) - identifier for the URL
   - `$role`(`string`) - the name of the role
 Returns the `array`value.
 - Throws one of the following exceptions:
@@ -103,7 +103,7 @@ Give the role to the user
 
 - **public** method.
 - It can take the following parameter (s):
-  - `$user_id`(`int`) - User ID
+  - `$user_id`(`int`) - user id
   - `$role`(`string`) - the name of the role
 Returns the `array`value.
 - Throws one of the following exceptions:
@@ -117,9 +117,9 @@ Add/change right of grant
 
 - **public** method.
 - It can take the following parameter (s):
-  - `$url_id`(`int`) - ID Urla
-  - `$user_id`(`int`) - User ID
-  - `$is_allow`(`bool`) - $values ​​will authorize or prohibit
+  - `$url_id`(`int`) - identifier for the URL
+  - `$user_id`(`int`) - user id
+  - `$is_allow`(`bool`) - $values ​​will be either resolving or prohibiting
   - `$values`(`array`) - with what filter values ​​to allow/deny access
 Returns the `array`value.
 - Throws one of the following exceptions:

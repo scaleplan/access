@@ -78,7 +78,7 @@ Constructor
 
 - **public** method.
 - It can take the following parameter (s):
-  - `$reflector`([`Reflector`](http://php.net/class.Reflector)) - a reflection method or SQL-properties
+  - `$reflector`([`Reflector`](http://php.net/class.Reflector)) - method reflection or SQL-property
   - `$args`(`array`) - array of arguments
 - Returns nothing.
 - Throws one of the following exceptions:
@@ -131,9 +131,9 @@ Checking for arguments
 
 - **protected static** method.
 - It can take the following parameter (s):
-  - `$paramName`(`string`) - the parameter name
+  - `$paramName`(`string`) - name of the parameter
   - `$args`(`array`) - array of arguments
-  - `$optionParams`(`array`) - an array of optional parameters
+  - `$optionParams`(`array`) - array of optional parameters
 - Returns nothing.
 - Throws one of the following exceptions:
   - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -146,7 +146,7 @@ Return an array of DOCBLOCK parameters and a subgroup of optional parameters
 
 - **protected static** method.
 - It can take the following parameter (s):
-  - `$docParams`(`array`) - the original array parameters
+  - `$docParams`(`array`) - the initial array of parameters
 Returns the `array`value.
 
 ### `docTypeCheck()`<a name="docTypeCheck"> </a>
@@ -175,7 +175,7 @@ Checking the value for the type
 - It can take the following parameter (s):
   - `$value`- value
   - `$types`(`array`) - accepted types
-  - `$denyFuzzy`(`bool`) - if a strict comparison is used
+  - `$denyFuzzy`(`bool`) - a strict comparison is used
 - Returns the `bool`value.
 
 ### `getSQLParams()`<a name="getSQLParams"> </a>

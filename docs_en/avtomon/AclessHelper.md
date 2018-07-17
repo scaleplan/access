@@ -30,6 +30,6 @@ Convert a string as camelCase to a string of the form dashed (camelCase -> camel
 
 - **public static** method.
 - It can take the following parameter (s):
-  - `$str`(`string`) - line in camelCase
+  - `$str`(`string`) - string in camelCase
 Returns `string`value.
 

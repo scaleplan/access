@@ -142,7 +142,7 @@ Return configuration or part of it
 
 - **public** method.
 - It can take the following parameter (s):
-  - `$key`(`string`) - configuration key
+  - `$key`(`string`) - the configuration key
 - Can return one of the following values:
 - array
   - `mixed`

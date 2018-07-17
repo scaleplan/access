@@ -66,7 +66,7 @@ Methods
 
 Abstract class methods:
 
-  - [`pushBefore()`](#pushBefore) &mdash; Add a function to the end of the array of functions performed before the execution of the controller method
+  - [`pushBefore()`](#pushBefore) &mdash; Add a function to the end of an array of functions performed before the execution of the controller method
   - [`unshiftBefore()`](#unshiftBefore) &mdash; Add a function to the beginning of the array of functions performed before the execution of the controller method
   - [`insertBefore()`](#insertBefore) &mdash; Add a function to the specified position of the array of functions performed before the execution of the controller method
   - [`pushAfter()`](#pushAfter) &mdash; Add a function to the end of an array of functions executed after the execution of the controller method
@@ -82,7 +82,7 @@ Abstract class methods:
 
 ### `pushBefore()`<a name="pushBefore"> </a>
 
-Add a function to the end of the array of functions performed before the execution of the controller method
+Add a function to the end of an array of functions performed before the execution of the controller method
 
 #### Signature
 

@@ -47,7 +47,7 @@ Checking the passed arguments for a method or SQL property in a static context
 
 - **public static** method.
 - It can take the following parameter (s):
-  - `$methodName`(`string`) - the name of the method or SQL-properties
+  - `$methodName`(`string`) - method name or SQL properties
   - `$args`(`array`) - array of arguments
 - Returns [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
 - Throws one of the following exceptions:
@@ -62,7 +62,7 @@ Checking the passed arguments for the method or the SQL property
 
 - **public** method.
 - It can take the following parameter (s):
-  - `$methodName`(`string`) - the name of the method or SQL-properties
+  - `$methodName`(`string`) - method name or SQL properties
   - `$args`(`array`) - array of arguments
 - Returns [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
 - Throws one of the following exceptions:

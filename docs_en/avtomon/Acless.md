@@ -76,7 +76,7 @@ Return information about all available URLs or about a specific URL
 
 - **public** method.
 - It can take the following parameter (s):
-  - `$url`(`string`) - text Urla
+  - `$url`(`string`) - the URL text
 Returns the `array`value.
 - Throws one of the following exceptions:
   - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -91,8 +91,8 @@ Check access to the method
 - **public** method.
 - It can take the following parameter (s):
   - `$refMethod`([`Reflector`](http://php.net/class.Reflector)) - Reflection-wrapper for the method
-  - `$args`(`array`) - options for running
-  - `$refClass`([`ReflectionClass`](http://php.net/class.ReflectionClass)) - method, class
+  - `$args`(`array`) - execution parameters
+  - `$refClass`([`ReflectionClass`](http://php.net/class.ReflectionClass)) - method class
 - Returns the `bool`value.
 - Throws one of the following exceptions:
   - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -106,7 +106,7 @@ Check access to the file
 
 - **public** method.
 - It can take the following parameter (s):
-  - `$filePath`(`string`) - path to the file
+  - `$filePath`(`string`) - the path to the file
 - Returns the `bool`value.
 - Throws one of the following exceptions:
   - [`avtomon\AclessException`](../avtomon/AclessException.md)
@@ -149,7 +149,7 @@ Find all files in the directory, including subdirectories
 
 - **protected** method.
 - It can take the following parameter (s):
-  - `$dir`(`string`) - directory path
+  - `$dir`(`string`) - path to the directory
 Returns the `array`value.
 
 ### `getControllerURLs()`<a name="getControllerURLs"> </a>

@@ -106,7 +106,7 @@ AclessModelResult constructor
   - `$method`([`ReflectionMethod`](http://php.net/class.ReflectionMethod)) - reflection of the model method
   - `$property`([`ReflectionProperty`](http://php.net/class.ReflectionProperty)) - reflection of the model property
   - `$args`(`array`) - execution arguments
-  - `$isPlainArgs`(`bool`) - true - model method takes arguments as a set, false - as an associative array
+  - `$isPlainArgs`(`bool`) - true - the model method takes arguments as a set, false - as an associative array
   - `$result`(`null`| `mixed`) - result
 - Returns nothing.
 
