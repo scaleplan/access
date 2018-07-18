@@ -2,13 +2,15 @@
 
 Access control system + check of argument types.
 
-### Installation
+#### Installation
 
 `
 composer reqire avtomon/acless
 `
+
 <br>
-### Initialization
+
+#### Initialization
 
 ```
 cd vendor/avtomon/Acless
@@ -20,7 +22,7 @@ where schema and data are optional parameters indicating the need to generate Ac
 
 <br>
 
-### Mechanics of work
+#### Mechanics of work
 
 The controller method is called from outside the controller class. How this happens is unimportant. 
 
@@ -202,7 +204,7 @@ When you change data in the primary storage (PostgreSQL), the data in the cache 
 
 <br>
 
-#### Additional functionality:
+##### Additional functionality:
 
 1. Supports the addition of callbacks running before and after the successful execution of the controller method. At the same time, these flasks can change the input data and the result accordingly.
 
