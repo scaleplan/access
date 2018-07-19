@@ -55,7 +55,7 @@ abstract class AclessAbstract
      *
      * @return AclessAbstract
      */
-    public static function create(int $userId = -1, string $confPath = __DIR__ . '../config.yml'): AclessAbstract
+    public static function create(int $userId = -1, string $confPath = __DIR__ . '/../config.yml'): AclessAbstract
     {
         if (!static::$instance) {
             $className = static::class;
