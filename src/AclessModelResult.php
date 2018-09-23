@@ -6,10 +6,10 @@ use phpDocumentor\Reflection\DocBlock;
 /**
  * Класс результата выполнения модели
  *
- * Class AclessModelResult
+ * Class AclessServiceResult
  * @package avtomon
  */
-class AclessModelResult extends DbResultItem
+class AclessServiceResult extends DbResultItem
 {
     /**
      * Отражение класса модели
@@ -48,7 +48,7 @@ class AclessModelResult extends DbResultItem
     protected $isPlainArgs = true;
 
     /**
-     * AclessModelResult constructor
+     * AclessServiceResult constructor
      *
      * @param \ReflectionClass $class - отражение класса модели
      * @param \ReflectionMethod|null $method - отражение метода модели

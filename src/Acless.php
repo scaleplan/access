@@ -114,7 +114,7 @@ class Acless extends AclessAbstract
         }
 
         $docParam = end($tag);
-        $filters = trim($docParam->getDescription() ? $docParam->getDescription()->render() : '');
+        $filters = trim($docParam->getDescription());
         if ($filters) {
             $filters = array_map('trim', explode(',', $filters));
 
@@ -245,7 +245,7 @@ class Acless extends AclessAbstract
         $sql = 'SELECT id, schema_name, table_name FROM acless.model_type';
         $models = $this->getPSConnection()->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
 
-        $seachModel = function (string $schema, string $table) use ($models): ?int {
+        $seachService = function (string $schema, string $table) use ($models): ?int {
             if (empty($models) || !\is_array($models) || empty($schema) || empty($table)) {
                 return null;
             }
@@ -279,7 +279,7 @@ class Acless extends AclessAbstract
             $aclessUrlType = $docBlock->getTagsByName($this->config['acless_url_type']);
             $aclessUrlType = end($aclessUrlType);
 
-            $modelId = $seachModel($aclessSchema, $aclessTables);
+            $modelId = $seachService($aclessSchema, $aclessTables);
 
             $url = [
                 'text' => '/' . strtolower(str_replace('Controller', '', $controller)) . '/' . AclessHelper::camel2dashed($methodName),

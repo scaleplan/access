@@ -1,6 +1,6 @@
 <small> avtomon </small>
 
-AclessModelResult
+AclessServiceResult
 =================
 
 The result class of the model
@@ -8,7 +8,7 @@ The result class of the model
 Description
 -----------
 
-Class AclessModelResult
+Class AclessServiceResult
 
 Signature
 ---------
@@ -85,7 +85,7 @@ Methods
 
 Class methods class:
 
-  - [`__construct()`](#__construct) &mdash; AclessModelResult constructor
+  - [`__construct()`](#__construct) &mdash; AclessServiceResult constructor
   - [`getClass()`](#getClass) &mdash; Getter for reflecting the model class
   - [`getMethod()`](#getMethod) &mdash; Getter to reflect the method of the model
   - [`getProperty()`](#getProperty) &mdash; Getter to reflect model properties
@@ -96,7 +96,7 @@ Class methods class:
 
 ### `__construct()`<a name="__construct"> </a>
 
-AclessModelResult constructor
+AclessServiceResult constructor
 
 #### Signature
 

@@ -7,10 +7,10 @@ use phpDocumentor\Reflection\DocBlock;
 /**
  * Родитель для моделей - для проверки аргументов
  *
- * Class AclessModelParent
+ * Class AclessServiceParent
  * @package avtomon
  */
-class AclessModelParent
+class AclessServiceParent
 {
     /**
      * Аудит метода или свойства, и выполнение для методов
@@ -18,12 +18,12 @@ class AclessModelParent
      * @param string $methodName - имя метода
      * @param array $args - аргументы
      *
-     * @return AclessModelResult
+     * @return AclessServiceResult
      *
      * @throws AclessException
      * @throws \ReflectionException
      */
-    protected static function checkModelMethodEssence(string $methodName, array $args): AclessModelResult
+    protected static function checkServiceMethodEssence(string $methodName, array $args): AclessServiceResult
     {
         $formatArgs = function (array &$args) use (&$methodName): array {
             $args = $args ? reset($args) : $args;
@@ -52,7 +52,7 @@ class AclessModelParent
 
             $method->setAccessible(true);
 
-            return new AclessModelResult(
+            return new AclessServiceResult(
                 $refclass,
                 $method,
                 null,
@@ -71,7 +71,7 @@ class AclessModelParent
             $formatArgs($args);
             $args = (new AclessSanitize($property, $args))->sanitizeArgs();
 
-            return new AclessModelResult(
+            return new AclessServiceResult(
                 $refclass,
                 null,
                 $property,
@@ -89,14 +89,14 @@ class AclessModelParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return AclessModelResult
+     * @return AclessServiceResult
      *
      * @throws AclessException
      * @throws \ReflectionException
      */
-    public static function __callStatic(string $methodName, array $args): AclessModelResult
+    public static function __callStatic(string $methodName, array $args): AclessServiceResult
     {
-        return self::checkModelMethodEssence($methodName, $args);
+        return self::checkServiceMethodEssence($methodName, $args);
     }
 
     /**
@@ -105,13 +105,13 @@ class AclessModelParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return AclessModelResult
+     * @return AclessServiceResult
      *
      * @throws AclessException
      * @throws \ReflectionException
      */
-    public function __call(string $methodName, array $args): AclessModelResult
+    public function __call(string $methodName, array $args): AclessServiceResult
     {
-        return self::checkModelMethodEssence($methodName, $args);
+        return self::checkServiceMethodEssence($methodName, $args);
     }
 }

@@ -1,6 +1,6 @@
 <small>avtomon</small>
 
-AclessModelParent
+AclessServiceParent
 =================
 
 Родитель для моделей - для проверки аргументов
@@ -8,7 +8,7 @@ AclessModelParent
 Описание
 -----------
 
-Class AclessModelParent
+Class AclessServiceParent
 
 Сигнатура
 ---------
@@ -20,11 +20,11 @@ Class AclessModelParent
 
 Методы класса class:
 
-- [`checkModelMethodEssence()`](#checkModelMethodEssence) &mdash; Аудит метода или свойства, и выполнение для методов
+- [`checkServiceMethodEssence()`](#checkServiceMethodEssence) &mdash; Аудит метода или свойства, и выполнение для методов
 - [`__callStatic()`](#__callStatic) &mdash; Проверка переданных аргументов для метода или SQL-свойства в статическом контексте
 - [`__call()`](#__call) &mdash; Проверка переданных аргументов для метода или SQL-свойства
 
-### `checkModelMethodEssence()` <a name="checkModelMethodEssence"></a>
+### `checkServiceMethodEssence()` <a name="checkServiceMethodEssence"></a>
 
 Аудит метода или свойства, и выполнение для методов
 
@@ -34,7 +34,7 @@ Class AclessModelParent
 - Может принимать следующий параметр(ы):
     - `$methodName` (`string`) - имя метода
     - `$args` (`array`) - аргументы
-- Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Возвращает [`AclessServiceResult`](../avtomon/AclessServiceResult.md) value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
     - [`ReflectionException`](http://php.net/class.ReflectionException)
@@ -49,7 +49,7 @@ Class AclessModelParent
 - Может принимать следующий параметр(ы):
     - `$methodName` (`string`) - имя метода или SQL-свойства
     - `$args` (`array`) - массив аргументов
-- Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Возвращает [`AclessServiceResult`](../avtomon/AclessServiceResult.md) value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
     - [`ReflectionException`](http://php.net/class.ReflectionException)
@@ -64,7 +64,7 @@ Class AclessModelParent
 - Может принимать следующий параметр(ы):
     - `$methodName` (`string`) - имя метода или SQL-свойства
     - `$args` (`array`) - массив аргументов
-- Возвращает [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Возвращает [`AclessServiceResult`](../avtomon/AclessServiceResult.md) value.
 - Выбрасывает одно из следующих исключений:
     - [`avtomon\AclessException`](../avtomon/AclessException.md)
     - [`ReflectionException`](http://php.net/class.ReflectionException)

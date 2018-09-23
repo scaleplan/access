@@ -1,6 +1,6 @@
 <small>avtomon</small>
 
-AclessModelResult
+AclessServiceResult
 =================
 
 Класс результата выполнения модели
@@ -8,7 +8,7 @@ AclessModelResult
 Описание
 -----------
 
-Class AclessModelResult
+Class AclessServiceResult
 
 Сигнатура
 ---------
@@ -85,7 +85,7 @@ false - в виде ассоциативного массива
 
 Методы класса class:
 
-- [`__construct()`](#__construct) &mdash; AclessModelResult constructor
+- [`__construct()`](#__construct) &mdash; AclessServiceResult constructor
 - [`getClass()`](#getClass) &mdash; Геттер для отражения класса модели
 - [`getMethod()`](#getMethod) &mdash; Геттер для отражения метода модели
 - [`getProperty()`](#getProperty) &mdash; Геттер для отражения свойства модели
@@ -96,7 +96,7 @@ false - в виде ассоциативного массива
 
 ### `__construct()` <a name="__construct"></a>
 
-AclessModelResult constructor
+AclessServiceResult constructor
 
 #### Сигнатура
 

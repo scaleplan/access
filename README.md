@@ -159,7 +159,7 @@ It is only necessary to specify the required configuration directives in the con
 controllers:
   - path:/var/www/project/controllers
     method_prefix: action
-    namespace: app\controllers
+    namespace: App\controllers
 ```
 
 After generating automatically filled in table <i>acless.url</i>
@@ -195,7 +195,7 @@ urls:
 
 <br>
 
-To work correctly with the controller methods, the controller classes to be processed must inherit from the AclessControllerParent class. To check arguments of methods models, you should inherit a model class from a class AclessModelParent.
+To work correctly with the controller methods, the controller classes to be processed must inherit from the AclessControllerParent class. To check arguments of methods models, you should inherit a model class from a class AclessServiceParent.
 <br>
 
 The main data store of the system is PostgreSQL. However, the data required for the authorization check is cached in the Redis store. To increase performance. 

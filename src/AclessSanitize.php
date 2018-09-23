@@ -90,7 +90,7 @@ class AclessSanitize
         [$docParams] = self::getDocParams($docBlock->getTagsByName('param'));
         foreach ($method->getParameters() as &$param) {
             $paramName = $param->getName();
-            $paramType = $param->getType() ? $param->getType()->getName() : ($docParams[$paramName]->getType() ? $docParams[$paramName]->getType()->getName(): '');
+            $paramType = $param->getType() ? $param->getType()->getName() : ($docParams[$paramName] ? $docParams[$paramName]->getType() : '');
 
             if ($param->isVariadic()) {
                 if (!$paramType) {
@@ -158,9 +158,15 @@ class AclessSanitize
         foreach ($allParams as $paramName => $param) {
             self::argAvailabilityCheck($paramName, $args, $optionParams);
 
+            if (!array_key_exists($paramName, $args)) {
+                continue;
+            }
+
             $arg = $args[$paramName];
 
-            self::docTypeCheck($arg, $paramName, $param->getType()->getName(), $docBlock);
+            if ($param instanceof DocBlock\Tag && $param->getType()) {
+                self::docTypeCheck($arg, $paramName, (string) $param->getType(), $docBlock);
+            }
 
             \is_string($arg) && $arg = strip_tags($arg);
 
@@ -197,10 +203,11 @@ class AclessSanitize
     {
         $allParams = $optionParams = [];
         foreach ($docParams as $docParam) {
-            $allParams[$docParam->getVariableName()] = $docParam;
+            $varName = ltrim($docParam->getVariableName(), '$');
+            $allParams[$varName] = $docParam;
             $paramDescription = (string) $docParam->getDescription();
             if ($paramDescription && stripos($paramDescription, '(optional)') !== false) {
-                $optionParams[$docParam->getVariableName()] = $docParam;
+                $optionParams[$varName] = $docParam;
             }
         }
 

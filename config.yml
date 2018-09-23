@@ -2,7 +2,7 @@
 controllers:
   - path: /var/www/payment_system/controllers
     method_prefix: action
-    namespace: app\controllers
+    namespace: App\controllers
 
 # Пути к директориям файлов
 files:

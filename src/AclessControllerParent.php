@@ -129,9 +129,9 @@ abstract class AclessControllerParent
      * @param \object|null $obj - объект, к контекте которого должен выполниться метод (если нестатический)
      *
      * @return AbstractResult
-     *
      * @throws AclessException
      * @throws DbResultItemException
+     * @throws RedisSingletonException
      * @throws \ReflectionException
      */
     protected static function checkControllerMethod(string $methodName, array $args, object $obj = null): AbstractResult
@@ -148,6 +148,7 @@ abstract class AclessControllerParent
         }
 
         $method = $refclass->getMethod($methodName);
+        /** @var Acless $acless */
         $acless = Acless::create();
         if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($acless->getConfig('acless_label')))) {
             throw new AclessException("Метод $methodName не доступен");
@@ -231,6 +232,7 @@ abstract class AclessControllerParent
      *
      * @throws AclessException
      * @throws DbResultItemException
+     * @throws RedisSingletonException
      * @throws \ReflectionException
      */
     public static function __callStatic(string $methodName, array $args): AbstractResult
@@ -244,11 +246,11 @@ abstract class AclessControllerParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return AbstractResult
-     *
-     * @throws AclessException
-     * @throws DbResultItemException
+     * @return \avtomon\AbstractResult
      * @throws \ReflectionException
+     * @throws \avtomon\AclessException
+     * @throws \avtomon\DbResultItemException
+     * @throws \avtomon\RedisSingletonException
      */
     public function __call(string $methodName, array $args): AbstractResult
     {

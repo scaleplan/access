@@ -1,6 +1,6 @@
 <small> avtomon </small>
 
-AclessModelParent
+AclessServiceParent
 =================
 
 Parent for models - to test the arguments
@@ -8,7 +8,7 @@ Parent for models - to test the arguments
 Description
 -----------
 
-Class AclessModelParent
+Class AclessServiceParent
 
 Signature
 ---------
@@ -20,11 +20,11 @@ Methods
 
 Class methods class:
 
-  - [`checkModelMethodEssence()`](#checkModelMethodEssence) &mdash; Audit a method or properties, and execute for methods
+  - [`checkServiceMethodEssence()`](#checkServiceMethodEssence) &mdash; Audit a method or properties, and execute for methods
   - [`__callStatic()`](#__callStatic) &mdash; Checking the passed arguments for a method or SQL property in a static context
   - [`__call()`](#__call) &mdash; Checking the passed arguments for the method or the SQL property
 
-### `checkModelMethodEssence()`<a name="checkModelMethodEssence"> </a>
+### `checkServiceMethodEssence()`<a name="checkServiceMethodEssence"> </a>
 
 Audit a method or properties, and execute for methods
 
@@ -34,7 +34,7 @@ Audit a method or properties, and execute for methods
 - It can take the following parameter (s):
   - `$methodName`(`string`) - method name
   - `$args`(`array`) - arguments
-- Returns [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Returns [`AclessServiceResult`](../avtomon/AclessServiceResult.md) value.
 - Throws one of the following exceptions:
   - [`avtomon\AclessException`](../avtomon/AclessException.md)
   - [`ReflectionException`](http://php.net/class.ReflectionException)
@@ -49,7 +49,7 @@ Checking the passed arguments for a method or SQL property in a static context
 - It can take the following parameter (s):
   - `$methodName`(`string`) - method name or SQL properties
   - `$args`(`array`) - array of arguments
-- Returns [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Returns [`AclessServiceResult`](../avtomon/AclessServiceResult.md) value.
 - Throws one of the following exceptions:
   - [`avtomon\AclessException`](../avtomon/AclessException.md)
   - [`ReflectionException`](http://php.net/class.ReflectionException)
@@ -64,7 +64,7 @@ Checking the passed arguments for the method or the SQL property
 - It can take the following parameter (s):
   - `$methodName`(`string`) - method name or SQL properties
   - `$args`(`array`) - array of arguments
-- Returns [`AclessModelResult`](../avtomon/AclessModelResult.md) value.
+- Returns [`AclessServiceResult`](../avtomon/AclessServiceResult.md) value.
 - Throws one of the following exceptions:
   - [`avtomon\AclessException`](../avtomon/AclessException.md)
   - [`ReflectionException`](http://php.net/class.ReflectionException)
