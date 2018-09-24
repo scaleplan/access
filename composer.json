@@ -1,13 +1,9 @@
 {
-    "name": "avtomon/Acless",
-    "description": "PHP access control system",
-    "minimum-stability": "dev",
-    "config": {
-        "process-timeout": 1800
-    },
+    "name": "scaleplan/access",
+    "description": "Access control system for Scaleplan",
     "autoload": {
         "psr-4": {
-            "avtomon\\": "src/"
+            "Scaleplan\\Access\\": "src/"
         }
     },
     "require": {
