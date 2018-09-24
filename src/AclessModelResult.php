@@ -6,10 +6,10 @@ use phpDocumentor\Reflection\DocBlock;
 /**
  * Класс результата выполнения модели
  *
- * Class AclessServiceResult
+ * Class AccessServiceResult
  * @package avtomon
  */
-class AclessServiceResult extends DbResultItem
+class AccessServiceResult extends DbResultItem
 {
     /**
      * Отражение класса модели
@@ -48,7 +48,7 @@ class AclessServiceResult extends DbResultItem
     protected $isPlainArgs = true;
 
     /**
-     * AclessServiceResult constructor
+     * AccessServiceResult constructor
      *
      * @param \ReflectionClass $class - отражение класса модели
      * @param \ReflectionMethod|null $method - отражение метода модели
@@ -137,20 +137,20 @@ class AclessServiceResult extends DbResultItem
     /**
      * Проверить тип возвращаемого значения по типам заданным в DOCBLOCK
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public function checkDocReturn(): void
     {
         $docBlock = new DocBlock($this->method ?? $this->property);
-        $denyFuzzy = $docBlock->hasTag(Acless::create()->getConfig('deny_fuzzy'));
+        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig('deny_fuzzy'));
         $returnTypes = $docBlock->getTagsByName('return');
         $returnTypes = end($returnTypes);
         $returnTypes = array_map(function ($item) {
             return trim($item, '\\\ \0');
         }, explode('|', $returnTypes));
 
-        if (!AclessSanitize::typeCheck($this->result, $returnTypes, $denyFuzzy)) {
-            throw new AclessException("Тип возвращаемого значения не соответствует заданному типу $returnTypes");
+        if (!AccessSanitize::typeCheck($this->result, $returnTypes, $denyFuzzy)) {
+            throw new AccessException("Тип возвращаемого значения не соответствует заданному типу $returnTypes");
         }
     }
 }

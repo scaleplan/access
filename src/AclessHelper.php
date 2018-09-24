@@ -5,20 +5,20 @@ namespace avtomon;
 /**
  * Класс ошибок
  *
- * Class AclessHelperException
+ * Class AccessHelperException
  * @package avtomon
  */
-class AclessHelperException extends CustomException
+class AccessHelperException extends CustomException
 {
 }
 
 /**
  * Класс вспомогательных методов
  *
- * Class AclessHelper
+ * Class AccessHelper
  * @package avtomon
  */
-class AclessHelper
+class AccessHelper
 {
     /**
      * Превратить строку в виде camelCase в строку вида dashed (camelCase -> camel-case)

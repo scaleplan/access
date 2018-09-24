@@ -9,10 +9,10 @@ use phpDocumentor\Reflection\{
 /**
  * Класс проверки аргументов выполнения
  *
- * Class AclessSanitize
+ * Class AccessSanitize
  * @package avtomon
  */
-class AclessSanitize
+class AccessSanitize
 {
     /**
      * Отражение метода или SQL-свойства
@@ -41,12 +41,12 @@ class AclessSanitize
      * @param \Reflector $reflector - отражение метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public function __construct(\Reflector $reflector, array $args)
     {
         if (!($reflector instanceof \ReflectionMethod) && !($reflector instanceof \ReflectionProperty)) {
-            throw new AclessException('Почистить можно только параметры методов и свойств');
+            throw new AccessException('Почистить можно только параметры методов и свойств');
         }
 
         $this->reflector = $reflector;
@@ -58,7 +58,7 @@ class AclessSanitize
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public function sanitizeArgs(): array
     {
@@ -81,7 +81,7 @@ class AclessSanitize
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public static function sanitizeMethodArgs(\ReflectionMethod $method, array $args): array
     {
@@ -107,7 +107,7 @@ class AclessSanitize
             }
 
             if (!array_key_exists($paramName, $args) && !$param->isOptional()) {
-                throw new AclessException("Отсутствует необходимый параметр $paramName");
+                throw new AccessException("Отсутствует необходимый параметр $paramName");
             }
 
             if ($param->isOptional() && (!array_key_exists($paramName, $args) || ($args[$paramName] == $param->getDefaultValue() && $param->getDefaultValue() === null))) {
@@ -135,7 +135,7 @@ class AclessSanitize
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public static function sanitizeSQLPropertyArgs(\ReflectionProperty $property, array $args): array
     {
@@ -183,12 +183,12 @@ class AclessSanitize
      * @param array $args - массив аргументов
      * @param array $optionParams - массив опциональных параметров
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     protected static function argAvailabilityCheck(string $paramName, array $args, array $optionParams): void
     {
         if (!array_key_exists($paramName, $args) && !array_key_exists($paramName, $optionParams)) {
-            throw new AclessException("Не хватает параметра $paramName");
+            throw new AccessException("Не хватает параметра $paramName");
         }
     }
 
@@ -222,7 +222,7 @@ class AclessSanitize
      * @param string $paramType - требуемый тип или группа типов
      * @param DocBlock $docBlock - ссылка объект DOCBLOCK метода или свойства
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     protected static function docTypeCheck(&$arg, string $paramName, string $paramType, DocBlock $docBlock): void
     {
@@ -230,14 +230,14 @@ class AclessSanitize
             return;
         }
 
-        $denyFuzzy = $docBlock->hasTag(Acless::create()->getConfig('deny_fuzzy'));
+        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig('deny_fuzzy'));
 
         $paramTypes = array_map(function ($item) {
             return trim($item, '\\\ \0');
         }, explode('|', $paramType));
 
         if (!self::typeCheck($arg, $paramTypes, $denyFuzzy)) {
-            throw new AclessException("Тип параметра $paramName не соответствует заданному типу $paramType");
+            throw new AccessException("Тип параметра $paramName не соответствует заданному типу $paramType");
         }
     }
 

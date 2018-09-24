@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION acless.right_update()
+CREATE OR REPLACE FUNCTION access.right_update()
 RETURNS trigger language plperlu AS
 $BODY$
 	my $script_path = "/tmp/flush_user_cache.sh";
@@ -25,7 +25,7 @@ CREATE TRIGGER
 AFTER
 	INSERT OR UPDATE OR DELETE
 ON
-	acless.access_right
+	access.access_right
 FOR EACH ROW
 EXECUTE PROCEDURE
-	acless.right_update();
+	access.right_update();

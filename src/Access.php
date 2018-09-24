@@ -1,41 +1,22 @@
 <?php
 
-namespace avtomon;
+namespace Scaleplan\Access;
 
 use phpDocumentor\Reflection\DocBlock;
-
-/**
- * Класс исключений
- *
- * Class AclessException
- * @package avtomon
- */
-class AclessException extends CustomException
-{
-}
+use Scaleplan\Access\Exceptions\ConfigException;
 
 /**
  * Класс формирования списка урлов и проверки прав
  *
- * Class Acless
+ * Class Access
  * @package avtomon
  */
-class Acless extends AclessAbstract
+class Access extends AccessAbstract
 {
-    /**
-     * Код ошибки Acless указывающий на закрытый доступ к ресурсу
-     */
-    public const ACLESS_403_ERROR_CODE = 43;
-
-    /**
-     * Код ошибки Acless указывающий на неразрешенный неавторизованный запрос
-     */
-    public const ACLESS_UNAUTH_ERROR_CODE = 47;
-
     /**
      * Инстанс класса
      *
-     * @var null|Acless
+     * @var null|Access
      */
     protected static $instance;
 
@@ -53,7 +34,7 @@ class Acless extends AclessAbstract
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws RedisSingletonException
      */
     public function getAccessRights(string $url = ''): array
@@ -61,7 +42,7 @@ class Acless extends AclessAbstract
         switch ($this->config['cache_storage']) {
             case 'redis':
                 if (empty($this->config['redis']['socket'])) {
-                    throw new AclessException('В конфигурации не задан путь к Redis-сокету');
+                    throw new ConfigException('В конфигурации не задан путь к Redis-сокету');
                 }
 
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
@@ -77,7 +58,7 @@ class Acless extends AclessAbstract
                 return $url ? ($_SESSION['access_rights'][$url] ?? []) : array_filter($_SESSION['access_rights']);
 
             default:
-                throw new AclessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой");
+                throw new AccessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой");
         }
     }
 
@@ -90,12 +71,12 @@ class Acless extends AclessAbstract
      *
      * @return bool
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws RedisSingletonException
      */
     public function checkMethodRights(\Reflector $refMethod, array $args, \ReflectionClass $refClass = null): bool
     {
-        if (empty($docBlock = new DocBlock($refMethod)) || empty($tag = $docBlock->getTagsByName($this->config['acless_label']))) {
+        if (empty($docBlock = new DocBlock($refMethod)) || empty($tag = $docBlock->getTagsByName($this->config['access_label']))) {
             return true;
         }
 
@@ -103,13 +84,13 @@ class Acless extends AclessAbstract
         $url = $this->methodToURL($className, $refMethod->getName());
         if (empty($accessRight = $this->getAccessRights($url))) {
             if ($this->getUserId() === $this->getConfig('guest_user_id')) {
-                throw new AclessException('Авторизуйтесь на сайте', self::ACLESS_UNAUTH_ERROR_CODE);
+                throw new AccessException('Авторизуйтесь на сайте', self::ACCESS_UNAUTH_ERROR_CODE);
             }
 
-            throw new AclessException('Метод не разрешен Вам для выпонения', self::ACLESS_403_ERROR_CODE);
+            throw new AccessException('Метод не разрешен Вам для выпонения', self::ACCESS_403_ERROR_CODE);
         }
 
-        if (empty($tag = $docBlock->getTagsByName($this->config['acless_filter_label']))) {
+        if (empty($tag = $docBlock->getTagsByName($this->config['access_filter_label']))) {
             return true;
         }
 
@@ -123,7 +104,7 @@ class Acless extends AclessAbstract
             }, json_decode($accessRight['values'], true));
 
             if (empty($args)) {
-                throw new AclessException('Список параметров выполнения действия пуст');
+                throw new AccessException('Список параметров выполнения действия пуст');
             }
 
             $methodDefaults = null;
@@ -141,7 +122,7 @@ class Acless extends AclessAbstract
             };
 
             if (\count($accessRight['values'][0]) !== \count($filters)) {
-                throw new AclessException('Количество фильтрующих параметров не соответствует количеству фильтрующих значений');
+                throw new AccessException('Количество фильтрующих параметров не соответствует количеству фильтрующих значений');
             }
 
             $checkValue = [];
@@ -154,14 +135,14 @@ class Acless extends AclessAbstract
             }
 
             if (array_intersect($filters, array_keys($args)) !== $filters) {
-                throw new AclessException('Список параметров выполнения действия не содержит все фильтрующие параметры');
+                throw new AccessException('Список параметров выполнения действия не содержит все фильтрующие параметры');
             }
 
             if (
                 ($accessRight['is_allow'] && !\in_array($checkValue, $accessRight['values'], true))
                 || (!$accessRight['is_allow'] && \in_array($checkValue, $accessRight['values'], true))
             ) {
-                throw new AclessException("Выполнение метода с такими параметрами $filters Вам не разрешено");
+                throw new AccessException("Выполнение метода с такими параметрами $filters Вам не разрешено");
             }
         }
 
@@ -175,17 +156,17 @@ class Acless extends AclessAbstract
      *
      * @return bool
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws RedisSingletonException
      */
     public function checkFileRights(string $filePath): bool
     {
         if (empty($accessRight = $this->getAccessRights($filePath))) {
             if ($this->getUserId() === $this->getConfig('guest_user_id')) {
-                throw new AclessException('Авторизуйтесь на сайте', self::ACLESS_UNAUTH_ERROR_CODE);
+                throw new AccessException('Авторизуйтесь на сайте', self::ACCESS_UNAUTH_ERROR_CODE);
             }
 
-            throw new AclessException('Файл Вам не доступен', self::ACLESS_403_ERROR_CODE);
+            throw new AccessException('Файл Вам не доступен', self::ACCESS_403_ERROR_CODE);
         }
 
         return true;
@@ -199,13 +180,13 @@ class Acless extends AclessAbstract
      *
      * @return string
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public function methodToURL(string $className, string $methodName): string
     {
         foreach ($this->config['controllers'] as $controllerDir) {
             if (empty($controllerDir['path'])) {
-                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
+                throw new AccessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
             }
 
             $className = str_replace($controllerDir['namespace'], '', $className);
@@ -213,7 +194,7 @@ class Acless extends AclessAbstract
 
         $methodName = str_replace('\\', '/', trim($className, '\/ ') . '\\' . trim($methodName, '\/ '));
 
-        return AclessHelper::camel2dashed(preg_replace('(Controller|action)', '', $methodName));
+        return AccessHelper::camel2dashed(preg_replace('(Controller|action)', '', $methodName));
     }
 
     /**
@@ -224,7 +205,7 @@ class Acless extends AclessAbstract
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws \ReflectionException
      */
     protected function generateControllerURLs(string $controllerFileName, string $controllerNamespace = null): array
@@ -242,7 +223,7 @@ class Acless extends AclessAbstract
         $refClass = new \ReflectionClass("$controllerNamespace$controller");
 
         $urls = [];
-        $sql = 'SELECT id, schema_name, table_name FROM acless.model_type';
+        $sql = 'SELECT id, schema_name, table_name FROM access.model_type';
         $models = $this->getPSConnection()->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
 
         $seachService = function (string $schema, string $table) use ($models): ?int {
@@ -262,30 +243,30 @@ class Acless extends AclessAbstract
         };
 
         foreach ($refClass->getMethods() as $method) {
-            if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($this->config['acless_label']))) {
+            if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($this->config['access_label']))) {
                 continue;
             }
 
-            if ($method->getDeclaringClass()->getName() === 'avtomon\AclessControllerParent') {
+            if ($method->getDeclaringClass()->getName() === 'avtomon\AccessControllerParent') {
                 continue;
             }
 
             $methodName = str_replace('action', '', $method->getName());
 
-            $aclessSchema = $docBlock->getTagsByName($this->config['acless_schema']);
-            $aclessSchema = end($aclessSchema);
-            $aclessTables = $docBlock->getTagsByName($this->config['acless_tables']);
-            $aclessTables = end($aclessTables);
-            $aclessUrlType = $docBlock->getTagsByName($this->config['acless_url_type']);
-            $aclessUrlType = end($aclessUrlType);
+            $accessSchema = $docBlock->getTagsByName($this->config['access_schema']);
+            $accessSchema = end($accessSchema);
+            $accessTables = $docBlock->getTagsByName($this->config['access_tables']);
+            $accessTables = end($accessTables);
+            $accessUrlType = $docBlock->getTagsByName($this->config['access_url_type']);
+            $accessUrlType = end($accessUrlType);
 
-            $modelId = $seachService($aclessSchema, $aclessTables);
+            $modelId = $seachService($accessSchema, $accessTables);
 
             $url = [
-                'text' => '/' . strtolower(str_replace('Controller', '', $controller)) . '/' . AclessHelper::camel2dashed($methodName),
+                'text' => '/' . strtolower(str_replace('Controller', '', $controller)) . '/' . AccessHelper::camel2dashed($methodName),
                 'name' => $docBlock->getSummary(),
                 'model_type_id' => $modelId,
-                'type' => $aclessUrlType
+                'type' => $accessUrlType
             ];
 
             $urls[] = $url;
@@ -328,7 +309,7 @@ class Acless extends AclessAbstract
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws \ReflectionException
      */
     public function getControllerURLs(): array
@@ -340,7 +321,7 @@ class Acless extends AclessAbstract
         $urls = [];
         foreach ($this->config['controllers'] as $controllerDir) {
             if (empty($controllerDir['path'])) {
-                throw new AclessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
+                throw new AccessException('Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"');
             }
 
             $controllers = array_map(function ($item) use ($controllerDir) {
@@ -404,7 +385,7 @@ class Acless extends AclessAbstract
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws \ReflectionException
      */
     public function getAllURLs(): array

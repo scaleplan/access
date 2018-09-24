@@ -1,16 +1,18 @@
 <?php
 
-namespace avtomon;
+namespace Scaleplan\Access;
 
+use Scaleplan\Access\Exceptions\ConfigException;
 use Symfony\Component\Yaml\Yaml;
 
 /**
  * Суперкласс
  *
- * Class AbstractAcless
+ * Class AccessAbstract
+ *
  * @package avtomon
  */
-abstract class AclessAbstract
+abstract class AccessAbstract
 {
     /**
      * Конфигурация
@@ -43,7 +45,7 @@ abstract class AclessAbstract
     /**
      * Инстанс класса
      *
-     * @var null|AclessAbstract
+     * @var null|AccessAbstract
      */
     protected static $instance;
 
@@ -53,9 +55,9 @@ abstract class AclessAbstract
      * @param int $userId - идентификатор пользователя
      * @param string $confPath - путь в файлу конфигурации
      *
-     * @return AclessAbstract
+     * @return AccessAbstract
      */
-    public static function create(int $userId = -1, string $confPath = __DIR__ . '/../config.yml'): AclessAbstract
+    public static function create(int $userId = -1, string $confPath = __DIR__ . '/../config.yml'): AccessAbstract
     {
         if (!static::$instance) {
             $className = static::class;
@@ -66,55 +68,55 @@ abstract class AclessAbstract
     }
 
     /**
-     * AclessAbstract constructor
+     * AccessAbstract constructor.
      *
      * @param int $userId - идентификатор пользователя
      * @param string $confPath - пусть к конфигурации
      *
-     * @throws AclessException
+     * @throws ConfigException
      */
     private function __construct(int $userId, string $confPath)
     {
         $this->config = Yaml::parse(file_get_contents($confPath));
 
         if (empty($this->config)) {
-            throw new AclessException('Отсутствует конфигурация');
+            throw new ConfigException('Отсутствует конфигурация');
         }
 
         if (empty($this->config['persistent_storage'])) {
-            throw new AclessException('В конфирурациии отсутствует указание постоянного хранилища');
+            throw new ConfigException('В конфирурациии отсутствует указание постоянного хранилища');
         }
 
         if (empty($this->config[$this->config['persistent_storage']])){
-            throw new AclessException('В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав');
+            throw new ConfigException('В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав');
         }
 
         if (empty($this->config['cache_storage'])) {
-            throw new AclessException('В конфирурациии отсутствует указание кефирующего хранилища');
+            throw new ConfigException('В конфирурациии отсутствует указание кефирующего хранилища');
         }
 
         if (empty($this->config[$this->config['cache_storage']])){
-            throw new AclessException('В конфигурации отсутствуют данные о подключениие к кэширующему хранилищу прав');
+            throw new ConfigException('В конфигурации отсутствуют данные о подключениие к кэширующему хранилищу прав');
         }
 
         if (!\is_array($this->config['roles'])){
-            throw new AclessException('Список ролей должен быть задан списком');
+            throw new ConfigException('Список ролей должен быть задан списком');
         }
 
-        if (empty($this->config['acless_filter_label'])) {
-            throw new AclessException('В конфигурации отсутствует имя для метки фильтрующего аргумента');
+        if (empty($this->config['access_filter_label'])) {
+            throw new ConfigException('В конфигурации отсутствует имя для метки фильтрующего аргумента');
         }
 
-        if (empty($this->config['acless_label'])) {
-            throw new AclessException('В конфигурации отсутствует имя метки Acless');
+        if (empty($this->config['access_label'])) {
+            throw new ConfigException('В конфигурации отсутствует имя метки Access');
         }
 
-        if (empty($this->config['acless_separator'])) {
-            throw new AclessException('В конфигурации отсутствует разделитель фильтров');
+        if (empty($this->config['access_separator'])) {
+            throw new ConfigException('В конфигурации отсутствует разделитель фильтров');
         }
 
         if ($userId < 0) {
-            throw new AclessException('Неверное задан идентификатор пользователя');
+            throw new ConfigException('Неверное задан идентификатор пользователя');
         }
 
         $this->userId = $userId;
@@ -135,7 +137,7 @@ abstract class AclessAbstract
      *
      * @return \PDO
      *
-     * @throws AclessException
+     * @throws ConfigException
      */
     protected function getPSConnection(): \PDO
     {
@@ -146,7 +148,7 @@ abstract class AclessAbstract
         switch ($this->config['persistent_storage']) {
             case 'postgresql':
                 if (empty($this->config['postgresql']) || empty($this->config['postgresql']['dns']) || empty($this->config['postgresql']['user']) || empty($this->config['postgresql']['password'])) {
-                    throw new AclessException('Недостаточно данных для подключения к PostgreSQL');
+                    throw new ConfigException('Недостаточно данных для подключения к PostgreSQL');
                 }
 
                 $this->ps = $this->ps ?? new \PDO(
@@ -161,7 +163,7 @@ abstract class AclessAbstract
                 return $this->ps;
 
             default:
-                throw new AclessException("Драйвер {$this->config['persistent_storage']} постоянного хранилища не поддерживается системой");
+                throw new ConfigException("Драйвер {$this->config['persistent_storage']} постоянного хранилища не поддерживается системой");
         }
     }
 

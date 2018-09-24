@@ -1,15 +1,18 @@
 <?php
 
-namespace avtomon;
+namespace Scaleplan\Access;
+
 use phpDocumentor\Reflection\DocBlock;
+use Scaleplan\Access\Exceptions\MethodNotFoundException;
+use Scaleplan\Access\Exceptions\ValidationException;
 
 /**
  * Родитель для контроллеров - проверка прав доступа, фильтрация параметров
  *
- * Class AclessControllerParent
+ * Class AccessControllerParent
  * @package avtomon
  */
-abstract class AclessControllerParent
+abstract class AccessControllerParent
 {
     /**
      * Функции для выполнения перед исполнением метода контроллера
@@ -129,7 +132,7 @@ abstract class AclessControllerParent
      * @param \object|null $obj - объект, к контекте которого должен выполниться метод (если нестатический)
      *
      * @return AbstractResult
-     * @throws AclessException
+     * @throws AccessException
      * @throws DbResultItemException
      * @throws RedisSingletonException
      * @throws \ReflectionException
@@ -138,32 +141,32 @@ abstract class AclessControllerParent
     {
         $args = reset($args);
         if (!\is_array($args)) {
-            throw new AclessException("Метод $methodName принимает параметры в виде массива");
+            throw new ValidationException("Метод $methodName принимает параметры в виде массива");
         }
 
         $refclass = new \ReflectionClass(static::class);
 
         if (!$refclass->hasMethod($methodName)) {
-            throw new AclessException("Метод $methodName не существует");
+            throw new MethodNotFoundException("Метод $methodName не существует");
         }
 
         $method = $refclass->getMethod($methodName);
-        /** @var Acless $acless */
-        $acless = Acless::create();
-        if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($acless->getConfig('acless_label')))) {
-            throw new AclessException("Метод $methodName не доступен");
+        /** @var Access $access */
+        $access = Access::create();
+        if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($access->getConfig('access_label')))) {
+            throw new AccessException("Метод $methodName не доступен");
         }
 
-        $isPlainArgs = empty($docBlock->getTagsByName($acless->getConfig('acless_array_arg')));
+        $isPlainArgs = empty($docBlock->getTagsByName($access->getConfig('access_array_arg')));
         if ($isPlainArgs && !empty($params[0]) && $params[0]->isVariadic()) {
             $isPlainArgs = false;
         }
 
-        if (empty($docBlock->getTagsByName($acless->getConfig('acless_no_rights_check')))) {
-            $acless->checkMethodRights($method, $args, $refclass);
+        if (empty($docBlock->getTagsByName($access->getConfig('access_no_rights_check')))) {
+            $access->checkMethodRights($method, $args, $refclass);
         }
 
-        $args = $isPlainArgs ? (new AclessSanitize($method, $args))->sanitizeArgs() : $args;
+        $args = $isPlainArgs ? (new AccessSanitize($method, $args))->sanitizeArgs() : $args;
 
         self::executeBeforeHandlers($method, $args);
 
@@ -230,7 +233,7 @@ abstract class AclessControllerParent
      *
      * @return AbstractResult
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws DbResultItemException
      * @throws RedisSingletonException
      * @throws \ReflectionException
@@ -248,7 +251,7 @@ abstract class AclessControllerParent
      *
      * @return \avtomon\AbstractResult
      * @throws \ReflectionException
-     * @throws \avtomon\AclessException
+     * @throws \avtomon\AccessException
      * @throws \avtomon\DbResultItemException
      * @throws \avtomon\RedisSingletonException
      */

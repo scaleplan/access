@@ -5,25 +5,25 @@ namespace avtomon;
 /**
  * Класс внесения изменений
  *
- * Class AclessModify
+ * Class AccessModify
  * @package avtomon
  */
-class AclessModify extends AclessAbstract
+class AccessModify extends AccessAbstract
 {
     /**
      * Инстанс класса
      *
-     * @var null|AclessModify
+     * @var null|AccessModify
      */
     protected static $instance;
 
     /**
      * Загрузить права доступа для текущего пользователя в кэш
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws RedisSingletonException
      */
-    public function loadAclessRights(): void
+    public function loadAccessRights(): void
     {
         $sth = $this->getPSConnection()
             ->prepare('
@@ -32,9 +32,9 @@ class AclessModify extends AclessAbstract
                          ar.is_allow,
                          array_to_json(ar.values) "values"
                        FROM 
-                         acless.url u 
+                         access.url u 
                        LEFT JOIN
-                         acless.access_right ar 
+                         access.access_right ar 
                          ON 
                            ar.url_id = u.id
                        WHERE 
@@ -47,7 +47,7 @@ class AclessModify extends AclessAbstract
         switch ($this->config['cache_storage']) {
             case 'redis':
                 if (empty($this->config['redis']['socket'])) {
-                    throw new AclessException('В конфигурации не задан путь к Redis-сокету');
+                    throw new AccessException('В конфигурации не задан путь к Redis-сокету');
                 }
 
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
@@ -62,7 +62,7 @@ class AclessModify extends AclessAbstract
 
                     if (!$this->cs->hMset("user_id:{$this->userId}", $hashValue))
                     {
-                        throw new AclessException('Не удалось записать права доступа в Redis');
+                        throw new AccessException('Не удалось записать права доступа в Redis');
                     }
                 }
 
@@ -73,20 +73,20 @@ class AclessModify extends AclessAbstract
                 break;
 
             default:
-                throw new AclessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой");
+                throw new AccessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой");
         }
     }
 
     /**
-     * Залить в базу данных схему для работы с Acless
+     * Залить в базу данных схему для работы с Access
      *
      * @return int
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     protected function initSQLScheme(): int
     {
-        $sql = file_get_contents(__DIR__ . '/acless.sql');
+        $sql = file_get_contents(__DIR__ . '/access.sql');
 
         return $this->getPSConnection()->exec($sql);
     }
@@ -96,19 +96,19 @@ class AclessModify extends AclessAbstract
      *
      * @return int
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public function initPersistentStorage(): int
     {
         if (!$this->initSQLScheme()) {
-            throw new AclessException('Не удалось создать необходимые объекты базы данных');
+            throw new AccessException('Не удалось создать необходимые объекты базы данных');
         }
 
         $urlsCount = 0;
 
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
-                                  acless.url
+                                  access.url
                                  (text,
                                   name,
                                   model_type_id,
@@ -125,7 +125,7 @@ class AclessModify extends AclessAbstract
                                   type = EXCLUDED.type,
                                   name = EXCLUDED.name'
         );
-        foreach (Acless::create($this->userId)->getAllURLs() as $arr) {
+        foreach (Access::create($this->userId)->getAllURLs() as $arr) {
             $sth->execute($arr);
             $urlsCount += $sth->rowCount();
         }
@@ -142,7 +142,7 @@ class AclessModify extends AclessAbstract
         $rolesPlaceholders = implode(',', array_map( function ($item) {
             return ":$item";
         }, array_keys($roles)));
-        $sth = $this->ps->prepare("CREATE TYPE acless.roles AS ENUM ($rolesPlaceholders)");
+        $sth = $this->ps->prepare("CREATE TYPE access.roles AS ENUM ($rolesPlaceholders)");
         $sth->execute($roles);
 
         return $urlsCount;
@@ -156,13 +156,13 @@ class AclessModify extends AclessAbstract
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public function addRoleAccessRight(int $url_id, string $role): array
     {
         $sth = $this->getPSConnection()->prepare(
                      'INSERT INTO
-                                  acless.default_right
+                                  access.default_right
                                 VALUES
                                  (:url_id,
                                   :role)
@@ -191,26 +191,26 @@ class AclessModify extends AclessAbstract
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public function addUserToRole(int $user_id, string $role = ''): array
     {
         $role = $role ?? $this->config['default_role'];
         if (!$role) {
-            throw new AclessException('Не задана роль по умолчанию');
+            throw new AccessException('Не задана роль по умолчанию');
         }
 
         if (empty($this->config['roles'])) {
-            throw new AclessException('Список ролей пуст');
+            throw new AccessException('Список ролей пуст');
         }
 
         if (!\in_array($role, $this->config['roles'], true)) {
-            throw new AclessException('Заданная роль не входит в список доступных ролей');
+            throw new AccessException('Заданная роль не входит в список доступных ролей');
         }
 
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
-                          acless.user_role
+                          access.user_role
                         VALUES
                          (:role,
                           :user_id)
@@ -239,13 +239,13 @@ class AclessModify extends AclessAbstract
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public function addAccessRight(int $url_id, int $user_id, bool $is_allow, array $values): array
     {
         $sth = $this->getPSConnection()->prepare(
                      'INSERT INTO
-                                  acless.access_right
+                                  access.access_right
                                 VALUES
                                  (:url_id,
                                   :user_id,
@@ -280,22 +280,22 @@ class AclessModify extends AclessAbstract
      *
      * @return array
      *
-     * @throws AclessException
+     * @throws AccessException
      */
     public function shiftAccessRightFromRole(int $userId): array
     {
         $sth = $this->getPSConnection()->prepare(
                     'INSERT INTO
-                                  acless.access_right
+                                  access.access_right
                                  (url_id,
                                   user_id)
                                 SELECT 
                                   dr.url_id,
                                   ur.user_id
                                 FROM
-                                  acless.default_right dr 
+                                  access.default_right dr 
                                 JOIN 
-                                  acless.user_role ur 
+                                  access.user_role ur 
                                   ON 
                                     ur.role = dr.role
                                 WHERE

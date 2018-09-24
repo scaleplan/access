@@ -2,9 +2,9 @@
 
 <?php
 
-use avtomon\AclessModify;
+use avtomon\AccessModify;
 
-$am = AclessModify::create(0);
+$am = AccessModify::create(0);
 
 if ($argv[1] === 'schema' || $argv[2] === 'schema') {
     /**

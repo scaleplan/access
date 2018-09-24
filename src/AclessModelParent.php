@@ -7,10 +7,10 @@ use phpDocumentor\Reflection\DocBlock;
 /**
  * Родитель для моделей - для проверки аргументов
  *
- * Class AclessServiceParent
+ * Class AccessServiceParent
  * @package avtomon
  */
-class AclessServiceParent
+class AccessServiceParent
 {
     /**
      * Аудит метода или свойства, и выполнение для методов
@@ -18,41 +18,41 @@ class AclessServiceParent
      * @param string $methodName - имя метода
      * @param array $args - аргументы
      *
-     * @return AclessServiceResult
+     * @return AccessServiceResult
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws \ReflectionException
      */
-    protected static function checkServiceMethodEssence(string $methodName, array $args): AclessServiceResult
+    protected static function checkServiceMethodEssence(string $methodName, array $args): AccessServiceResult
     {
         $formatArgs = function (array &$args) use (&$methodName): array {
             $args = $args ? reset($args) : $args;
             if (!\is_array($args)) {
-                throw new AclessException("Метод $methodName принимает параметры в виде массива");
+                throw new AccessException("Метод $methodName принимает параметры в виде массива");
             }
 
             return $args;
         };
 
         $refclass = new \ReflectionClass(static::class);
-        $acless = Acless::create();
+        $access = Access::create();
 
         if ($refclass->hasMethod($methodName)) {
             $method = $refclass->getMethod($methodName);
 
-            if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
-                throw new AclessException("Метод $methodName не доступен");
+            if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($access->getConfig()['access_label']))) {
+                throw new AccessException("Метод $methodName не доступен");
             }
 
-            $isPlainArgs = empty($docBlock->getTagsByName($acless->getConfig('acless_array_arg')));
+            $isPlainArgs = empty($docBlock->getTagsByName($access->getConfig('access_array_arg')));
             if ($isPlainArgs) {
                 $formatArgs($args);
-                $args = (new AclessSanitize($method, $args))->sanitizeArgs();
+                $args = (new AccessSanitize($method, $args))->sanitizeArgs();
             }
 
             $method->setAccessible(true);
 
-            return new AclessServiceResult(
+            return new AccessServiceResult(
                 $refclass,
                 $method,
                 null,
@@ -64,14 +64,14 @@ class AclessServiceParent
         if ($refclass->hasProperty($methodName)) {
             $property = $refclass->getProperty($methodName);
 
-            if (empty($docBlock = new DocBlock($property)) || empty($docBlock->getTagsByName($acless->getConfig()['acless_label']))) {
-                throw new AclessException("Свойство $methodName не доступно");
+            if (empty($docBlock = new DocBlock($property)) || empty($docBlock->getTagsByName($access->getConfig()['access_label']))) {
+                throw new AccessException("Свойство $methodName не доступно");
             }
 
             $formatArgs($args);
-            $args = (new AclessSanitize($property, $args))->sanitizeArgs();
+            $args = (new AccessSanitize($property, $args))->sanitizeArgs();
 
-            return new AclessServiceResult(
+            return new AccessServiceResult(
                 $refclass,
                 null,
                 $property,
@@ -80,7 +80,7 @@ class AclessServiceParent
             );
         }
 
-        throw new AclessException("Метод $methodName не существует");
+        throw new AccessException("Метод $methodName не существует");
     }
 
     /**
@@ -89,12 +89,12 @@ class AclessServiceParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return AclessServiceResult
+     * @return AccessServiceResult
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws \ReflectionException
      */
-    public static function __callStatic(string $methodName, array $args): AclessServiceResult
+    public static function __callStatic(string $methodName, array $args): AccessServiceResult
     {
         return self::checkServiceMethodEssence($methodName, $args);
     }
@@ -105,12 +105,12 @@ class AclessServiceParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return AclessServiceResult
+     * @return AccessServiceResult
      *
-     * @throws AclessException
+     * @throws AccessException
      * @throws \ReflectionException
      */
-    public function __call(string $methodName, array $args): AclessServiceResult
+    public function __call(string $methodName, array $args): AccessServiceResult
     {
         return self::checkServiceMethodEssence($methodName, $args);
     }
