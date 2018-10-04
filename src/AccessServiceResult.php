@@ -1,15 +1,20 @@
 <?php
 
-namespace avtomon;
+namespace Scaleplan\Access;
+
 use phpDocumentor\Reflection\DocBlock;
+use Scaleplan\Access\Constants\ConfigConstants;
+use Scaleplan\Access\Exceptions\ValidationException;
+use Scaleplan\Result\DbResult;
 
 /**
  * Класс результата выполнения модели
  *
  * Class AccessServiceResult
- * @package avtomon
+ *
+ * @package Scaleplan\Access
  */
-class AccessServiceResult extends DbResultItem
+class AccessServiceResult extends DbResult
 {
     /**
      * Отражение класса модели
@@ -125,11 +130,11 @@ class AccessServiceResult extends DbResultItem
     }
 
     /**
-     * Добавить результат из другого объекта DbResultItem
+     * Добавить результат из другого объекта DbResult
      *
-     * @param DbResultItem|null $rawResult
+     * @param DbResult|null $rawResult
      */
-    public function setRawResult(?DbResultItem $rawResult): void
+    public function setRawResult(?DbResult $rawResult): void
     {
         $this->result = $rawResult ? $rawResult->result : null;
     }
@@ -137,12 +142,12 @@ class AccessServiceResult extends DbResultItem
     /**
      * Проверить тип возвращаемого значения по типам заданным в DOCBLOCK
      *
-     * @throws AccessException
+     * @throws ValidationException
      */
     public function checkDocReturn(): void
     {
         $docBlock = new DocBlock($this->method ?? $this->property);
-        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig('deny_fuzzy'));
+        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig(ConfigConstants::DOCBLOCK_CHECK_LABEL_NAME));
         $returnTypes = $docBlock->getTagsByName('return');
         $returnTypes = end($returnTypes);
         $returnTypes = array_map(function ($item) {
@@ -150,7 +155,9 @@ class AccessServiceResult extends DbResultItem
         }, explode('|', $returnTypes));
 
         if (!AccessSanitize::typeCheck($this->result, $returnTypes, $denyFuzzy)) {
-            throw new AccessException("Тип возвращаемого значения не соответствует заданному типу $returnTypes");
+            throw new ValidationException(
+                "Тип возвращаемого значения не соответствует заданному типу $returnTypes"
+            );
         }
     }
 }

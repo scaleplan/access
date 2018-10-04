@@ -3,14 +3,20 @@
 namespace Scaleplan\Access;
 
 use phpDocumentor\Reflection\DocBlock;
+use Scaleplan\Access\Constants\ConfigConstants;
+use Scaleplan\Access\Exceptions\AccessDeniedException;
 use Scaleplan\Access\Exceptions\MethodNotFoundException;
 use Scaleplan\Access\Exceptions\ValidationException;
+use Scaleplan\Result\AbstractResult;
+use Scaleplan\Result\DbResult;
+use Scaleplan\Result\HTMLResult;
 
 /**
  * Родитель для контроллеров - проверка прав доступа, фильтрация параметров
  *
  * Class AccessControllerParent
- * @package avtomon
+ *
+ * @package Scaleplan\Access
  */
 abstract class AccessControllerParent
 {
@@ -132,10 +138,17 @@ abstract class AccessControllerParent
      * @param \object|null $obj - объект, к контекте которого должен выполниться метод (если нестатический)
      *
      * @return AbstractResult
-     * @throws AccessException
-     * @throws DbResultItemException
-     * @throws RedisSingletonException
+     *
+     * @throws AccessDeniedException
+     * @throws Exceptions\AccessException
+     * @throws Exceptions\AuthException
+     * @throws Exceptions\ConfigException
+     * @throws Exceptions\FormatException
+     * @throws MethodNotFoundException
+     * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
+     * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     protected static function checkControllerMethod(string $methodName, array $args, object $obj = null): AbstractResult
     {
@@ -144,26 +157,34 @@ abstract class AccessControllerParent
             throw new ValidationException("Метод $methodName принимает параметры в виде массива");
         }
 
-        $refclass = new \ReflectionClass(static::class);
+        $refClass = new \ReflectionClass(static::class);
 
-        if (!$refclass->hasMethod($methodName)) {
+        if (!$refClass->hasMethod($methodName)) {
             throw new MethodNotFoundException("Метод $methodName не существует");
         }
 
-        $method = $refclass->getMethod($methodName);
+        $method = $refClass->getMethod($methodName);
         /** @var Access $access */
         $access = Access::create();
-        if (empty($docBlock = new DocBlock($method)) || empty($docBlock->getTagsByName($access->getConfig('access_label')))) {
-            throw new AccessException("Метод $methodName не доступен");
+        if (empty($docBlock = new DocBlock($method))
+            ||
+            empty($docBlock->getTagsByName($access->getConfig(ConfigConstants::ANNOTATION_LABEL_NAME)))
+        ) {
+            throw new AccessDeniedException("Метод $methodName не доступен");
         }
 
-        $isPlainArgs = empty($docBlock->getTagsByName($access->getConfig('access_array_arg')));
-        if ($isPlainArgs && !empty($params[0]) && $params[0]->isVariadic()) {
+        $isPlainArgs = empty($docBlock->getTagsByName($access->getConfig(ConfigConstants::ARRAY_ARG_LABEL_NAME)));
+        if ($isPlainArgs) {
             $isPlainArgs = false;
+        } else {
+            $params = $method->getParameters();
+            if (!empty($params[0]) && $params[0]->isVariadic()) {
+                $isPlainArgs = false;
+            }
         }
 
-        if (empty($docBlock->getTagsByName($access->getConfig('access_no_rights_check')))) {
-            $access->checkMethodRights($method, $args, $refclass);
+        if (empty($docBlock->getTagsByName($access->getConfig(ConfigConstants::NO_CHECK_LABEL_NAME)))) {
+            $access->checkMethodRights($method, $args, $refClass);
         }
 
         $args = $isPlainArgs ? (new AccessSanitize($method, $args))->sanitizeArgs() : $args;
@@ -178,10 +199,10 @@ abstract class AccessControllerParent
         }
 
         if (\is_array($result)) {
-            return new DbResultItem($result);
+            return new DbResult($result);
         }
 
-        return new HTMLResultItem($result);
+        return new HTMLResult($result);
     }
 
     /**
@@ -233,10 +254,16 @@ abstract class AccessControllerParent
      *
      * @return AbstractResult
      *
-     * @throws AccessException
-     * @throws DbResultItemException
-     * @throws RedisSingletonException
+     * @throws AccessDeniedException
+     * @throws Exceptions\AccessException
+     * @throws Exceptions\AuthException
+     * @throws Exceptions\ConfigException
+     * @throws Exceptions\FormatException
+     * @throws MethodNotFoundException
+     * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
+     * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public static function __callStatic(string $methodName, array $args): AbstractResult
     {
@@ -249,11 +276,18 @@ abstract class AccessControllerParent
      * @param string $methodName - имя метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @return \avtomon\AbstractResult
+     * @return AbstractResult
+     *
+     * @throws AccessDeniedException
+     * @throws Exceptions\AccessException
+     * @throws Exceptions\AuthException
+     * @throws Exceptions\ConfigException
+     * @throws Exceptions\FormatException
+     * @throws MethodNotFoundException
+     * @throws ValidationException
      * @throws \ReflectionException
-     * @throws \avtomon\AccessException
-     * @throws \avtomon\DbResultItemException
-     * @throws \avtomon\RedisSingletonException
+     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
+     * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public function __call(string $methodName, array $args): AbstractResult
     {

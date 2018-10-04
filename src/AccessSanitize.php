@@ -1,16 +1,18 @@
 <?php
 
-namespace avtomon;
+namespace Scaleplan\Access;
 
-use phpDocumentor\Reflection\{
-    DocBlock
-};
+use phpDocumentor\Reflection\DocBlock;
+use Scaleplan\Access\Constants\ConfigConstants;
+use Scaleplan\Access\Exceptions\AccessException;
+use Scaleplan\Access\Exceptions\ValidationException;
 
 /**
  * Класс проверки аргументов выполнения
  *
  * Class AccessSanitize
- * @package avtomon
+ *
+ * @package Scaleplan\Access
  */
 class AccessSanitize
 {
@@ -90,7 +92,8 @@ class AccessSanitize
         [$docParams] = self::getDocParams($docBlock->getTagsByName('param'));
         foreach ($method->getParameters() as &$param) {
             $paramName = $param->getName();
-            $paramType = $param->getType() ? $param->getType()->getName() : ($docParams[$paramName] ? $docParams[$paramName]->getType() : '');
+            $paramType = $param->getType()
+                ? $param->getType()->getName() : ($docParams[$paramName] ? $docParams[$paramName]->getType() : '');
 
             if ($param->isVariadic()) {
                 if (!$paramType) {
@@ -107,10 +110,16 @@ class AccessSanitize
             }
 
             if (!array_key_exists($paramName, $args) && !$param->isOptional()) {
-                throw new AccessException("Отсутствует необходимый параметр $paramName");
+                throw new ValidationException("Отсутствует необходимый параметр $paramName");
             }
 
-            if ($param->isOptional() && (!array_key_exists($paramName, $args) || ($args[$paramName] == $param->getDefaultValue() && $param->getDefaultValue() === null))) {
+            if ($param->isOptional()
+                &&
+                (!array_key_exists($paramName, $args)
+                 ||
+                 ($args[$paramName] == $param->getDefaultValue() && $param->getDefaultValue() === null)
+                )
+            ) {
                 $sanArgs[$paramName] = $param->getDefaultValue();
                 continue;
             }
@@ -188,7 +197,7 @@ class AccessSanitize
     protected static function argAvailabilityCheck(string $paramName, array $args, array $optionParams): void
     {
         if (!array_key_exists($paramName, $args) && !array_key_exists($paramName, $optionParams)) {
-            throw new AccessException("Не хватает параметра $paramName");
+            throw new ValidationException("Не хватает параметра $paramName");
         }
     }
 
@@ -230,14 +239,16 @@ class AccessSanitize
             return;
         }
 
-        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig('deny_fuzzy'));
+        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig(ConfigConstants::DOCBLOCK_CHECK_LABEL_NAME));
 
         $paramTypes = array_map(function ($item) {
             return trim($item, '\\\ \0');
         }, explode('|', $paramType));
 
         if (!self::typeCheck($arg, $paramTypes, $denyFuzzy)) {
-            throw new AccessException("Тип параметра $paramName не соответствует заданному типу $paramType");
+            throw new ValidationException(
+                "Тип параметра $paramName не соответствует заданному типу $paramType"
+            );
         }
     }
 

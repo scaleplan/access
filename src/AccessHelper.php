@@ -1,22 +1,13 @@
 <?php
 
-namespace avtomon;
-
-/**
- * Класс ошибок
- *
- * Class AccessHelperException
- * @package avtomon
- */
-class AccessHelperException extends CustomException
-{
-}
+namespace Scaleplan\Access;
 
 /**
  * Класс вспомогательных методов
  *
  * Class AccessHelper
- * @package avtomon
+ *
+ * @package Scaleplan\Access
  */
 class AccessHelper
 {

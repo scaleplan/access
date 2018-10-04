@@ -3,7 +3,7 @@
 namespace Scaleplan\Access\Exceptions;
 
 /**
- * Class AccessException
+ * Class ConfigException
  *
  * @package Scaleplan\Access\Exceptions
  */

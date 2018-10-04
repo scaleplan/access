@@ -2,6 +2,7 @@
 
 namespace Scaleplan\Access;
 
+use Scaleplan\Access\Constants\ConfigConstants;
 use Scaleplan\Access\Exceptions\ConfigException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -10,7 +11,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * Class AccessAbstract
  *
- * @package avtomon
+ * @package Scaleplan\Access
  */
 abstract class AccessAbstract
 {
@@ -83,35 +84,43 @@ abstract class AccessAbstract
             throw new ConfigException('Отсутствует конфигурация');
         }
 
-        if (empty($this->config['persistent_storage'])) {
+        if (empty($this->config[ConfigConstants::PERSISTENT_STORAGE_SECTION_NAME])) {
             throw new ConfigException('В конфирурациии отсутствует указание постоянного хранилища');
         }
 
-        if (empty($this->config[$this->config['persistent_storage']])){
-            throw new ConfigException('В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав');
+        if (empty($this->config[$this->config[ConfigConstants::PERSISTENT_STORAGE_SECTION_NAME]])){
+            throw new ConfigException(
+                'В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав'
+            );
         }
 
-        if (empty($this->config['cache_storage'])) {
+        if (empty($this->config[ConfigConstants::CACHE_STORAGE_SECTION_NAME])) {
             throw new ConfigException('В конфирурациии отсутствует указание кефирующего хранилища');
         }
 
-        if (empty($this->config[$this->config['cache_storage']])){
-            throw new ConfigException('В конфигурации отсутствуют данные о подключениие к кэширующему хранилищу прав');
+        if (empty($this->config[$this->config[ConfigConstants::CACHE_STORAGE_SECTION_NAME]])){
+            throw new ConfigException(
+                'В конфигурации отсутствуют данные о подключениие к кэширующему хранилищу прав'
+            );
         }
 
-        if (!\is_array($this->config['roles'])){
+        if (!isset($this->config[ConfigConstants::ROLES_SECTION_NAME])){
+            throw new ConfigException('Отсутствует список ролей');
+        }
+
+        if (!\is_array($this->config[ConfigConstants::ROLES_SECTION_NAME])){
             throw new ConfigException('Список ролей должен быть задан списком');
         }
 
-        if (empty($this->config['access_filter_label'])) {
+        if (empty($this->config[ConfigConstants::FILTER_DIRECTIVE_NAME])) {
             throw new ConfigException('В конфигурации отсутствует имя для метки фильтрующего аргумента');
         }
 
-        if (empty($this->config['access_label'])) {
+        if (empty($this->config[ConfigConstants::ANNOTATION_LABEL_NAME])) {
             throw new ConfigException('В конфигурации отсутствует имя метки Access');
         }
 
-        if (empty($this->config['access_separator'])) {
+        if (empty($this->config[ConfigConstants::FILTER_SEPARATOR_NAME])) {
             throw new ConfigException('В конфигурации отсутствует разделитель фильтров');
         }
 
@@ -145,16 +154,25 @@ abstract class AccessAbstract
             return $this->ps;
         }
 
-        switch ($this->config['persistent_storage']) {
+        $persistentStorageName = $this->config[ConfigConstants::PERSISTENT_STORAGE_SECTION_NAME];
+        switch ($persistentStorageName) {
             case 'postgresql':
-                if (empty($this->config['postgresql']) || empty($this->config['postgresql']['dns']) || empty($this->config['postgresql']['user']) || empty($this->config['postgresql']['password'])) {
+                $postgresSection = &$this->config[$persistentStorageName] ?? null;
+                if (empty($postgresSection)
+                    ||
+                    empty($postgresSection['dns'])
+                    ||
+                    empty($postgresSection['user'])
+                    ||
+                    empty($postgresSection['password'])
+                ) {
                     throw new ConfigException('Недостаточно данных для подключения к PostgreSQL');
                 }
 
                 $this->ps = $this->ps ?? new \PDO(
-                        $this->config['postgresql']['dns'],
-                        $this->config['postgresql']['user'],
-                        $this->config['postgresql']['password']
+                        $postgresSection['dns'],
+                        $postgresSection['user'],
+                        $postgresSection['password']
                     );
                 $this->ps->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
                 $this->ps->setAttribute(\PDO::ATTR_ORACLE_NULLS, \PDO::NULL_TO_STRING);
@@ -163,7 +181,9 @@ abstract class AccessAbstract
                 return $this->ps;
 
             default:
-                throw new ConfigException("Драйвер {$this->config['persistent_storage']} постоянного хранилища не поддерживается системой");
+                throw new ConfigException(
+                    "Драйвер {$persistentStorageName} постоянного хранилища не поддерживается системой"
+                );
         }
     }
 

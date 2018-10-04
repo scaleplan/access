@@ -1,12 +1,19 @@
 <?php
 
-namespace avtomon;
+namespace Scaleplan\Access;
+
+use Scaleplan\Access\Constants\ConfigConstants;
+use Scaleplan\Access\Constants\SessionConstants;
+use Scaleplan\Access\Exceptions\AccessException;
+use Scaleplan\Access\Exceptions\ConfigException;
+use Scaleplan\Redis\RedisSingleton;
 
 /**
  * Класс внесения изменений
  *
  * Class AccessModify
- * @package avtomon
+ *
+ * @package Scaleplan\Access
  */
 class AccessModify extends AccessAbstract
 {
@@ -18,10 +25,9 @@ class AccessModify extends AccessAbstract
     protected static $instance;
 
     /**
-     * Загрузить права доступа для текущего пользователя в кэш
-     *
      * @throws AccessException
-     * @throws RedisSingletonException
+     * @throws ConfigException
+     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     public function loadAccessRights(): void
     {
@@ -44,13 +50,14 @@ class AccessModify extends AccessAbstract
 
         $accessRights = $sth->fetchAll();
 
-        switch ($this->config['cache_storage']) {
+        $cacheStorageName = $this->config[ConfigConstants::CACHE_STORAGE_SECTION_NAME];
+        switch ($cacheStorageName) {
             case 'redis':
-                if (empty($this->config['redis']['socket'])) {
-                    throw new AccessException('В конфигурации не задан путь к Redis-сокету');
+                if (empty($this->config[$cacheStorageName]['socket'])) {
+                    throw new ConfigException('В конфигурации не задан путь к Redis-сокету');
                 }
 
-                $this->cs = $this->cs ?? RedisSingleton::create($this->config['redis']['socket']);
+                $this->cs = $this->cs ?? RedisSingleton::create($this->config[$cacheStorageName]['socket']);
                 $this->cs->delete("user_id:{$this->userId}");
 
                 if ($accessRights) {
@@ -69,11 +76,14 @@ class AccessModify extends AccessAbstract
                 break;
 
             case 'session':
-                $_SESSION['access_rights'] = array_column($accessRights, null, 'url');
+                $_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME]
+                    = array_column($accessRights, null, 'url');
                 break;
 
             default:
-                throw new AccessException("Драйвер {$this->config['cache_storage']} кэширующего хранилища не поддерживается системой");
+                throw new ConfigException(
+                    "Драйвер $cacheStorageName кэширующего хранилища не поддерживается системой"
+                );
         }
     }
 
@@ -97,6 +107,8 @@ class AccessModify extends AccessAbstract
      * @return int
      *
      * @throws AccessException
+     * @throws ConfigException
+     * @throws \ReflectionException
      */
     public function initPersistentStorage(): int
     {
@@ -125,17 +137,15 @@ class AccessModify extends AccessAbstract
                                   type = EXCLUDED.type,
                                   name = EXCLUDED.name'
         );
-        foreach (Access::create($this->userId)->getAllURLs() as $arr) {
+        /** @var Access $access */
+        $access = Access::create($this->userId);
+        foreach ($access->getAllURLs() as $arr) {
             $sth->execute($arr);
             $urlsCount += $sth->rowCount();
         }
 
-        if (empty($this->config['roles'])) {
-            return 0;
-        }
-
         $roles = [];
-        foreach ($this->config['roles'] as $index => $role) {
+        foreach ($this->config[ConfigConstants::ROLES_SECTION_NAME] as $index => $role) {
             $roles["value{$index}"] = $role;
         }
 
@@ -195,17 +205,13 @@ class AccessModify extends AccessAbstract
      */
     public function addUserToRole(int $user_id, string $role = ''): array
     {
-        $role = $role ?? $this->config['default_role'];
+        $role = $role ?? $this->config[ConfigConstants::DEFAULT_ROLE_LABEL_NAME];
         if (!$role) {
-            throw new AccessException('Не задана роль по умолчанию');
+            throw new ConfigException('Не задана роль по умолчанию');
         }
 
-        if (empty($this->config['roles'])) {
-            throw new AccessException('Список ролей пуст');
-        }
-
-        if (!\in_array($role, $this->config['roles'], true)) {
-            throw new AccessException('Заданная роль не входит в список доступных ролей');
+        if (!\in_array($role, $this->config[ConfigConstants::ROLES_SECTION_NAME], true)) {
+            throw new ConfigException('Заданная роль не входит в список доступных ролей');
         }
 
         $sth = $this->getPSConnection()->prepare(

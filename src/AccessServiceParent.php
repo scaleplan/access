@@ -2,7 +2,6 @@
 
 namespace Scaleplan\Access;
 
-use avtomon\AccessServiceResult;
 use phpDocumentor\Reflection\DocBlock;
 use Scaleplan\Access\Constants\ConfigConstants;
 use Scaleplan\Access\Exceptions\AccessDeniedException;
@@ -14,7 +13,7 @@ use Scaleplan\Access\Exceptions\ValidationException;
  *
  * Class AccessServiceParent
  *
- * @package avtomon
+ * @package Scaleplan\Access
  */
 class AccessServiceParent
 {
@@ -39,7 +38,9 @@ class AccessServiceParent
     /**
      * @param \ReflectionMethod $method
      * @param array $args
-     * @return AccessServiceResult
+     *
+     * @return array
+     *
      * @throws AccessDeniedException
      * @throws ValidationException
      */
@@ -69,7 +70,9 @@ class AccessServiceParent
     /**
      * @param \ReflectionProperty $property
      * @param array $args
+     *
      * @return array
+     *
      * @throws AccessException
      * @throws ValidationException
      */

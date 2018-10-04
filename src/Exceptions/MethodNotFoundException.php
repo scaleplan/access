@@ -3,7 +3,7 @@
 namespace Scaleplan\Access\Exceptions;
 
 /**
- * Class AccessException
+ * Class MethodNotFoundException
  *
  * @package Scaleplan\Access\Exceptions
  */
