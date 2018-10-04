@@ -94,7 +94,7 @@ class AccessModify extends AccessAbstract
      *
      * @throws AccessException
      */
-    protected function initSQLScheme(): int
+    public function initSQLScheme(): int
     {
         $sql = file_get_contents(__DIR__ . '/access.sql');
 

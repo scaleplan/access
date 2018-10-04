@@ -5,7 +5,7 @@ Access control system + check of argument types.
 #### Installation
 
 `
-composer reqire avtomon/access
+composer reqire scaleplan/access
 `
 
 <br>
@@ -13,7 +13,7 @@ composer reqire avtomon/access
 #### Initialization
 
 ```
-cd vendor/avtomon/Access
+cd vendor/scaleplan/access
 
 ./init schema data
 ```

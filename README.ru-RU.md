@@ -5,7 +5,7 @@
 #### Установка
 
 ``
-composer reqire avtomon/access
+composer reqire scaleplan/access
 ``
 
 <br>
@@ -13,7 +13,7 @@ composer reqire avtomon/access
 #### Инициализация
 
 ```
-cd vendor/avtomon/Access
+cd vendor/scaleplan/access
 
 ./init schema data
 ```

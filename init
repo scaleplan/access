@@ -2,8 +2,9 @@
 
 <?php
 
-use avtomon\AccessModify;
+use Scaleplan\Access\AccessModify;
 
+/** @var AccessModify $am */
 $am = AccessModify::create(0);
 
 if ($argv[1] === 'schema' || $argv[2] === 'schema') {
