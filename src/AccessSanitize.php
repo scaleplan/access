@@ -6,6 +6,7 @@ use phpDocumentor\Reflection\DocBlock;
 use Scaleplan\Access\Constants\ConfigConstants;
 use Scaleplan\Access\Exceptions\AccessException;
 use Scaleplan\Access\Exceptions\ValidationException;
+use Scaleplan\DTO\DTO;
 
 /**
  * Класс проверки аргументов выполнения
@@ -48,7 +49,7 @@ class AccessSanitize
     public function __construct(\Reflector $reflector, array $args)
     {
         if (!($reflector instanceof \ReflectionMethod) && !($reflector instanceof \ReflectionProperty)) {
-            throw new AccessException('Почистить можно только параметры методов и свойств');
+            throw new AccessException('Почистить можно только параметры методов и SQL-свойств');
         }
 
         $this->reflector = $reflector;
@@ -84,12 +85,25 @@ class AccessSanitize
      * @return array
      *
      * @throws AccessException
+     * @throws ValidationException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     public static function sanitizeMethodArgs(\ReflectionMethod $method, array $args): array
     {
         $sanArgs = [];
         $docBlock = new DocBlock($method);
         [$docParams] = self::getDocParams($docBlock->getTagsByName('param'));
+        if ($method->getNumberOfParameters() === 1) {
+            $typeName = $method->getParameters()[0]->getType()->getName();
+            if (is_subclass_of($typeName, DTO::class)) {
+                /** @var DTO $arg */
+                $arg = new $typeName($args);
+                $arg->validate();
+                $sanArgs[] = $arg;
+                return $sanArgs;
+            }
+        }
+
         foreach ($method->getParameters() as &$param) {
             $paramName = $param->getName();
             $paramType = $param->getType()
@@ -114,11 +128,8 @@ class AccessSanitize
             }
 
             if ($param->isOptional()
-                &&
-                (!array_key_exists($paramName, $args)
-                 ||
-                 ($args[$paramName] == $param->getDefaultValue() && $param->getDefaultValue() === null)
-                )
+                && (!array_key_exists($paramName, $args)
+                    || ($args[$paramName] == $param->getDefaultValue() && $param->getDefaultValue() === null))
             ) {
                 $sanArgs[$paramName] = $param->getDefaultValue();
                 continue;
