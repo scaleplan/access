@@ -62,6 +62,8 @@ class AccessSanitize
      * @return array
      *
      * @throws AccessException
+     * @throws ValidationException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     public function sanitizeArgs(): array
     {
@@ -70,10 +72,10 @@ class AccessSanitize
         }
 
         if ($this->reflector instanceof \ReflectionMethod) {
-            return $this->sanitizedArgs = self::sanitizeMethodArgs($this->reflector, $this->args);
+            return $this->sanitizedArgs = static::sanitizeMethodArgs($this->reflector, $this->args);
         }
 
-        return $this->sanitizedArgs = self::sanitizeSQLPropertyArgs($this->reflector, $this->args);
+        return $this->sanitizedArgs = static::sanitizeSQLPropertyArgs($this->reflector, $this->args);
     }
 
     /**
@@ -92,7 +94,7 @@ class AccessSanitize
     {
         $sanArgs = [];
         $docBlock = new DocBlock($method);
-        [$docParams] = self::getDocParams($docBlock->getTagsByName('param'));
+        [$docParams] = static::getDocParams($docBlock->getTagsByName('param'));
         if ($method->getNumberOfParameters() === 1) {
             $typeName = $method->getParameters()[0]->getType()->getName();
             if (is_subclass_of($typeName, DTO::class)) {
@@ -116,8 +118,7 @@ class AccessSanitize
                 }
 
                 $sanArgs = array_merge($sanArgs, array_map(function ($arg) use ($paramType, $paramName, $docBlock) {
-                    self::docTypeCheck($arg, $paramName, $paramType, $docBlock);
-
+                    static::docTypeCheck($arg, $paramName, $paramType, $docBlock);
                     return $arg;
                 }, $args));
                 break;
@@ -129,15 +130,14 @@ class AccessSanitize
 
             if ($param->isOptional()
                 && (!array_key_exists($paramName, $args)
-                    || ($args[$paramName] == $param->getDefaultValue() && $param->getDefaultValue() === null))
-            ) {
+                    || ($args[$paramName] == $param->getDefaultValue() && $param->getDefaultValue() === null))) {
                 $sanArgs[$paramName] = $param->getDefaultValue();
                 continue;
             }
 
             $arg = $args[$paramName];
 
-            self::docTypeCheck($arg, $paramName, $paramType, $docBlock);
+            static::docTypeCheck($arg, $paramName, $paramType, $docBlock);
 
             \is_string($arg) && $arg = strip_tags($arg);
 
@@ -167,16 +167,16 @@ class AccessSanitize
         $docBlock = new DocBlock($property);
         $docParams = $docBlock->getTagsByName('param');
         if ($docParams) {
-            [$allParams, $optionParams] = self::getDocParams($docParams);
+            [$allParams, $optionParams] = static::getDocParams($docParams);
         } else {
             $value = $property->getDeclaringClass()->getDefaultProperties()[$property->getName()];
-            $sqlParams = self::getSQLParams($value);
+            $sqlParams = static::getSQLParams($value);
             $allParams = array_fill_keys($sqlParams[0], null);
             $optionParams = array_fill_keys($sqlParams[1], null);
         }
 
         foreach ($allParams as $paramName => $param) {
-            self::argAvailabilityCheck($paramName, $args, $optionParams);
+            static::argAvailabilityCheck($paramName, $args, $optionParams);
 
             if (!array_key_exists($paramName, $args)) {
                 continue;
@@ -185,7 +185,7 @@ class AccessSanitize
             $arg = $args[$paramName];
 
             if ($param instanceof DocBlock\Tag && $param->getType()) {
-                self::docTypeCheck($arg, $paramName, (string) $param->getType(), $docBlock);
+                static::docTypeCheck($arg, $paramName, (string) $param->getType(), $docBlock);
             }
 
             \is_string($arg) && $arg = strip_tags($arg);
@@ -256,7 +256,7 @@ class AccessSanitize
             return trim($item, '\\\ \0');
         }, explode('|', $paramType));
 
-        if (!self::typeCheck($arg, $paramTypes, $denyFuzzy)) {
+        if (!static::typeCheck($arg, $paramTypes, $denyFuzzy)) {
             throw new ValidationException(
                 "Тип параметра $paramName не соответствует заданному типу $paramType"
             );
@@ -295,10 +295,12 @@ class AccessSanitize
         }
 
         foreach ($types as $type) {
+            $tmpType = gettype($value);
             $tmp = $value;
             settype($tmp, $type);
+            settype($tmp, $tmpType);
             if ($tmp == $value) {
-                $value = $tmp;
+                settype($value, $type);
                 return true;
             }
         }

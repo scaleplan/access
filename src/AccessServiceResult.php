@@ -53,7 +53,7 @@ class AccessServiceResult extends DbResult
     protected $isPlainArgs = true;
 
     /**
-     * AccessServiceResult constructor
+     * AccessServiceResult constructor.
      *
      * @param \ReflectionClass $class - отражение класса модели
      * @param \ReflectionMethod|null $method - отражение метода модели
@@ -61,6 +61,8 @@ class AccessServiceResult extends DbResult
      * @param array|null $args - аргументы выполнения
      * @param bool $isPlainArgs - true - метод модели принимает аргументы в виде набора, false - в виде ассоциативного массива
      * @param null|mixed $result - результат
+     *
+     * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public function __construct(
         \ReflectionClass $class,
@@ -76,7 +78,8 @@ class AccessServiceResult extends DbResult
         $this->property = $property;
         $this->args = $args;
         $this->isPlainArgs = $isPlainArgs;
-        $this->result = $result;
+
+        parent::__construct($result);
     }
 
     /**

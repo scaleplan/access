@@ -19,18 +19,17 @@ class AccessServiceParent
 {
     /**
      * @param array $args
-     * @param \ReflectionMethod|\ReflectionProperty $method
-     *
+     * @param \Reflector $method
      * @return array
      *
      * @throws ValidationException
      */
-    protected static function formatArgs(array &$args, \Reflector &$method): array
+    protected static function formatArgs(array &$args, \Reflector &$method) : array
     {
-            $args = $args ? reset($args) : $args;
-            if (!\is_array($args)) {
-                throw new ValidationException("Метод {$method->getName()} принимает параметры в виде массива");
-            }
+        $args = $args ? reset($args) : $args;
+        if (!\is_array($args)) {
+            throw new ValidationException("Метод {$method->getName()} принимает параметры в виде массива");
+        }
 
         return $args;
     }
@@ -42,7 +41,9 @@ class AccessServiceParent
      * @return array
      *
      * @throws AccessDeniedException
+     * @throws AccessException
      * @throws ValidationException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     protected static function checkMethod(\ReflectionMethod &$method, array &$args) : array
     {
@@ -50,9 +51,7 @@ class AccessServiceParent
         $access = Access::create();
 
         if (empty($docBlock = new DocBlock($method))
-            ||
-            empty($docBlock->getTagsByName($access->getConfig()[ConfigConstants::ANNOTATION_LABEL_NAME]))
-        ) {
+            || empty($docBlock->getTagsByName($access->getConfig()[ConfigConstants::ANNOTATION_LABEL_NAME]))) {
             throw new AccessDeniedException("Метод {$method->getName()} не доступен");
         }
 
@@ -60,7 +59,7 @@ class AccessServiceParent
             $docBlock->getTagsByName($access->getConfig(ConfigConstants::ARRAY_ARG_LABEL_NAME))
         );
         if ($isPlainArgs) {
-            self::formatArgs($args, $method);
+            static::formatArgs($args, $method);
             $args = (new AccessSanitize($method, $args))->sanitizeArgs();
         }
 
@@ -75,17 +74,19 @@ class AccessServiceParent
      *
      * @throws AccessException
      * @throws ValidationException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     protected static function checkProperty(\ReflectionProperty &$property, array &$args) : array
     {
         /** @var Access $access */
         $access = Access::create();
 
-        if (empty($docBlock = new DocBlock($property)) || empty($docBlock->getTagsByName($access->getConfig()[ConfigConstants::ANNOTATION_LABEL_NAME]))) {
+        if (empty($docBlock = new DocBlock($property))
+            || empty($docBlock->getTagsByName($access->getConfig()[ConfigConstants::ANNOTATION_LABEL_NAME]))) {
             throw new AccessException("Свойство {$property->getName()} не доступно");
         }
 
-        self::formatArgs($args, $property);
+        static::formatArgs($args, $property);
         $args = (new AccessSanitize($property, $args))->sanitizeArgs();
 
         return [$args, false];
@@ -99,8 +100,11 @@ class AccessServiceParent
      *
      * @return AccessServiceResult
      *
+     * @throws AccessDeniedException
      * @throws AccessException
+     * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     protected static function checkServiceMethodEssence(string $methodName, array $args) : AccessServiceResult
     {
@@ -109,7 +113,7 @@ class AccessServiceParent
         if ($refClass->hasMethod($methodName)) {
             $method = $refClass->getMethod($methodName);
 
-            [$args, $isPlainArgs] = self::checkMethod($method, $args);
+            [$args, $isPlainArgs] = static::checkMethod($method, $args);
 
             $method->setAccessible(true);
 
@@ -125,7 +129,7 @@ class AccessServiceParent
         if ($refClass->hasProperty($methodName)) {
             $property = $refClass->getProperty($methodName);
 
-            [$args, $isPlainArgs] = self::checkProperty($method, $args);
+            [$args, $isPlainArgs] = static::checkProperty($method, $args);
 
             $property->setAccessible(true);
 
@@ -149,12 +153,15 @@ class AccessServiceParent
      *
      * @return AccessServiceResult
      *
+     * @throws AccessDeniedException
      * @throws AccessException
+     * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     public static function __callStatic(string $methodName, array $args) : AccessServiceResult
     {
-        return self::checkServiceMethodEssence($methodName, $args);
+        return static::checkServiceMethodEssence($methodName, $args);
     }
 
     /**
@@ -165,11 +172,14 @@ class AccessServiceParent
      *
      * @return AccessServiceResult
      *
+     * @throws AccessDeniedException
      * @throws AccessException
+     * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     public function __call(string $methodName, array $args) : AccessServiceResult
     {
-        return self::checkServiceMethodEssence($methodName, $args);
+        return static::checkServiceMethodEssence($methodName, $args);
     }
 }

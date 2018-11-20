@@ -10,12 +10,8 @@
         "phpdocumentor/reflection-docblock": "~2.0",
         "symfony/yaml": "~3.0",
         "scaleplan/redis-singleton": "dev-master",
-        "ext-pdo": "*"
-    },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "git@github.com:scaleplan/redis-singleton.git"
-        }
-    ]
+        "ext-pdo": "*",
+        "scaleplan/result": "dev-master",
+        "scaleplan/dto": "dev-master"
+    }
 }

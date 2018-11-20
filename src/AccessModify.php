@@ -17,6 +17,8 @@ use Scaleplan\Redis\RedisSingleton;
  */
 class AccessModify extends AccessAbstract
 {
+    public const INIT_SQL_PATH = 'access.sql';
+
     /**
      * Инстанс класса
      *
@@ -29,7 +31,7 @@ class AccessModify extends AccessAbstract
      * @throws ConfigException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
-    public function loadAccessRights(): void
+    public function loadAccessRights() : void
     {
         $sth = $this->getPSConnection()
             ->prepare('
@@ -62,13 +64,10 @@ class AccessModify extends AccessAbstract
 
                 if ($accessRights) {
                     $hashValue = array_map(function ($item) {
-                        return json_encode(
-                            $item,
-                            JSON_FORCE_OBJECT) ?? $item;
+                        return json_encode($item, JSON_FORCE_OBJECT) ?? $item;
                     }, array_column($accessRights, null, 'url'));
 
-                    if (!$this->cs->hMset("user_id:{$this->userId}", $hashValue))
-                    {
+                    if (!$this->cs->hMset("user_id:{$this->userId}", $hashValue)) {
                         throw new AccessException('Не удалось записать права доступа в Redis');
                     }
                 }
@@ -94,9 +93,9 @@ class AccessModify extends AccessAbstract
      *
      * @throws AccessException
      */
-    public function initSQLScheme(): int
+    public function initSQLScheme() : int
     {
-        $sql = file_get_contents(__DIR__ . '/access.sql');
+        $sql = file_get_contents(dirname(__DIR__) . static::INIT_SQL_PATH);
 
         return $this->getPSConnection()->exec($sql);
     }
@@ -110,7 +109,7 @@ class AccessModify extends AccessAbstract
      * @throws ConfigException
      * @throws \ReflectionException
      */
-    public function initPersistentStorage(): int
+    public function initPersistentStorage() : int
     {
         if (!$this->initSQLScheme()) {
             throw new AccessException('Не удалось создать необходимые объекты базы данных');
@@ -149,7 +148,7 @@ class AccessModify extends AccessAbstract
             $roles["value{$index}"] = $role;
         }
 
-        $rolesPlaceholders = implode(',', array_map( function ($item) {
+        $rolesPlaceholders = implode(',', array_map(function ($item) {
             return ":$item";
         }, array_keys($roles)));
         $sth = $this->ps->prepare("CREATE TYPE access.roles AS ENUM ($rolesPlaceholders)");
@@ -168,10 +167,10 @@ class AccessModify extends AccessAbstract
      *
      * @throws AccessException
      */
-    public function addRoleAccessRight(int $url_id, string $role): array
+    public function addRoleAccessRight(int $url_id, string $role) : array
     {
         $sth = $this->getPSConnection()->prepare(
-                     'INSERT INTO
+            'INSERT INTO
                                   access.default_right
                                 VALUES
                                  (:url_id,
@@ -185,8 +184,8 @@ class AccessModify extends AccessAbstract
         );
         $sth->execute(
             [
-                'url_id'   => $url_id,
-                'role'     => $role
+                'url_id' => $url_id,
+                'role'   => $role,
             ]
         );
 
@@ -203,7 +202,7 @@ class AccessModify extends AccessAbstract
      *
      * @throws AccessException
      */
-    public function addUserToRole(int $user_id, string $role = ''): array
+    public function addUserToRole(int $user_id, string $role = '') : array
     {
         $role = $role ?? $this->config[ConfigConstants::DEFAULT_ROLE_LABEL_NAME];
         if (!$role) {
@@ -228,7 +227,7 @@ class AccessModify extends AccessAbstract
         $sth->execute(
             [
                 'role'    => $role,
-                'user_id' => $user_id
+                'user_id' => $user_id,
             ]
         );
 
@@ -247,10 +246,10 @@ class AccessModify extends AccessAbstract
      *
      * @throws AccessException
      */
-    public function addAccessRight(int $url_id, int $user_id, bool $is_allow, array $values): array
+    public function addAccessRight(int $url_id, int $user_id, bool $is_allow, array $values) : array
     {
         $sth = $this->getPSConnection()->prepare(
-                     'INSERT INTO
+            'INSERT INTO
                                   access.access_right
                                 VALUES
                                  (:url_id,
@@ -270,9 +269,9 @@ class AccessModify extends AccessAbstract
         $sth->execute(
             [
                 'url_id'   => $url_id,
-                'user_id'     => $user_id,
+                'user_id'  => $user_id,
                 'is_allow' => $is_allow,
-                'values'   => "{'" . implode("', '", $values) . "'}"
+                'values'   => "{'" . implode("', '", $values) . "'}",
             ]
         );
 
@@ -288,10 +287,10 @@ class AccessModify extends AccessAbstract
      *
      * @throws AccessException
      */
-    public function shiftAccessRightFromRole(int $userId): array
+    public function shiftAccessRightFromRole(int $userId) : array
     {
         $sth = $this->getPSConnection()->prepare(
-                    'INSERT INTO
+            'INSERT INTO
                                   access.access_right
                                  (url_id,
                                   user_id)

@@ -46,7 +46,7 @@ class Access extends AccessAbstract
      * @throws ConfigException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
-    public function getAccessRights(string $url = ''): array
+    public function getAccessRights(string $url = '') : array
     {
         $cacheStorageName = $this->config[ConfigConstants::CACHE_STORAGE_SECTION_NAME];
         switch ($cacheStorageName) {
@@ -57,7 +57,7 @@ class Access extends AccessAbstract
 
                 $this->cs = $this->cs ?? RedisSingleton::create($this->config[$cacheStorageName]['socket']);
                 if ($url) {
-                    return json_decode($this->cs->hGet("user_id:{$this->userId}", $url), true)  ?? [];
+                    return json_decode($this->cs->hGet("user_id:{$this->userId}", $url), true) ?? [];
                 }
 
                 return array_map(function ($item) {
@@ -71,9 +71,7 @@ class Access extends AccessAbstract
 
             default:
                 throw new ConfigException(
-                    "Драйвер 
-                    {$cacheStorageName} 
-                    кэширующего хранилища не поддерживается системой"
+                    "Драйвер {$cacheStorageName} кэширующего хранилища не поддерживается системой"
                 );
         }
     }
@@ -98,11 +96,10 @@ class Access extends AccessAbstract
         \ReflectionMethod $refMethod,
         array $args,
         \ReflectionClass $refClass = null
-    ): bool
+    ) : bool
     {
         if (empty($docBlock = new DocBlock($refMethod))
-            || empty($tag = $docBlock->getTagsByName($this->config[ConfigConstants::ANNOTATION_LABEL_NAME]))
-        ) {
+            || empty($tag = $docBlock->getTagsByName($this->config[ConfigConstants::ANNOTATION_LABEL_NAME]))) {
             return true;
         }
 
@@ -156,8 +153,7 @@ class Access extends AccessAbstract
             $checkValue = [];
             foreach ($filters as $filter) {
                 if (!array_key_exists($filter, $args)
-                    && array_key_exists($filter, $getMethodDefaults($methodDefaults))
-                ) {
+                    && array_key_exists($filter, $getMethodDefaults($methodDefaults))) {
                     $args[$filter] = $getMethodDefaults($methodDefaults)[$filter];
                 }
 
@@ -170,16 +166,11 @@ class Access extends AccessAbstract
                 );
             }
 
-            if (
-                (
-                    $accessRight[DbConstants::IS_ALLOW_FIELD_NAME]
-                    && !\in_array($checkValue, $accessRight[DbConstants::VALUES_FIELD_NAME], true)
-                )
+            if (($accessRight[DbConstants::IS_ALLOW_FIELD_NAME]
+                    && !\in_array($checkValue, $accessRight[DbConstants::VALUES_FIELD_NAME], true))
                 ||
-                (
-                    !$accessRight[DbConstants::IS_ALLOW_FIELD_NAME]
-                    && \in_array($checkValue, $accessRight[DbConstants::VALUES_FIELD_NAME], true)
-                )
+                (!$accessRight[DbConstants::IS_ALLOW_FIELD_NAME]
+                    && \in_array($checkValue, $accessRight[DbConstants::VALUES_FIELD_NAME], true))
             ) {
                 throw new AccessDeniedException(
                     "Выполнение метода с такими параметрами $filters Вам не разрешено"
@@ -202,7 +193,7 @@ class Access extends AccessAbstract
      * @throws ConfigException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
-    public function checkFileRights(string $filePath): bool
+    public function checkFileRights(string $filePath) : bool
     {
         if (empty($accessRight = $this->getAccessRights($filePath))) {
             if ($this->getUserId() === $this->getConfig(ConfigConstants::GUEST_USER_ID_DIRECTIVE_NAME)) {
@@ -225,7 +216,7 @@ class Access extends AccessAbstract
      *
      * @throws FormatException
      */
-    public function methodToURL(string $className, string $methodName): string
+    public function methodToURL(string $className, string $methodName) : string
     {
         foreach ($this->config[ConfigConstants::CONTROLLERS_SECTION_NAME] as $controllerDir) {
             if (empty($controllerDir['path'])) {
@@ -257,7 +248,7 @@ class Access extends AccessAbstract
      * @throws AccessException
      * @throws \ReflectionException
      */
-    protected function generateControllerURLs(string $controllerFileName, string $controllerNamespace = null): array
+    protected function generateControllerURLs(string $controllerFileName, string $controllerNamespace = null) : array
     {
         $controller = trim(explode('.', $controllerFileName)[0]);
         $controllerNamespace = trim($controllerNamespace, '/\ ');
@@ -275,7 +266,7 @@ class Access extends AccessAbstract
         $sql = 'SELECT id, schema_name, table_name FROM access.model_type';
         $models = $this->getPSConnection()->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
 
-        $seachService = function (string $schema, string $table) use ($models): ?int {
+        $searchService = function (string $schema, string $table) use ($models): ?int {
             if (empty($models) || !\is_array($models) || empty($schema) || empty($table)) {
                 return null;
             }
@@ -293,12 +284,11 @@ class Access extends AccessAbstract
 
         foreach ($refClass->getMethods() as $method) {
             if (empty($docBlock = new DocBlock($method))
-                || empty($docBlock->getTagsByName($this->config['access_label']))
-            ) {
+                || empty($docBlock->getTagsByName($this->config['access_label']))) {
                 continue;
             }
 
-            if ($method->getDeclaringClass()->getName() === 'avtomon\AccessControllerParent') {
+            if ($method->getDeclaringClass()->getName() === __NAMESPACE__ . '\AccessControllerParent') {
                 continue;
             }
 
@@ -311,16 +301,16 @@ class Access extends AccessAbstract
             $accessUrlType = $docBlock->getTagsByName($this->config[ConfigConstants::ANNOTATION_URL_TYPE_LABEL_NAME]);
             $accessUrlType = end($accessUrlType);
 
-            $modelId = $seachService($accessSchema, $accessTables);
+            $modelId = $searchService($accessSchema, $accessTables);
 
             $url = [
-                'text' => '/' . strtolower(
-                    str_replace(
-                        'Controller', '', $controller)
+                'text'          => '/' . strtolower(
+                        str_replace(
+                            'Controller', '', $controller)
                     ) . '/' . AccessHelper::camel2dashed($methodName),
-                'name' => $docBlock->getText(),
+                'name'          => $docBlock->getText(),
                 'model_type_id' => $modelId,
-                'type' => $accessUrlType
+                'type'          => $accessUrlType,
             ];
 
             $urls[] = $url;
@@ -336,7 +326,7 @@ class Access extends AccessAbstract
      *
      * @return array
      */
-    protected function getRecursivePaths(string $dir): array
+    protected function getRecursivePaths(string $dir) : array
     {
         $dir = rtrim($dir, '/\ ');
         $paths = scandir($dir, SCANDIR_SORT_NONE);
@@ -367,7 +357,7 @@ class Access extends AccessAbstract
      * @throws FormatException
      * @throws \ReflectionException
      */
-    public function getControllerURLs(): array
+    public function getControllerURLs() : array
     {
         if (empty($this->config[ConfigConstants::CONTROLLERS_SECTION_NAME])) {
             return null;
@@ -399,7 +389,7 @@ class Access extends AccessAbstract
      *
      * @return array
      */
-    public function getFilesURLs(): array
+    public function getFilesURLs() : array
     {
         if (empty($this->config[ConfigConstants::FILES_SECTION_NAME])) {
             return null;
@@ -409,10 +399,10 @@ class Access extends AccessAbstract
         foreach ($this->config[ConfigConstants::FILES_SECTION_NAME] as $fileDir) {
             $urls = array_merge($urls, array_map(function ($item) use ($fileDir) {
                 return [
-                    'text' => trim(str_replace($fileDir, '', $item), '\/ '),
-                    'name' => null,
+                    'text'          => trim(str_replace($fileDir, '', $item), '\/ '),
+                    'name'          => null,
                     'model_type_id' => null,
-                    'type' => null
+                    'type'          => null,
                 ];
             }, $this->getRecursivePaths($fileDir)));
         }
@@ -425,14 +415,14 @@ class Access extends AccessAbstract
      *
      * @return array
      */
-    public function getPlainURLs(): array
+    public function getPlainURLs() : array
     {
         return array_map(function ($item) {
             return [
-                'text' => trim($item, '\/ '),
-                'name' => null,
+                'text'          => trim($item, '\/ '),
+                'name'          => null,
                 'model_type_id' => null,
-                'type' => null
+                'type'          => null,
             ];
         }, array_filter($this->config[ConfigConstants::URLS_SECTION_NAME]));
     }
@@ -445,7 +435,7 @@ class Access extends AccessAbstract
      * @throws AccessException
      * @throws \ReflectionException
      */
-    public function getAllURLs(): array
+    public function getAllURLs() : array
     {
         return array_merge($this->getControllerURLs(), $this->getFilesURLs(), $this->getPlainURLs());
     }

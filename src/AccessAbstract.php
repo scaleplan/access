@@ -58,7 +58,7 @@ abstract class AccessAbstract
      *
      * @return AccessAbstract
      */
-    public static function create(int $userId = -1, string $confPath = __DIR__ . '/../config.yml'): AccessAbstract
+    public static function create(int $userId = -1, string $confPath = __DIR__ . '/../config.yml') : AccessAbstract
     {
         if (!static::$instance) {
             $className = static::class;
@@ -88,7 +88,7 @@ abstract class AccessAbstract
             throw new ConfigException('В конфирурациии отсутствует указание постоянного хранилища');
         }
 
-        if (empty($this->config[$this->config[ConfigConstants::PERSISTENT_STORAGE_SECTION_NAME]])){
+        if (empty($this->config[$this->config[ConfigConstants::PERSISTENT_STORAGE_SECTION_NAME]])) {
             throw new ConfigException(
                 'В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав'
             );
@@ -98,17 +98,17 @@ abstract class AccessAbstract
             throw new ConfigException('В конфирурациии отсутствует указание кефирующего хранилища');
         }
 
-        if (empty($this->config[$this->config[ConfigConstants::CACHE_STORAGE_SECTION_NAME]])){
+        if (empty($this->config[$this->config[ConfigConstants::CACHE_STORAGE_SECTION_NAME]])) {
             throw new ConfigException(
                 'В конфигурации отсутствуют данные о подключениие к кэширующему хранилищу прав'
             );
         }
 
-        if (!isset($this->config[ConfigConstants::ROLES_SECTION_NAME])){
+        if (!isset($this->config[ConfigConstants::ROLES_SECTION_NAME])) {
             throw new ConfigException('Отсутствует список ролей');
         }
 
-        if (!\is_array($this->config[ConfigConstants::ROLES_SECTION_NAME])){
+        if (!\is_array($this->config[ConfigConstants::ROLES_SECTION_NAME])) {
             throw new ConfigException('Список ролей должен быть задан списком');
         }
 
@@ -136,7 +136,7 @@ abstract class AccessAbstract
      *
      * @return int
      */
-    public function getUserId(): int
+    public function getUserId() : int
     {
         return $this->userId;
     }
@@ -148,7 +148,7 @@ abstract class AccessAbstract
      *
      * @throws ConfigException
      */
-    protected function getPSConnection(): \PDO
+    protected function getPSConnection() : \PDO
     {
         if ($this->ps) {
             return $this->ps;
@@ -158,22 +158,14 @@ abstract class AccessAbstract
         switch ($persistentStorageName) {
             case 'postgresql':
                 $postgresSection = &$this->config[$persistentStorageName] ?? null;
-                if (empty($postgresSection)
-                    ||
-                    empty($postgresSection['dns'])
-                    ||
-                    empty($postgresSection['user'])
-                    ||
-                    empty($postgresSection['password'])
-                ) {
+                if (empty($postgresSection) || empty($postgresSection['dns'])
+                    || empty($postgresSection['user']) || empty($postgresSection['password'])) {
                     throw new ConfigException('Недостаточно данных для подключения к PostgreSQL');
                 }
 
-                $this->ps = $this->ps ?? new \PDO(
-                        $postgresSection['dns'],
-                        $postgresSection['user'],
-                        $postgresSection['password']
-                    );
+                $this->ps = $this->ps
+                    ?? new \PDO($postgresSection['dns'], $postgresSection['user'], $postgresSection['password']);
+
                 $this->ps->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
                 $this->ps->setAttribute(\PDO::ATTR_ORACLE_NULLS, \PDO::NULL_TO_STRING);
                 $this->ps->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);

@@ -189,7 +189,7 @@ abstract class AccessControllerParent
 
         $args = $isPlainArgs ? (new AccessSanitize($method, $args))->sanitizeArgs() : $args;
 
-        self::executeBeforeHandlers($method, $args);
+        static::executeBeforeHandlers($method, $args);
 
         $method->setAccessible(true);
         $result = $isPlainArgs ? $method->invokeArgs($obj, $args) : $method->invoke($obj, $args);
@@ -267,7 +267,7 @@ abstract class AccessControllerParent
      */
     public static function __callStatic(string $methodName, array $args): AbstractResult
     {
-        return self::checkControllerMethod($methodName, $args);
+        return static::checkControllerMethod($methodName, $args);
     }
 
     /**
@@ -291,6 +291,6 @@ abstract class AccessControllerParent
      */
     public function __call(string $methodName, array $args): AbstractResult
     {
-        return self::checkControllerMethod($methodName, $args, $this);
+        return static::checkControllerMethod($methodName, $args, $this);
     }
 }
