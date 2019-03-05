@@ -44,9 +44,6 @@ access_filter_label: accessFilter
 # Метка PHPDOC указывающая, что метод следует обработать Access
 access_label: accessMethod
 
-# Метка PHPDOC указывающая, что аргументы метода упакованы в массив и их не стоит проверять
-access_array_arg: accessArrayArg
-
 # Не проверять права на выполнение метода контроллера
 access_no_rights_check: noCheck
 

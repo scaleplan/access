@@ -138,7 +138,6 @@ abstract class AccessControllerParent
      * @param \object|null $obj - объект, к контекте которого должен выполниться метод (если нестатический)
      *
      * @return AbstractResult
-     *
      * @throws AccessDeniedException
      * @throws Exceptions\AccessException
      * @throws Exceptions\AuthException
@@ -147,10 +146,11 @@ abstract class AccessControllerParent
      * @throws MethodNotFoundException
      * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
-    protected static function checkControllerMethod(string $methodName, array $args, object $obj = null): AbstractResult
+    protected static function checkControllerMethod(string $methodName, array $args, \object $obj = null): AbstractResult
     {
         $args = reset($args);
         if (!\is_array($args)) {
@@ -173,26 +173,16 @@ abstract class AccessControllerParent
             throw new AccessDeniedException("Метод $methodName не доступен");
         }
 
-        $isPlainArgs = empty($docBlock->getTagsByName($access->getConfig(ConfigConstants::ARRAY_ARG_LABEL_NAME)));
-        if ($isPlainArgs) {
-            $isPlainArgs = false;
-        } else {
-            $params = $method->getParameters();
-            if (!empty($params[0]) && $params[0]->isVariadic()) {
-                $isPlainArgs = false;
-            }
-        }
-
         if (empty($docBlock->getTagsByName($access->getConfig(ConfigConstants::NO_CHECK_LABEL_NAME)))) {
             $access->checkMethodRights($method, $args, $refClass);
         }
 
-        $args = $isPlainArgs ? (new AccessSanitize($method, $args))->sanitizeArgs() : $args;
+        $args = (new AccessSanitize($method, $args))->sanitizeArgs();
 
         static::executeBeforeHandlers($method, $args);
 
         $method->setAccessible(true);
-        $result = $isPlainArgs ? $method->invokeArgs($obj, $args) : $method->invoke($obj, $args);
+        $result = $method->invokeArgs($obj, $args);
 
         if ($result instanceof AbstractResult) {
             return $result;
@@ -213,7 +203,7 @@ abstract class AccessControllerParent
      *
      * @return mixed
      */
-    public static function executeBeforeHandlers(?\ReflectionMethod $method = null, array $args = [])
+    protected static function executeBeforeHandlers(?\ReflectionMethod $method = null, array $args = [])
     {
         foreach (static::$before as $index => $func) {
             $result = $func($method, $args);
@@ -262,6 +252,7 @@ abstract class AccessControllerParent
      * @throws MethodNotFoundException
      * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
@@ -286,6 +277,7 @@ abstract class AccessControllerParent
      * @throws MethodNotFoundException
      * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */

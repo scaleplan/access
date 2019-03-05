@@ -171,16 +171,16 @@ class AccessModify extends AccessAbstract
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
-                                  access.default_right
-                                VALUES
-                                 (:url_id,
-                                  :role)
-                                ON CONFLICT 
-                                  (url_id,
-                                   role) 
-                                DO NOTHING 
-                                RETURNING
-                                  *'
+               access.default_right
+             VALUES
+              (:url_id,
+               :role)
+             ON CONFLICT 
+              (url_id,
+               role) 
+             DO NOTHING 
+             RETURNING
+               *'
         );
         $sth->execute(
             [
@@ -215,15 +215,16 @@ class AccessModify extends AccessAbstract
 
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
-                          access.user_role
-                        VALUES
-                         (:role,
-                          :user_id)
-                        ON CONFLICT ON CONSTRAINT
-                          user_role_pkey
-                        DO NOTHING
-                        RETURNING
-                          *');
+               access.user_role
+             VALUES
+              (:role,
+               :user_id)
+             ON CONFLICT ON CONSTRAINT
+               user_role_pkey
+             DO NOTHING
+             RETURNING
+               *'
+        );
         $sth->execute(
             [
                 'role'    => $role,
@@ -250,28 +251,29 @@ class AccessModify extends AccessAbstract
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
-                                  access.access_right
-                                VALUES
-                                 (:url_id,
-                                  :user_id,
-                                  :is_allow,
-                                  :values::varchar[])
-                                ON CONFLICT 
-                                  (url_id,
-                                   user_id,
-                                   is_allow,
-                                   values) 
-                                DO UPDATE SET 
-                                  is_allow = EXCLUDED.is_allow,
-                                  values = EXCLUDED.values
-                                RETURNING
-                                  *');
+               access.access_right
+             VALUES
+              (:url_id,
+               :user_id,
+               :is_allow,
+               :values::varchar[])
+             ON CONFLICT 
+              (url_id,
+               user_id,
+               is_allow,
+               values) 
+             DO UPDATE SET 
+               is_allow = EXCLUDED.is_allow,
+               values = EXCLUDED.values
+             RETURNING
+               *'
+        );
         $sth->execute(
             [
                 'url_id'   => $url_id,
                 'user_id'  => $user_id,
                 'is_allow' => $is_allow,
-                'values'   => "{'" . implode("', '", $values) . "'}",
+                'values'   => "{'" . implode("', '", $values) . "'}:int8[]",
             ]
         );
 
@@ -291,27 +293,22 @@ class AccessModify extends AccessAbstract
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
-                                  access.access_right
-                                 (url_id,
-                                  user_id)
-                                SELECT 
-                                  dr.url_id,
-                                  ur.user_id
-                                FROM
-                                  access.default_right dr 
-                                JOIN 
-                                  access.user_role ur 
-                                  ON 
-                                    ur.role = dr.role
-                                WHERE
-                                  ur.user_id = :user_id
-                                ON CONFLICT 
-                                  (url_id,
-                                   user_id) 
-                                DO UPDATE SET 
-                                  is_allow = EXCLUDED.is_allow,
-                                  values = EXCLUDED.values');
-
+               access.access_right
+              (url_id,
+               user_id)
+             SELECT 
+               dr.url_id,
+               ur.user_id
+             FROM access.default_right dr 
+             JOIN access.user_role ur ON ur.role = dr.role
+             WHERE ur.user_id = :user_id
+             ON CONFLICT 
+              (url_id,
+               user_id) 
+             DO UPDATE SET 
+               is_allow = EXCLUDED.is_allow,
+               values = EXCLUDED.values'
+        );
         $sth->execute(['user_id' => $userId]);
 
         return $sth->fetchAll();

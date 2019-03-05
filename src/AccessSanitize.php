@@ -63,6 +63,7 @@ class AccessSanitize
      *
      * @throws AccessException
      * @throws ValidationException
+     * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     public function sanitizeArgs(): array
@@ -79,6 +80,27 @@ class AccessSanitize
     }
 
     /**
+     * @param string $dtoName
+     * @param array $args
+     *
+     * @return DTO
+     *
+     * @throws AccessException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     */
+    protected static function sanitizeDTOParam(string $dtoName, array $args)
+    {
+        if (is_subclass_of($dtoName, DTO::class)) {
+            throw new AccessException('Параметр не является DTO');
+        }
+        /** @var DTO $arg */
+        $arg = new $dtoName($args);
+        $arg->validate();
+
+        return $arg;
+    }
+
+    /**
      * Проверить аргументы метода
      *
      * @param \ReflectionMethod $method - Reflection-обертка для метода
@@ -88,28 +110,24 @@ class AccessSanitize
      *
      * @throws AccessException
      * @throws ValidationException
+     * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
-    public static function sanitizeMethodArgs(\ReflectionMethod $method, array $args): array
+    protected static function sanitizeMethodArgs(\ReflectionMethod $method, array $args): array
     {
         $sanArgs = [];
         $docBlock = new DocBlock($method);
         [$docParams] = static::getDocParams($docBlock->getTagsByName('param'));
-        if ($method->getNumberOfParameters() === 1) {
-            $typeName = $method->getParameters()[0]->getType()->getName();
-            if (is_subclass_of($typeName, DTO::class)) {
-                /** @var DTO $arg */
-                $arg = new $typeName($args);
-                $arg->validate();
-                $sanArgs[] = $arg;
-                return $sanArgs;
-            }
-        }
 
         foreach ($method->getParameters() as &$param) {
             $paramName = $param->getName();
             $paramType = $param->getType()
                 ? $param->getType()->getName() : ($docParams[$paramName] ? $docParams[$paramName]->getType() : '');
+
+            if ($paramType && is_subclass_of($paramType, DTO::class)) {
+                $sanArgs[] = static::sanitizeDTOParam($paramType, $args);
+                continue;
+            }
 
             if ($param->isVariadic()) {
                 if (!$paramType) {

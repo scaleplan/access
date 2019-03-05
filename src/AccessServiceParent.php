@@ -20,6 +20,7 @@ class AccessServiceParent
     /**
      * @param array $args
      * @param \Reflector $method
+     *
      * @return array
      *
      * @throws ValidationException
@@ -28,6 +29,7 @@ class AccessServiceParent
     {
         $args = $args ? reset($args) : $args;
         if (!\is_array($args)) {
+            /** @var \ReflectionMethod | \ReflectionProperty $method */
             throw new ValidationException("Метод {$method->getName()} принимает параметры в виде массива");
         }
 
@@ -43,6 +45,7 @@ class AccessServiceParent
      * @throws AccessDeniedException
      * @throws AccessException
      * @throws ValidationException
+     * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     protected static function checkMethod(\ReflectionMethod &$method, array &$args) : array
@@ -55,15 +58,10 @@ class AccessServiceParent
             throw new AccessDeniedException("Метод {$method->getName()} не доступен");
         }
 
-        $isPlainArgs = empty(
-            $docBlock->getTagsByName($access->getConfig(ConfigConstants::ARRAY_ARG_LABEL_NAME))
-        );
-        if ($isPlainArgs) {
-            static::formatArgs($args, $method);
-            $args = (new AccessSanitize($method, $args))->sanitizeArgs();
-        }
+        static::formatArgs($args, $method);
+        $args = (new AccessSanitize($method, $args))->sanitizeArgs();
 
-        return [$args, $isPlainArgs];
+        return $args;
     }
 
     /**
@@ -74,6 +72,7 @@ class AccessServiceParent
      *
      * @throws AccessException
      * @throws ValidationException
+     * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     protected static function checkProperty(\ReflectionProperty &$property, array &$args) : array
@@ -89,7 +88,7 @@ class AccessServiceParent
         static::formatArgs($args, $property);
         $args = (new AccessSanitize($property, $args))->sanitizeArgs();
 
-        return [$args, false];
+        return $args;
     }
 
     /**
@@ -105,6 +104,7 @@ class AccessServiceParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     protected static function checkServiceMethodEssence(string $methodName, array $args) : AccessServiceResult
     {
@@ -158,6 +158,7 @@ class AccessServiceParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public static function __callStatic(string $methodName, array $args) : AccessServiceResult
     {
@@ -177,6 +178,7 @@ class AccessServiceParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public function __call(string $methodName, array $args) : AccessServiceResult
     {
