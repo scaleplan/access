@@ -3,10 +3,11 @@
 namespace Scaleplan\Access;
 
 use phpDocumentor\Reflection\DocBlock;
-use Scaleplan\Access\Constants\ConfigConstants;
 use Scaleplan\Access\Exceptions\AccessException;
+use Scaleplan\Access\Exceptions\SupportingException;
 use Scaleplan\Access\Exceptions\ValidationException;
 use Scaleplan\DTO\DTO;
+use phpDocumentor\Reflection\DocBlock\Tag\ParamTag;
 
 /**
  * Класс проверки аргументов выполнения
@@ -49,7 +50,7 @@ class AccessSanitize
     public function __construct(\Reflector $reflector, array $args)
     {
         if (!($reflector instanceof \ReflectionMethod) && !($reflector instanceof \ReflectionProperty)) {
-            throw new AccessException('Почистить можно только параметры методов и SQL-свойств');
+            throw new SupportingException();
         }
 
         $this->reflector = $reflector;
@@ -63,6 +64,7 @@ class AccessSanitize
      *
      * @throws AccessException
      * @throws ValidationException
+     * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     public function sanitizeArgs(): array
@@ -79,6 +81,25 @@ class AccessSanitize
     }
 
     /**
+     * @param $args
+     * @param string $typeName
+     *
+     * @return DTO|null
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     */
+    public static function getDTO($args, string $typeName) : ?DTO
+    {
+        if (!is_subclass_of($typeName, DTO::class)) {
+            return null;
+        }
+
+        /** @var DTO $param */
+        $param = new $typeName($args);
+        $param->validate();
+        return $param;
+    }
+
+    /**
      * Проверить аргументы метода
      *
      * @param \ReflectionMethod $method - Reflection-обертка для метода
@@ -88,28 +109,20 @@ class AccessSanitize
      *
      * @throws AccessException
      * @throws ValidationException
+     * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
     public static function sanitizeMethodArgs(\ReflectionMethod $method, array $args): array
     {
         $sanArgs = [];
         $docBlock = new DocBlock($method);
+        /** @var ParamTag[] $docParams */
         [$docParams] = static::getDocParams($docBlock->getTagsByName('param'));
-        if ($method->getNumberOfParameters() === 1) {
-            $typeName = $method->getParameters()[0]->getType()->getName();
-            if (is_subclass_of($typeName, DTO::class)) {
-                /** @var DTO $arg */
-                $arg = new $typeName($args);
-                $arg->validate();
-                $sanArgs[] = $arg;
-                return $sanArgs;
-            }
-        }
 
         foreach ($method->getParameters() as &$param) {
             $paramName = $param->getName();
-            $paramType = $param->getType()
-                ? $param->getType()->getName() : ($docParams[$paramName] ? $docParams[$paramName]->getType() : '');
+            $docParamType = $docParams[$paramName] ? $docParams[$paramName]->getType() : '';
+            $paramType = $param->getType() ? $param->getType()->getName() : $docParamType;
 
             if ($param->isVariadic()) {
                 if (!$paramType) {
@@ -136,11 +149,14 @@ class AccessSanitize
             }
 
             $arg = $args[$paramName];
+            $dto = static::getDTO($args, $paramType);
+            if ($dto) {
+                $sanArgs[$paramName] = $dto;
+                continue;
+            }
 
             static::docTypeCheck($arg, $paramName, $paramType, $docBlock);
-
-            \is_string($arg) && $arg = strip_tags($arg);
-
+            \is_string($arg) && $arg = \strip_tags($arg);
             $sanArgs[$paramName] = $arg;
         }
 
@@ -183,8 +199,7 @@ class AccessSanitize
             }
 
             $arg = $args[$paramName];
-
-            if ($param instanceof DocBlock\Tag && $param->getType()) {
+            if ($param instanceof ParamTag && $param->getType()) {
                 static::docTypeCheck($arg, $paramName, (string) $param->getType(), $docBlock);
             }
 
@@ -215,7 +230,7 @@ class AccessSanitize
     /**
      * Вернуть массив DOCBLOCK-параметров и подгруппу необязательных параметров
      *
-     * @param array $docParams - исходный массив параметров
+     * @param DocBlock\Tag\ParamTag[] $docParams - исходный массив параметров
      *
      * @return array
      */
@@ -250,7 +265,7 @@ class AccessSanitize
             return;
         }
 
-        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig(ConfigConstants::DOCBLOCK_CHECK_LABEL_NAME));
+        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
 
         $paramTypes = array_map(function ($item) {
             return trim($item, '\\\ \0');
@@ -318,11 +333,11 @@ class AccessSanitize
     public static function getSQLParams($sql): array
     {
         $all = $optional = [];
-        if (preg_match_all('/[^:]+?:([\w_\-]+).*?/i', $sql, $matches)) {
+        if (preg_match_all('/[^:]+?:([\w_\-]+).*?/', $sql, $matches)) {
             $all = array_unique($matches[1]);
         }
 
-        if (preg_match_all('/\[[^\]]*?:([\w_\-]+)[^\[]*?\]/i', $sql, $matches)) {
+        if (preg_match_all('/\[[^\]]*?:([\w_\-]+)[^\[]*?\]/', $sql, $matches)) {
             $optional = array_unique($matches[1]);
         }
 

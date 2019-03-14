@@ -3,7 +3,6 @@
 namespace Scaleplan\Access;
 
 use phpDocumentor\Reflection\DocBlock;
-use Scaleplan\Access\Constants\ConfigConstants;
 use Scaleplan\Access\Exceptions\ValidationException;
 use Scaleplan\Result\DbResult;
 
@@ -143,14 +142,12 @@ class AccessServiceResult extends DbResult
     }
 
     /**
-     * Проверить тип возвращаемого значения по типам заданным в DOCBLOCK
-     *
      * @throws ValidationException
      */
     public function checkDocReturn(): void
     {
         $docBlock = new DocBlock($this->method ?? $this->property);
-        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig(ConfigConstants::DOCBLOCK_CHECK_LABEL_NAME));
+        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
         $returnTypes = $docBlock->getTagsByName('return');
         $returnTypes = end($returnTypes);
         $returnTypes = array_map(function ($item) {

@@ -11,7 +11,14 @@ class AccessException extends \Exception
 {
     public const MESSAGE = 'Access error.';
 
-    public function __construct(string $message = null, int $code = 0, \Throwable $previous = null)
+    /**
+     * AccessException constructor.
+     *
+     * @param string|null $message
+     * @param int $code
+     * @param \Throwable|null $previous
+     */
+    public function __construct(\string $message = null, \int $code = 0, \Throwable $previous = null)
     {
         parent::__construct($message ?? static::MESSAGE, $code, $previous);
     }

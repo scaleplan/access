@@ -3,10 +3,14 @@
 namespace Scaleplan\Access;
 
 use phpDocumentor\Reflection\DocBlock;
-use Scaleplan\Access\Constants\ConfigConstants;
 use Scaleplan\Access\Exceptions\AccessDeniedException;
+use Scaleplan\Access\Exceptions\ClassNotFoundException;
 use Scaleplan\Access\Exceptions\MethodNotFoundException;
 use Scaleplan\Access\Exceptions\ValidationException;
+use Scaleplan\Access\Hooks\MethodAllowed;
+use Scaleplan\Access\Hooks\MethodExecuted;
+use Scaleplan\Access\Hooks\SanitizePassed;
+use function Scaleplan\Event\dispatch;
 use Scaleplan\Result\AbstractResult;
 use Scaleplan\Result\DbResult;
 use Scaleplan\Result\HTMLResult;
@@ -18,126 +22,16 @@ use Scaleplan\Result\HTMLResult;
  *
  * @package Scaleplan\Access
  */
-abstract class AccessControllerParent
+class AccessControllerParent
 {
-    /**
-     * Функции для выполнения перед исполнением метода контроллера
-     *
-     * @var array
-     */
-    protected static $before = [];
-
-    /**
-     * Результат выполения before-функции по умолчанию
-     *
-     * @var mixed
-     */
-    public static $beforeDefaultResult;
-
-    /**
-     * Функции для выполнения после исполнения метода контроллера
-     *
-     * @var array
-     */
-    protected static $after = [];
-
-    /**
-     * Результат выполения after-функции по умолчанию
-     *
-     * @var mixed
-     */
-    public static $afterDefaultResult;
-
-    /**
-     * Добавить функцию в конец массива функций выполняемых перед исполнением метода контроллера
-     *
-     * @param callable $function - функция
-     */
-    public static function pushBefore(callable $function): void
-    {
-        static::$before[] = $function;
-    }
-
-    /**
-     * Добавить функцию в начало массива функций выполняемых перед исполнением метода контроллера
-     *
-     * @param callable $function - функция
-     */
-    public static function unshiftBefore(callable $function): void
-    {
-        array_unshift(static::$before, $function);
-    }
-
-    /**
-     * Добавить функцию в заданную позицию массива функций выполняемых перед исполнением метода контроллера
-     *
-     * @param int $index - позиция вставки
-     * @param callable $function - функция
-     */
-    public static function insertBefore(int $index, callable $function): void
-    {
-        array_merge(\array_slice(static::$before, 0, $index), $function, \array_slice(static::$before, $index));
-    }
-
-    /**
-     * Добавить функцию в конец массива функций выполняемых после исполнения метода контроллера
-     *
-     * @param callable $function - функция
-     */
-    public static function pushAfter(callable $function): void
-    {
-        static::$after[] = $function;
-    }
-
-    /**
-     * Добавить функцию в начало массива функций выполняемых после исполнения метода контроллера
-     *
-     * @param callable $function - функция
-     */
-    public static function unshiftAfter(callable $function): void
-    {
-        array_unshift(static::$after, $function);
-    }
-
-    /**
-     * Добавить функцию в заданную позицию массива функций выполняемых после исполнения метода контроллера
-     *
-     * @param int $index - позиция вставки
-     * @param callable $function - функция
-     */
-    public static function insertAfter(int $index, callable $function): void
-    {
-        array_merge(\array_slice(static::$after, 0, $index), $function, \array_slice(static::$after, $index));
-    }
-
-    /**
-     * Удалить функцию или все функции, которые должны выполняться перед исполненим метода контроллера
-     *
-     * @param int $index - позиция удаления
-     */
-    public static function removeBefore(int $index): void
-    {
-        unset(static::$before[$index]);
-    }
-
-    /**
-     * Удалить функцию или все функции, которые должны выполняться после исполнения метода контроллера
-     *
-     * @param int $index - позиция удаления
-     */
-    public static function removeAfter(int $index): void
-    {
-        unset(static::$after[$index]);
-    }
-
     /**
      * Проверка прав доступа и входных данных для метода
      *
+     * @param string $className - имя класса
      * @param string $methodName - имя метода
      * @param array $args - аргументы выполнения
-     * @param \object|null $obj - объект, к контекте которого должен выполниться метод (если нестатический)
      *
-     * @return AbstractResult
+     * @return array
      *
      * @throws AccessDeniedException
      * @throws Exceptions\AccessException
@@ -147,52 +41,60 @@ abstract class AccessControllerParent
      * @throws MethodNotFoundException
      * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
-     * @throws \Scaleplan\Result\Exceptions\ResultException
      */
-    protected static function checkControllerMethod(string $methodName, array $args, object $obj = null): AbstractResult
+    public static function checkControllerMethod(\string $className, \string $methodName, array $args): array
     {
-        $args = reset($args);
         if (!\is_array($args)) {
             throw new ValidationException("Метод $methodName принимает параметры в виде массива");
         }
 
-        $refClass = new \ReflectionClass(static::class);
+        if (!class_exists($className)) {
+            throw new ClassNotFoundException("Метод $methodName не существует");
+        }
+
+        $refClass = new \ReflectionClass($className);
 
         if (!$refClass->hasMethod($methodName)) {
             throw new MethodNotFoundException("Метод $methodName не существует");
         }
 
-        $method = $refClass->getMethod($methodName);
+        $refMethod = $refClass->getMethod($methodName);
         /** @var Access $access */
         $access = Access::create();
-        if (empty($docBlock = new DocBlock($method))
-            ||
-            empty($docBlock->getTagsByName($access->getConfig(ConfigConstants::ANNOTATION_LABEL_NAME)))
-        ) {
+        $docBlock = new DocBlock($refMethod);
+        if (!$docBlock->getTagsByName($access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME))) {
             throw new AccessDeniedException("Метод $methodName не доступен");
         }
 
-        $isPlainArgs = empty($docBlock->getTagsByName($access->getConfig(ConfigConstants::ARRAY_ARG_LABEL_NAME)));
-        if ($isPlainArgs) {
-            $isPlainArgs = false;
-        } else {
-            $params = $method->getParameters();
-            if (!empty($params[0]) && $params[0]->isVariadic()) {
-                $isPlainArgs = false;
-            }
+        if (empty($docBlock->getTagsByName($access->getConfig()->get(AccessConfig::NO_CHECK_LABEL_NAME)))) {
+            $access->checkMethodRights($refMethod, $args, $refClass);
         }
+        dispatch(MethodAllowed::class);
 
-        if (empty($docBlock->getTagsByName($access->getConfig(ConfigConstants::NO_CHECK_LABEL_NAME)))) {
-            $access->checkMethodRights($method, $args, $refClass);
-        }
+        $args = (new AccessSanitize($refMethod, $args))->sanitizeArgs();
+        dispatch(SanitizePassed::class);
 
-        $args = $isPlainArgs ? (new AccessSanitize($method, $args))->sanitizeArgs() : $args;
+        return [$refClass, $refMethod, $args,];
+    }
 
-        static::executeBeforeHandlers($method, $args);
-
+    /**
+     * @param \ReflectionMethod $method
+     * @param array $args
+     * @param object|null $obj
+     *
+     * @return mixed|DbResult|HTMLResult
+     *
+     * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
+     * @throws \Scaleplan\Result\Exceptions\ResultException
+     */
+    protected static function execute(\ReflectionMethod $method, array &$args, \object $obj = null)
+    {
         $method->setAccessible(true);
-        $result = $isPlainArgs ? $method->invokeArgs($obj, $args) : $method->invoke($obj, $args);
+        $result = $method->invokeArgs($obj, $args);
+        dispatch(MethodExecuted::class);
 
         if ($result instanceof AbstractResult) {
             return $result;
@@ -205,46 +107,6 @@ abstract class AccessControllerParent
         return new HTMLResult($result);
     }
 
-    /**
-     * Выполнить обработчики начала выполнения запроса
-     *
-     * @param null|\ReflectionMethod $method - отражение метода, который будет выполняться
-     * @param array $args - его аргументы
-     *
-     * @return mixed
-     */
-    public static function executeBeforeHandlers(?\ReflectionMethod $method = null, array $args = [])
-    {
-        foreach (static::$before as $index => $func) {
-            $result = $func($method, $args);
-            if ($result === false) {
-                break;
-            }
-        }
-
-        return $result ?? static::$beforeDefaultResult;
-    }
-
-    /**
-     * Выполнить обработчики окончания выполнения запроса
-     *
-     * @param \ReflectionMethod|null $method - отражение выполнявшегося метода констроллера
-     * @param array $args - его аргументы
-     * @param null $result - результат выполнения
-     *
-     * @return mixed
-     */
-    public static function executeAfterHandlers(\ReflectionMethod $method = null, array $args = [], $result = null)
-    {
-        foreach (static::$after as $index => $func) {
-            $result = $func($method, $args, $result);
-            if ($result === false) {
-                break;
-            }
-        }
-
-        return $result ?? static::$afterDefaultResult;
-    }
 
     /**
      * Проверка прав доступа и входных данных для статических методов
@@ -262,12 +124,16 @@ abstract class AccessControllerParent
      * @throws MethodNotFoundException
      * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public static function __callStatic(string $methodName, array $args): AbstractResult
     {
-        return static::checkControllerMethod($methodName, $args);
+        $args = reset($args);
+        [null, $method, &$args] = static::checkControllerMethod(static::class, $methodName, $args);
+        return static::execute($method, $args);
     }
 
     /**
@@ -286,11 +152,15 @@ abstract class AccessControllerParent
      * @throws MethodNotFoundException
      * @throws ValidationException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public function __call(string $methodName, array $args): AbstractResult
     {
-        return static::checkControllerMethod($methodName, $args, $this);
+        $args = reset($args);
+        [null, $method, &$args] = static::checkControllerMethod(static::class, $methodName, $args);
+        return static::execute($method, $args, $this);
     }
 }

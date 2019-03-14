@@ -2,7 +2,6 @@
 
 namespace Scaleplan\Access;
 
-use Scaleplan\Access\Constants\ConfigConstants;
 use Scaleplan\Access\Constants\SessionConstants;
 use Scaleplan\Access\Exceptions\AccessException;
 use Scaleplan\Access\Exceptions\ConfigException;
@@ -27,11 +26,11 @@ class AccessModify extends AccessAbstract
     protected static $instance;
 
     /**
-     * @throws AccessException
+     * @return array
+     *
      * @throws ConfigException
-     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
-    public function loadAccessRights() : void
+    public function getAccessRightsFromDb() : array
     {
         $sth = $this->getPSConnection()
             ->prepare('
@@ -50,16 +49,31 @@ class AccessModify extends AccessAbstract
                     ');
         $sth->execute(['user_id' => $this->userId]);
 
-        $accessRights = $sth->fetchAll();
+        return $sth->fetchAll();
+    }
 
-        $cacheStorageName = $this->config[ConfigConstants::CACHE_STORAGE_SECTION_NAME];
-        switch ($cacheStorageName) {
+    /**
+     * @param array|null $accessRights
+     *
+     * @throws AccessException
+     * @throws ConfigException
+     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
+     */
+    public function saveAccessRightsToCache(array $accessRights = null) : void
+    {
+        $cache = $this->config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME);
+        if (!$cache || empty($cache['type'])) {
+            throw new ConfigException('Нет данных для подключения к кэширующему хранилищу');
+        }
+
+        $accessRights = $accessRights ?? $this->getAccessRightsFromDb();
+        switch ($cache['type']) {
             case 'redis':
-                if (empty($this->config[$cacheStorageName]['socket'])) {
+                if (empty($cache['socket'])) {
                     throw new ConfigException('В конфигурации не задан путь к Redis-сокету');
                 }
 
-                $this->cs = $this->cs ?? RedisSingleton::create($this->config[$cacheStorageName]['socket']);
+                $this->cs = $this->cs ?? RedisSingleton::create($cache['socket']);
                 $this->cs->delete("user_id:{$this->userId}");
 
                 if ($accessRights) {
@@ -67,7 +81,7 @@ class AccessModify extends AccessAbstract
                         return json_encode($item, JSON_FORCE_OBJECT) ?? $item;
                     }, array_column($accessRights, null, 'url'));
 
-                    if (!$this->cs->hMset("user_id:{$this->userId}", $hashValue)) {
+                    if (!$this->cs->hMSet("user_id:{$this->userId}", $hashValue)) {
                         throw new AccessException('Не удалось записать права доступа в Redis');
                     }
                 }
@@ -81,7 +95,7 @@ class AccessModify extends AccessAbstract
 
             default:
                 throw new ConfigException(
-                    "Драйвер $cacheStorageName кэширующего хранилища не поддерживается системой"
+                    "Драйвер {$cache['type']} кэширующего хранилища не поддерживается системой"
                 );
         }
     }
@@ -89,34 +103,21 @@ class AccessModify extends AccessAbstract
     /**
      * Залить в базу данных схему для работы с Access
      *
-     * @return int
-     *
-     * @throws AccessException
+     * @throws ConfigException
      */
-    public function initSQLScheme() : int
+    public function initSQLScheme() : void
     {
         $sql = file_get_contents(dirname(__DIR__) . static::INIT_SQL_PATH);
-
-        return $this->getPSConnection()->exec($sql);
+        $this->getPSConnection()->exec($sql);
     }
 
     /**
-     * Инициальзировать персистентное хранилище данных о правах доступа
-     *
-     * @return int
-     *
-     * @throws AccessException
      * @throws ConfigException
+     * @throws Exceptions\FormatException
      * @throws \ReflectionException
      */
-    public function initPersistentStorage() : int
+    public function initPersistentScheme() : void
     {
-        if (!$this->initSQLScheme()) {
-            throw new AccessException('Не удалось создать необходимые объекты базы данных');
-        }
-
-        $urlsCount = 0;
-
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
                                   access.url
@@ -138,13 +139,19 @@ class AccessModify extends AccessAbstract
         );
         /** @var Access $access */
         $access = Access::create($this->userId);
-        foreach ($access->getAllURLs() as $arr) {
+        $urlGenerator = new AccessUrlGenerator($access);
+        foreach ($urlGenerator->getAllURLs() as $arr) {
             $sth->execute($arr);
-            $urlsCount += $sth->rowCount();
         }
+    }
 
+    /**
+     *
+     */
+    public function initPersistentStorageTypes() : void
+    {
         $roles = [];
-        foreach ($this->config[ConfigConstants::ROLES_SECTION_NAME] as $index => $role) {
+        foreach ($this->config->get(AccessConfig::ROLES_SECTION_NAME) as $index => $role) {
             $roles["value{$index}"] = $role;
         }
 
@@ -153,8 +160,20 @@ class AccessModify extends AccessAbstract
         }, array_keys($roles)));
         $sth = $this->ps->prepare("CREATE TYPE access.roles AS ENUM ($rolesPlaceholders)");
         $sth->execute($roles);
+    }
 
-        return $urlsCount;
+    /**
+     * Инициальзировать персистентное хранилище данных о правах доступа
+     *
+     * @throws ConfigException
+     * @throws Exceptions\FormatException
+     * @throws \ReflectionException
+     */
+    public function initPersistentStorage() : void
+    {
+        $this->initSQLScheme();
+        $this->initPersistentScheme();
+        $this->initPersistentStorageTypes();
     }
 
     /**
@@ -182,12 +201,7 @@ class AccessModify extends AccessAbstract
                                 RETURNING
                                   *'
         );
-        $sth->execute(
-            [
-                'url_id' => $url_id,
-                'role'   => $role,
-            ]
-        );
+        $sth->execute(['url_id' => $url_id, 'role' => $role,]);
 
         return $sth->fetchAll();
     }
@@ -204,12 +218,12 @@ class AccessModify extends AccessAbstract
      */
     public function addUserToRole(int $user_id, string $role = '') : array
     {
-        $role = $role ?? $this->config[ConfigConstants::DEFAULT_ROLE_LABEL_NAME];
+        $role = $role ?? $this->config->get(AccessConfig::DEFAULT_ROLE_LABEL_NAME);
         if (!$role) {
             throw new ConfigException('Не задана роль по умолчанию');
         }
 
-        if (!\in_array($role, $this->config[ConfigConstants::ROLES_SECTION_NAME], true)) {
+        if (!\in_array($role, $this->config->get(AccessConfig::ROLES_SECTION_NAME), true)) {
             throw new ConfigException('Заданная роль не входит в список доступных ролей');
         }
 
@@ -224,12 +238,7 @@ class AccessModify extends AccessAbstract
                         DO NOTHING
                         RETURNING
                           *');
-        $sth->execute(
-            [
-                'role'    => $role,
-                'user_id' => $user_id,
-            ]
-        );
+        $sth->execute(['role' => $role, 'user_id' => $user_id,]);
 
         return $sth->fetchAll();
     }

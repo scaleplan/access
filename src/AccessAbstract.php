@@ -2,7 +2,6 @@
 
 namespace Scaleplan\Access;
 
-use Scaleplan\Access\Constants\ConfigConstants;
 use Scaleplan\Access\Exceptions\ConfigException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -15,12 +14,13 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class AccessAbstract
 {
+    protected const DEFAULT_USER_ID = -1;
     /**
      * Конфигурация
      *
-     * @var array
+     * @var AccessConfig
      */
-    protected $config = [];
+    protected $config;
 
     /**
      * Идентификатор пользователя
@@ -58,7 +58,10 @@ abstract class AccessAbstract
      *
      * @return AccessAbstract
      */
-    public static function create(int $userId = -1, string $confPath = __DIR__ . '/../config.yml') : AccessAbstract
+    public static function create(
+        \int $userId = self::DEFAULT_USER_ID,
+        \string $confPath = __DIR__ . '/../config.yml'
+    ) : AccessAbstract
     {
         if (!static::$instance) {
             $className = static::class;
@@ -78,51 +81,7 @@ abstract class AccessAbstract
      */
     private function __construct(int $userId, string $confPath)
     {
-        $this->config = Yaml::parse(file_get_contents($confPath));
-
-        if (empty($this->config)) {
-            throw new ConfigException('Отсутствует конфигурация');
-        }
-
-        if (empty($this->config[ConfigConstants::PERSISTENT_STORAGE_SECTION_NAME])) {
-            throw new ConfigException('В конфирурациии отсутствует указание постоянного хранилища');
-        }
-
-        if (empty($this->config[$this->config[ConfigConstants::PERSISTENT_STORAGE_SECTION_NAME]])) {
-            throw new ConfigException(
-                'В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав'
-            );
-        }
-
-        if (empty($this->config[ConfigConstants::CACHE_STORAGE_SECTION_NAME])) {
-            throw new ConfigException('В конфирурациии отсутствует указание кефирующего хранилища');
-        }
-
-        if (empty($this->config[$this->config[ConfigConstants::CACHE_STORAGE_SECTION_NAME]])) {
-            throw new ConfigException(
-                'В конфигурации отсутствуют данные о подключениие к кэширующему хранилищу прав'
-            );
-        }
-
-        if (!isset($this->config[ConfigConstants::ROLES_SECTION_NAME])) {
-            throw new ConfigException('Отсутствует список ролей');
-        }
-
-        if (!\is_array($this->config[ConfigConstants::ROLES_SECTION_NAME])) {
-            throw new ConfigException('Список ролей должен быть задан списком');
-        }
-
-        if (empty($this->config[ConfigConstants::FILTER_DIRECTIVE_NAME])) {
-            throw new ConfigException('В конфигурации отсутствует имя для метки фильтрующего аргумента');
-        }
-
-        if (empty($this->config[ConfigConstants::ANNOTATION_LABEL_NAME])) {
-            throw new ConfigException('В конфигурации отсутствует имя метки Access');
-        }
-
-        if (empty($this->config[ConfigConstants::FILTER_SEPARATOR_NAME])) {
-            throw new ConfigException('В конфигурации отсутствует разделитель фильтров');
-        }
+        $this->config = new AccessConfig(Yaml::parse(file_get_contents($confPath)));
 
         if ($userId < 0) {
             throw new ConfigException('Неверное задан идентификатор пользователя');
@@ -148,16 +107,16 @@ abstract class AccessAbstract
      *
      * @throws ConfigException
      */
-    protected function getPSConnection() : \PDO
+    public function getPSConnection() : \PDO
     {
         if ($this->ps) {
             return $this->ps;
         }
 
-        $persistentStorageName = $this->config[ConfigConstants::PERSISTENT_STORAGE_SECTION_NAME];
+        $persistentStorageName = $this->config->get(AccessConfig::PERSISTENT_STORAGE_SECTION_NAME);
         switch ($persistentStorageName) {
             case 'postgresql':
-                $postgresSection = &$this->config[$persistentStorageName] ?? null;
+                $postgresSection = $this->config->get($persistentStorageName);
                 if (empty($postgresSection) || empty($postgresSection['dns'])
                     || empty($postgresSection['user']) || empty($postgresSection['password'])) {
                     throw new ConfigException('Недостаточно данных для подключения к PostgreSQL');
@@ -180,14 +139,10 @@ abstract class AccessAbstract
     }
 
     /**
-     * Вернуть конфигурацию или ее часть
-     *
-     * @param string|null $key - ключ конфигурации
-     *
-     * @return array|mixed|null
+     * @return AccessConfig
      */
-    public function getConfig(string $key = null)
+    public function getConfig() : AccessConfig
     {
-        return $key ? $this->config[$key] ?? null : $this->config;
+        return $this->config;
     }
 }
