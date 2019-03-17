@@ -63,15 +63,10 @@ class AccessServiceParent
             throw new AccessDeniedException("Метод {$method->getName()} не доступен");
         }
 
-        $isPlainArgs = empty(
-            $docBlock->getTagsByName($access->getConfig()->get(AccessConfig::ARRAY_ARG_LABEL_NAME))
-        );
-        if ($isPlainArgs) {
-            static::formatArgs($args, $method);
-            $args = (new AccessSanitize($method, $args))->sanitizeArgs();
-        }
+        static::formatArgs($args, $method);
+        $args = (new AccessSanitize($method, $args))->sanitizeArgs();
 
-        return [$args, $isPlainArgs];
+        return $args;
     }
 
     /**
@@ -99,7 +94,7 @@ class AccessServiceParent
         static::formatArgs($args, $property);
         $args = (new AccessSanitize($property, $args))->sanitizeArgs();
 
-        return [$args, false];
+        return $args;
     }
 
     /**

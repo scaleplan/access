@@ -280,7 +280,7 @@ class AccessModify extends AccessAbstract
                 'url_id'   => $url_id,
                 'user_id'  => $user_id,
                 'is_allow' => $is_allow,
-                'values'   => "{'" . implode("', '", $values) . "'}",
+                'values'   => "{'" . implode("', '", $values) . "'}::int8[]",
             ]
         );
 

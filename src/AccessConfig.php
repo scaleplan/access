@@ -39,8 +39,6 @@ class AccessConfig
 
     public const FILTER_SEPARATOR_NAME = 'access_separator';
 
-    public const ARRAY_ARG_LABEL_NAME = 'access_array_arg';
-
     public const NO_CHECK_LABEL_NAME = 'access_no_rights_check';
 
     public const DOCBLOCK_CHECK_LABEL_NAME = 'deny_fuzzy';
