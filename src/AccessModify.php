@@ -69,19 +69,13 @@ class AccessModify extends AccessAbstract
         $accessRights = $accessRights ?? $this->getAccessRightsFromDb();
         switch ($cache['type']) {
             case 'redis':
-                if (empty($cache['socket'])) {
-                    throw new ConfigException('В конфигурации не задан путь к Redis-сокету');
-                }
-
-                $this->cs = $this->cs ?? RedisSingleton::create($cache['socket']);
-                $this->cs->delete("user_id:{$this->userId}");
-
+                $this->getCSConnection()->delete("user_id:{$this->userId}");
                 if ($accessRights) {
                     $hashValue = array_map(function ($item) {
                         return json_encode($item, JSON_FORCE_OBJECT) ?? $item;
                     }, array_column($accessRights, null, 'url'));
 
-                    if (!$this->cs->hMSet("user_id:{$this->userId}", $hashValue)) {
+                    if (!$this->getCSConnection()->hMSet("user_id:{$this->userId}", $hashValue)) {
                         throw new AccessException('Не удалось записать права доступа в Redis');
                     }
                 }
@@ -146,7 +140,7 @@ class AccessModify extends AccessAbstract
     }
 
     /**
-     *
+     * @throws ConfigException
      */
     public function initPersistentStorageTypes() : void
     {
@@ -158,7 +152,7 @@ class AccessModify extends AccessAbstract
         $rolesPlaceholders = implode(',', array_map(function ($item) {
             return ":$item";
         }, array_keys($roles)));
-        $sth = $this->ps->prepare("CREATE TYPE access.roles AS ENUM ($rolesPlaceholders)");
+        $sth = $this->getPSConnection()->prepare("CREATE TYPE access.roles AS ENUM ($rolesPlaceholders)");
         $sth->execute($roles);
     }
 

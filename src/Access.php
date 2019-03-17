@@ -53,18 +53,13 @@ class Access extends AccessAbstract
 
         switch ($cache['type']) {
             case 'redis':
-                if (empty($cache['socket'])) {
-                    throw new ConfigException('В конфигурации не задан путь к Redis-сокету');
-                }
-
-                $this->cs = $this->cs ?? RedisSingleton::create($cache['socket']);
                 if ($url) {
-                    return json_decode($this->cs->hGet("user_id:{$this->userId}", $url), true) ?? [];
+                    return json_decode($this->getCSConnection()->hGet("user_id:{$this->userId}", $url), true) ?? [];
                 }
 
                 return array_map(function ($item) {
                     return json_decode($item, true) ?? $item;
-                }, array_filter($this->cs->hGetAll("user_id:{$this->userId}")));
+                }, array_filter($this->getCSConnection()->hGetAll("user_id:{$this->userId}")));
 
             case 'session':
                 return $url

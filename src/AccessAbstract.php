@@ -3,6 +3,7 @@
 namespace Scaleplan\Access;
 
 use Scaleplan\Access\Exceptions\ConfigException;
+use Scaleplan\Redis\RedisSingleton;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -136,6 +137,25 @@ abstract class AccessAbstract
                     "Драйвер {$persistentStorageName} постоянного хранилища не поддерживается системой"
                 );
         }
+    }
+
+    /**
+     * @return \Redis
+     *
+     * @throws ConfigException
+     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
+     */
+    protected function getCSConnection() : \Redis
+    {
+        if (!$this->cs) {
+            if (empty($cache['socket'])) {
+                throw new ConfigException('В конфигурации не задан путь к Redis-сокету');
+            }
+
+            $this->cs = $this->cs ?? RedisSingleton::create($cache['socket']);
+        }
+
+        return $this->cs;
     }
 
     /**
