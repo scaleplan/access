@@ -23,16 +23,14 @@ roles:
 # Роль по умолчанию
 default_role: Гость
 
-# Тип постоянного хранилица
-persistent_storage: postgresql
-
 # Данные для поключения к кэширующему хранилищу
 cache_storage:
   type: redis
   socket: /var/run/redis/redis.sock
 
 # Данные для поключения к постоянному хранилищу
-postgresql:
+persistent_storage:
+  type: postgresql
   dns: pgsql:host=/var/run/postgresql;port=5432;dbname=edu
   user: avtomonov
   password: password

@@ -2,8 +2,9 @@
 
 namespace Scaleplan\Access;
 
+use Scaleplan\Access\CacheStorage\CacheStorageFabric;
+use Scaleplan\Access\CacheStorage\CacheStorageInterface;
 use Scaleplan\Access\Exceptions\ConfigException;
-use Scaleplan\Redis\RedisSingleton;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -31,18 +32,9 @@ abstract class AccessAbstract
     protected $userId = 0;
 
     /**
-     * Подключение к РСУБД
-     *
-     * @var null|\PDO
+     * @var CacheStorageInterface
      */
-    protected $ps;
-
-    /**
-     * Подключение к кэшу
-     *
-     * @var null|\Redis
-     */
-    protected $cs;
+    protected $cache;
 
     /**
      * Инстанс класса
@@ -62,7 +54,7 @@ abstract class AccessAbstract
     public static function create(
         \int $userId = self::DEFAULT_USER_ID,
         \string $confPath = __DIR__ . '/../config.yml'
-    ) : AccessAbstract
+    ) : self
     {
         if (!static::$instance) {
             $className = static::class;
@@ -79,10 +71,16 @@ abstract class AccessAbstract
      * @param string $confPath - пусть к конфигурации
      *
      * @throws ConfigException
+     * @throws Exceptions\CacheTypeNotSupportingException
+     * @throws Exceptions\UserIdNotPresentException
      */
     private function __construct(int $userId, string $confPath)
     {
         $this->config = new AccessConfig(Yaml::parse(file_get_contents($confPath)));
+        $this->cache = CacheStorageFabric::getInstance(
+            $this->config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME),
+            $userId
+        );
 
         if ($userId < 0) {
             throw new ConfigException('Неверное задан идентификатор пользователя');
@@ -110,52 +108,27 @@ abstract class AccessAbstract
      */
     public function getPSConnection() : \PDO
     {
-        if ($this->ps) {
-            return $this->ps;
-        }
+        static $connection;
+        if (!$connection) {
+            $connectionData = $this->config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME);
+            $type = $connectionData['type'];
+            switch ($type) {
+                case 'postgresql':
+                    $connection
+                        = new \PDO($connectionData['dns'], $connectionData['user'], $connectionData['password']);
 
-        $persistentStorageName = $this->config->get(AccessConfig::PERSISTENT_STORAGE_SECTION_NAME);
-        switch ($persistentStorageName) {
-            case 'postgresql':
-                $postgresSection = $this->config->get($persistentStorageName);
-                if (empty($postgresSection) || empty($postgresSection['dns'])
-                    || empty($postgresSection['user']) || empty($postgresSection['password'])) {
-                    throw new ConfigException('Недостаточно данных для подключения к PostgreSQL');
-                }
+                    $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                    $connection->setAttribute(\PDO::ATTR_ORACLE_NULLS, \PDO::NULL_TO_STRING);
+                    $connection->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);;
 
-                $this->ps = $this->ps
-                    ?? new \PDO($postgresSection['dns'], $postgresSection['user'], $postgresSection['password']);
-
-                $this->ps->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                $this->ps->setAttribute(\PDO::ATTR_ORACLE_NULLS, \PDO::NULL_TO_STRING);
-                $this->ps->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-
-                return $this->ps;
-
-            default:
-                throw new ConfigException(
-                    "Драйвер {$persistentStorageName} постоянного хранилища не поддерживается системой"
-                );
-        }
-    }
-
-    /**
-     * @return \Redis
-     *
-     * @throws ConfigException
-     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
-     */
-    protected function getCSConnection() : \Redis
-    {
-        if (!$this->cs) {
-            if (empty($cache['socket'])) {
-                throw new ConfigException('В конфигурации не задан путь к Redis-сокету');
+                default:
+                    throw new ConfigException(
+                        "Драйвер $type постоянного хранилища не поддерживается системой"
+                    );
             }
-
-            $this->cs = $this->cs ?? RedisSingleton::create($cache['socket']);
         }
 
-        return $this->cs;
+        return $connection;
     }
 
     /**

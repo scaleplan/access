@@ -4,12 +4,9 @@ namespace Scaleplan\Access;
 
 use phpDocumentor\Reflection\DocBlock;
 use Scaleplan\Access\Constants\DbConstants;
-use Scaleplan\Access\Constants\SessionConstants;
 use Scaleplan\Access\Exceptions\AccessDeniedException;
 use Scaleplan\Access\Exceptions\AuthException;
-use Scaleplan\Access\Exceptions\ConfigException;
 use Scaleplan\Access\Exceptions\FormatException;
-use Scaleplan\Redis\RedisSingleton;
 
 /**
  * Класс формирования списка урлов и проверки прав
@@ -40,37 +37,14 @@ class Access extends AccessAbstract
      * @param string|null $url - текст урла
      *
      * @return array
-     *
-     * @throws ConfigException
-     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     public function getAccessRights(\string $url = '') : array
     {
-        $cache = $this->config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME);
-        if (!$cache || empty($cache['type'])) {
-            throw new ConfigException('Нет данных для подключения к кэширующему хранилищу');
+        if ($url) {
+            return $this->cache->getAccessRight($url);
         }
 
-        switch ($cache['type']) {
-            case 'redis':
-                if ($url) {
-                    return json_decode($this->getCSConnection()->hGet("user_id:{$this->userId}", $url), true) ?? [];
-                }
-
-                return array_map(function ($item) {
-                    return json_decode($item, true) ?? $item;
-                }, array_filter($this->getCSConnection()->hGetAll("user_id:{$this->userId}")));
-
-            case 'session':
-                return $url
-                    ? ($_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME][$url] ?? [])
-                    : array_filter($_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME]);
-
-            default:
-                throw new ConfigException(
-                    "Драйвер {$cache['socket']} кэширующего хранилища не поддерживается системой"
-                );
-        }
+        return $this->cache->getAllAccessRights();
     }
 
     /**
@@ -96,9 +70,7 @@ class Access extends AccessAbstract
      *
      * @throws AccessDeniedException
      * @throws AuthException
-     * @throws ConfigException
      * @throws FormatException
-     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     protected function checkOnlyMethod(?\ReflectionClass $refClass, \ReflectionMethod $refMethod) : array
     {
@@ -211,10 +183,8 @@ class Access extends AccessAbstract
      *
      * @throws AccessDeniedException
      * @throws AuthException
-     * @throws ConfigException
      * @throws FormatException
      * @throws \ReflectionException
-     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     public function checkMethodRights(
         \ReflectionMethod $refMethod,
@@ -247,8 +217,6 @@ class Access extends AccessAbstract
      *
      * @throws AccessDeniedException
      * @throws AuthException
-     * @throws ConfigException
-     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     public function checkFileRights(string $filePath) : bool
     {
@@ -292,5 +260,15 @@ class Access extends AccessAbstract
         );
 
         return AccessHelper::camel2dashed(preg_replace('(Controller|action)', '', $methodName));
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return array
+     */
+    public function getForbiddenSelectors(\string $url) : array
+    {
+        return $this->cache->getForbiddenSelectors($url);
     }
 }

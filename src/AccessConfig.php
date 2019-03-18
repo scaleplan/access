@@ -61,23 +61,20 @@ class AccessConfig
             throw new ConfigException('Отсутствует конфигурация');
         }
 
-        if (empty($config[static::PERSISTENT_STORAGE_SECTION_NAME])) {
-            throw new ConfigException('В конфирурациии отсутствует указание постоянного хранилища');
-        }
-
-        if (empty($config[$config[static::PERSISTENT_STORAGE_SECTION_NAME]])) {
+        if (empty($config[static::PERSISTENT_STORAGE_SECTION_NAME])
+            || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['type'])
+            || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['user'])
+            || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['password'])
+            || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['dns'])) {
             throw new ConfigException(
                 'В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав'
             );
         }
 
-        if (empty($config[static::CACHE_STORAGE_SECTION_NAME])) {
-            throw new ConfigException('В конфирурациии отсутствует указание кефирующего хранилища');
-        }
-
-        if (empty($config[$config[static::CACHE_STORAGE_SECTION_NAME]])) {
+        if (empty($config[static::CACHE_STORAGE_SECTION_NAME])
+            || empty($config[static::CACHE_STORAGE_SECTION_NAME]['type'])) {
             throw new ConfigException(
-                'В конфигурации отсутствуют данные о подключениие к кэширующему хранилищу прав'
+                'В конфигурации отсутствуют необходимые данные о подключениие к кэширующему хранилищу прав'
             );
         }
 

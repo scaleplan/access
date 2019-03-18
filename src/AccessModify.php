@@ -2,10 +2,8 @@
 
 namespace Scaleplan\Access;
 
-use Scaleplan\Access\Constants\SessionConstants;
 use Scaleplan\Access\Exceptions\AccessException;
 use Scaleplan\Access\Exceptions\ConfigException;
-use Scaleplan\Redis\RedisSingleton;
 
 /**
  * Класс внесения изменений
@@ -55,43 +53,12 @@ class AccessModify extends AccessAbstract
     /**
      * @param array|null $accessRights
      *
-     * @throws AccessException
      * @throws ConfigException
-     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     public function saveAccessRightsToCache(array $accessRights = null) : void
     {
-        $cache = $this->config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME);
-        if (!$cache || empty($cache['type'])) {
-            throw new ConfigException('Нет данных для подключения к кэширующему хранилищу');
-        }
-
         $accessRights = $accessRights ?? $this->getAccessRightsFromDb();
-        switch ($cache['type']) {
-            case 'redis':
-                $this->getCSConnection()->delete("user_id:{$this->userId}");
-                if ($accessRights) {
-                    $hashValue = array_map(function ($item) {
-                        return json_encode($item, JSON_FORCE_OBJECT) ?? $item;
-                    }, array_column($accessRights, null, 'url'));
-
-                    if (!$this->getCSConnection()->hMSet("user_id:{$this->userId}", $hashValue)) {
-                        throw new AccessException('Не удалось записать права доступа в Redis');
-                    }
-                }
-
-                break;
-
-            case 'session':
-                $_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME]
-                    = array_column($accessRights, null, 'url');
-                break;
-
-            default:
-                throw new ConfigException(
-                    "Драйвер {$cache['type']} кэширующего хранилища не поддерживается системой"
-                );
-        }
+        $this->cache->saveToCache($accessRights);
     }
 
     /**
@@ -173,14 +140,14 @@ class AccessModify extends AccessAbstract
     /**
      * обавить/изменить права доступа по умолчанию для роли
      *
-     * @param int $url_id - идентификатор урла
+     * @param int $urlId - идентификатор урла
      * @param string $role - наименование роли
      *
      * @return array
      *
      * @throws AccessException
      */
-    public function addRoleAccessRight(int $url_id, string $role) : array
+    public function addRoleAccessRight(\int $urlId, \string $role) : array
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
@@ -195,7 +162,7 @@ class AccessModify extends AccessAbstract
                                 RETURNING
                                   *'
         );
-        $sth->execute(['url_id' => $url_id, 'role' => $role,]);
+        $sth->execute(['url_id' => $urlId, 'role' => $role,]);
 
         return $sth->fetchAll();
     }
@@ -203,14 +170,14 @@ class AccessModify extends AccessAbstract
     /**
      * Выдать роль пользователю
      *
-     * @param int $user_id - идентификатор пользователя
+     * @param int $userId - идентификатор пользователя
      * @param string|null $role - наименование роли
      *
      * @return array
      *
      * @throws AccessException
      */
-    public function addUserToRole(int $user_id, string $role = '') : array
+    public function addUserToRole(\int $userId, string $role = '') : array
     {
         $role = $role ?? $this->config->get(AccessConfig::DEFAULT_ROLE_LABEL_NAME);
         if (!$role) {
@@ -232,7 +199,7 @@ class AccessModify extends AccessAbstract
                         DO NOTHING
                         RETURNING
                           *');
-        $sth->execute(['role' => $role, 'user_id' => $user_id,]);
+        $sth->execute(['role' => $role, 'user_id' => $userId,]);
 
         return $sth->fetchAll();
     }
@@ -240,16 +207,16 @@ class AccessModify extends AccessAbstract
     /**
      * Добавить/изменить право дотупа
      *
-     * @param int $url_id - идентификатор урла
-     * @param int $user_id - идентификатор пользователя
-     * @param bool $is_allow - $values будут разрешающими или запрещающими
+     * @param int $urlId - идентификатор урла
+     * @param int $userId - идентификатор пользователя
+     * @param bool $isAllow - $values будут разрешающими или запрещающими
      * @param array $values - с какими значения фильтра разрешать/запрещать доступ
      *
      * @return array
      *
      * @throws AccessException
      */
-    public function addAccessRight(int $url_id, int $user_id, bool $is_allow, array $values) : array
+    public function addAccessRight(\int $urlId, \int $userId, bool $isAllow, array $values) : array
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
@@ -271,9 +238,9 @@ class AccessModify extends AccessAbstract
                                   *');
         $sth->execute(
             [
-                'url_id'   => $url_id,
-                'user_id'  => $user_id,
-                'is_allow' => $is_allow,
+                'url_id'   => $urlId,
+                'user_id'  => $userId,
+                'is_allow' => $isAllow,
                 'values'   => "{'" . implode("', '", $values) . "'}::int8[]",
             ]
         );
