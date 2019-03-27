@@ -147,7 +147,7 @@ class AccessServiceResult extends DbResult
     public function checkDocReturn(): void
     {
         $docBlock = new DocBlock($this->method ?? $this->property);
-        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
+        $denyFuzzy = $docBlock->hasTag(Access::getInstance()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
         $returnTypes = $docBlock->getTagsByName('return');
         $returnTypes = end($returnTypes);
         $returnTypes = array_map(function ($item) {

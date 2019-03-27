@@ -56,7 +56,7 @@ class AccessServiceParent
     public static function checkMethod(\ReflectionMethod $method, array &$args) : array
     {
         /** @var Access $access */
-        $access = Access::create();
+        $access = Access::getInstance();
 
         $docBlock = new DocBlock($method);
         if (empty($docBlock->getTagsByName($access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME)))) {
@@ -84,7 +84,7 @@ class AccessServiceParent
     public static function checkProperty(\ReflectionProperty $property, array &$args) : array
     {
         /** @var Access $access */
-        $access = Access::create();
+        $access = Access::getInstance();
 
         $docBlock = new DocBlock($property);
         if (empty($docBlock->getTagsByName($access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME)))) {

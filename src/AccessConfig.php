@@ -98,6 +98,10 @@ class AccessConfig
             throw new ConfigException('В конфигурации отсутствует разделитель фильтров');
         }
 
+        if (empty($config[static::DEFAULT_ROLE_LABEL_NAME])) {
+            throw new ConfigException('В конфигурации отсутствует роль пользователя по умолчанию');
+        }
+
         $this->properties = $config;
     }
 
@@ -106,7 +110,7 @@ class AccessConfig
      *
      * @return mixed|null
      */
-    public function get(\string $property)
+    public function get(string $property)
     {
         if (!\array_key_exists($property, $this->properties)) {
             return null;

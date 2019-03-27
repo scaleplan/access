@@ -16,7 +16,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class AccessAbstract
 {
-    protected const DEFAULT_USER_ID = -1;
+    protected const DEFAULT_USER_ID = 0;
     /**
      * Конфигурация
      *
@@ -29,7 +29,7 @@ abstract class AccessAbstract
      *
      * @var int
      */
-    protected $userId = 0;
+    protected $userId = self::DEFAULT_USER_ID;
 
     /**
      * @var CacheStorageInterface
@@ -51,9 +51,9 @@ abstract class AccessAbstract
      *
      * @return AccessAbstract
      */
-    public static function create(
-        \int $userId = self::DEFAULT_USER_ID,
-        \string $confPath = __DIR__ . '/../config.yml'
+    public static function getInstance(
+        int $userId = self::DEFAULT_USER_ID,
+        string $confPath = __DIR__ . '/../config.yml'
     ) : self
     {
         if (!static::$instance) {
@@ -72,17 +72,16 @@ abstract class AccessAbstract
      *
      * @throws ConfigException
      * @throws Exceptions\CacheTypeNotSupportingException
-     * @throws Exceptions\UserIdNotPresentException
      */
-    private function __construct(int $userId, string $confPath)
+    protected function __construct(int $userId, string $confPath)
     {
         $this->config = new AccessConfig(Yaml::parse(file_get_contents($confPath)));
         $this->cache = CacheStorageFabric::getInstance(
-            $this->config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME),
+            $this->config,
             $userId
         );
 
-        if ($userId < 0) {
+        if ($userId < self::DEFAULT_USER_ID) {
             throw new ConfigException('Неверное задан идентификатор пользователя');
         }
 
@@ -110,8 +109,8 @@ abstract class AccessAbstract
     {
         static $connection;
         if (!$connection) {
-            $connectionData = $this->config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME);
-            $type = $connectionData['type'];
+            $connectionData = $this->config->get(AccessConfig::PERSISTENT_STORAGE_SECTION_NAME);
+            $type = &$connectionData['type'];
             switch ($type) {
                 case 'postgresql':
                     $connection
@@ -119,7 +118,8 @@ abstract class AccessAbstract
 
                     $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
                     $connection->setAttribute(\PDO::ATTR_ORACLE_NULLS, \PDO::NULL_TO_STRING);
-                    $connection->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);;
+                    $connection->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+                    break;
 
                 default:
                     throw new ConfigException(

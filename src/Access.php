@@ -38,7 +38,7 @@ class Access extends AccessAbstract
      *
      * @return array
      */
-    public function getAccessRights(\string $url = '') : array
+    public function getAccessRights(string $url = '') : array
     {
         if ($url) {
             return $this->cache->getAccessRight($url);
@@ -267,7 +267,7 @@ class Access extends AccessAbstract
      *
      * @return array
      */
-    public function getForbiddenSelectors(\string $url) : array
+    public function getForbiddenSelectors(string $url) : array
     {
         return $this->cache->getForbiddenSelectors($url);
     }

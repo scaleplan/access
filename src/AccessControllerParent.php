@@ -36,16 +36,14 @@ class AccessControllerParent
      * @throws AccessDeniedException
      * @throws Exceptions\AccessException
      * @throws Exceptions\AuthException
-     * @throws Exceptions\ConfigException
      * @throws Exceptions\FormatException
      * @throws MethodNotFoundException
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
-     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
-    public static function checkControllerMethod(\string $className, \string $methodName, array $args): array
+    public static function checkControllerMethod(string $className, string $methodName, array $args): array
     {
         if (!\is_array($args)) {
             throw new ValidationException("Метод $methodName принимает параметры в виде массива");
@@ -63,7 +61,7 @@ class AccessControllerParent
 
         $refMethod = $refClass->getMethod($methodName);
         /** @var Access $access */
-        $access = Access::create();
+        $access = Access::getInstance();
         $docBlock = new DocBlock($refMethod);
         if (!$docBlock->getTagsByName($access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME))) {
             throw new AccessDeniedException("Метод $methodName не доступен");
@@ -90,7 +88,7 @@ class AccessControllerParent
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
-    protected static function execute(\ReflectionMethod $method, array &$args, \object $obj = null)
+    protected static function execute(\ReflectionMethod $method, array &$args, object $obj = null)
     {
         $method->setAccessible(true);
         $result = $method->invokeArgs($obj, $args);
@@ -126,13 +124,12 @@ class AccessControllerParent
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
-     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public static function __callStatic(string $methodName, array $args): AbstractResult
     {
         $args = reset($args);
-        [null, $method, &$args] = static::checkControllerMethod(static::class, $methodName, $args);
+        [$refClass, $method, $args] = static::checkControllerMethod(static::class, $methodName, $args);
         return static::execute($method, $args);
     }
 
@@ -154,13 +151,12 @@ class AccessControllerParent
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
-     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public function __call(string $methodName, array $args): AbstractResult
     {
         $args = reset($args);
-        [null, $method, &$args] = static::checkControllerMethod(static::class, $methodName, $args);
+        [$refClass, $method, $args] = static::checkControllerMethod(static::class, $methodName, $args);
         return static::execute($method, $args, $this);
     }
 }

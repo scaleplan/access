@@ -26,10 +26,10 @@ class RedisCache implements CacheStorageInterface
      * @param int $userId
      * @param AccessConfig $config
      */
-    public function __construct(\int $userId, AccessConfig $config)
+    public function __construct(int $userId, AccessConfig $config)
     {
         $this->userId = $userId;
-        $this->cacheData = $config->get('redis');
+        $this->cacheData = $config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME);
     }
 
     /**
@@ -77,7 +77,7 @@ class RedisCache implements CacheStorageInterface
     {
         return json_decode(
                 $this->getConnection()->hGet(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}", $url), true
-            ) ?? [];
+            ) ?: [];
     }
 
     /**
@@ -107,6 +107,9 @@ class RedisCache implements CacheStorageInterface
         $hashValue = array_map(function ($item) {
             return json_encode($item, JSON_FORCE_OBJECT) ?? $item;
         }, array_column($accessRights, null, DbConstants::URL_FIELD_NAME));
+        if (!$hashValue) {
+            return;
+        }
 
         if (!$this->getConnection()->hMSet(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}", $hashValue)) {
             throw new AccessException('Не удалось записать права доступа в Redis');

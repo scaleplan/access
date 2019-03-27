@@ -14,7 +14,7 @@ interface CacheStorageInterface
      *
      * @return array
      */
-    public function getAccessRight(\string $url) : array;
+    public function getAccessRight(string $url) : array;
 
     /**
      * @return array
@@ -26,7 +26,7 @@ interface CacheStorageInterface
      *
      * @return array
      */
-    public function getForbiddenSelectors(\string $url) : array;
+    public function getForbiddenSelectors(string $url) : array;
 
     /**
      * @param array $accessRights

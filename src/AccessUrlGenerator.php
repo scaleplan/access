@@ -69,8 +69,8 @@ class AccessUrlGenerator
      * @throws \ReflectionException
      */
     protected function generateControllerURLs(
-        \string $controllerFileName,
-        \string $controllerNamespace = null
+        string $controllerFileName,
+        string $controllerNamespace = null
     ) : array
     {
         $controller = trim(explode('.', $controllerFileName)[0]);

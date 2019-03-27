@@ -265,7 +265,7 @@ class AccessSanitize
             return;
         }
 
-        $denyFuzzy = $docBlock->hasTag(Access::create()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
+        $denyFuzzy = $docBlock->hasTag(Access::getInstance()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
 
         $paramTypes = array_map(function ($item) {
             return trim($item, '\\\ \0');

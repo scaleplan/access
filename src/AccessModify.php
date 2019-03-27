@@ -17,11 +17,29 @@ class AccessModify extends AccessAbstract
     public const INIT_SQL_PATH = 'access.sql';
 
     /**
-     * Инстанс класса
-     *
-     * @var null|AccessModify
+     * @var string
      */
-    protected static $instance;
+    protected $role;
+
+    public function __construct(int $userId, string $confPath)
+    {
+        parent::__construct($userId, $confPath);
+        $this->role = $this->config->get(AccessConfig::DEFAULT_ROLE_LABEL_NAME);
+    }
+
+    /**
+     * @param string $role
+     *
+     * @throws ConfigException
+     */
+    public function setRole(string $role) : void
+    {
+        if (!\in_array($role, $this->config->get(AccessConfig::ROLES_SECTION_NAME), true)) {
+            throw new ConfigException('Заданная роль не входит в список доступных ролей');
+        }
+
+        $this->role = $role;
+    }
 
     /**
      * @return array
@@ -34,18 +52,20 @@ class AccessModify extends AccessAbstract
             ->prepare('
                        SELECT 
                          u.text AS url,
-                         ar.is_allow,
+                         COALESCE(ar.is_allow, true),
                          array_to_json(ar.values) "values"
                        FROM 
                          access.url u 
-                       LEFT JOIN
-                         access.access_right ar 
-                         ON 
-                           ar.url_id = u.id
+                       LEFT JOIN access.default_right dr
+                         ON dr.url_id = u.id
+                       LEFT JOIN access.access_right ar 
+                         ON ar.url_id = u.id
                        WHERE 
-                         ar.user_id = :user_id
+                         ar.user_id = :user_id OR dr.role = :role
                     ');
-        $sth->execute(['user_id' => $this->userId]);
+        $sth->execute(
+            ['user_id' => $this->userId, 'role' => $this->role]
+        );
 
         return $sth->fetchAll();
     }
@@ -99,7 +119,7 @@ class AccessModify extends AccessAbstract
                                   name = EXCLUDED.name'
         );
         /** @var Access $access */
-        $access = Access::create($this->userId);
+        $access = Access::getInstance($this->userId);
         $urlGenerator = new AccessUrlGenerator($access);
         foreach ($urlGenerator->getAllURLs() as $arr) {
             $sth->execute($arr);
@@ -147,7 +167,7 @@ class AccessModify extends AccessAbstract
      *
      * @throws AccessException
      */
-    public function addRoleAccessRight(\int $urlId, \string $role) : array
+    public function addRoleAccessRight(int $urlId, string $role) : array
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
@@ -171,23 +191,14 @@ class AccessModify extends AccessAbstract
      * Выдать роль пользователю
      *
      * @param int $userId - идентификатор пользователя
-     * @param string|null $role - наименование роли
+     * @param string $role - наименование роли
      *
      * @return array
      *
      * @throws AccessException
      */
-    public function addUserToRole(\int $userId, string $role = '') : array
+    public function addUserToRole(int $userId, string $role) : array
     {
-        $role = $role ?? $this->config->get(AccessConfig::DEFAULT_ROLE_LABEL_NAME);
-        if (!$role) {
-            throw new ConfigException('Не задана роль по умолчанию');
-        }
-
-        if (!\in_array($role, $this->config->get(AccessConfig::ROLES_SECTION_NAME), true)) {
-            throw new ConfigException('Заданная роль не входит в список доступных ролей');
-        }
-
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
                           access.user_role
@@ -216,7 +227,7 @@ class AccessModify extends AccessAbstract
      *
      * @throws AccessException
      */
-    public function addAccessRight(\int $urlId, \int $userId, bool $isAllow, array $values) : array
+    public function addAccessRight(int $urlId, int $userId, bool $isAllow, array $values) : array
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
