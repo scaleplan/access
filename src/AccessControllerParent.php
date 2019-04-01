@@ -50,7 +50,7 @@ class AccessControllerParent
         }
 
         if (!class_exists($className)) {
-            throw new ClassNotFoundException("Метод $methodName не существует");
+            throw new ClassNotFoundException("Класс $className не существует");
         }
 
         $refClass = new \ReflectionClass($className);
@@ -63,13 +63,11 @@ class AccessControllerParent
         /** @var Access $access */
         $access = Access::getInstance();
         $docBlock = new DocBlock($refMethod);
-        if (!$docBlock->getTagsByName($access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME))) {
-            throw new AccessDeniedException("Метод $methodName не доступен");
-        }
 
         if (empty($docBlock->getTagsByName($access->getConfig()->get(AccessConfig::NO_CHECK_LABEL_NAME)))) {
             $access->checkMethodRights($refMethod, $args, $refClass);
         }
+
         dispatch(MethodAllowed::class);
 
         $args = (new AccessSanitize($refMethod, $args))->sanitizeArgs();

@@ -18,6 +18,8 @@ use phpDocumentor\Reflection\DocBlock\Tag\ParamTag;
  */
 class AccessSanitize
 {
+    public const TYPE_VALIDATION_GROUP = 'type';
+
     /**
      * Отражение метода или SQL-свойства
      *
@@ -95,6 +97,7 @@ class AccessSanitize
 
         /** @var DTO $param */
         $param = new $typeName($args);
+        $param->validate([static::TYPE_VALIDATION_GROUP]);
         $param->validate();
         return $param;
     }
@@ -130,7 +133,7 @@ class AccessSanitize
                     break;
                 }
 
-                $sanArgs = array_merge($sanArgs, array_map(function ($arg) use ($paramType, $paramName, $docBlock) {
+                $sanArgs = array_merge($sanArgs, array_map(static function ($arg) use ($paramType, $paramName, $docBlock) {
                     static::docTypeCheck($arg, $paramName, $paramType, $docBlock);
                     return $arg;
                 }, $args));
@@ -156,7 +159,7 @@ class AccessSanitize
             }
 
             static::docTypeCheck($arg, $paramName, $paramType, $docBlock);
-            \is_string($arg) && $arg = \strip_tags($arg);
+            //\is_string($arg) && $arg = \strip_tags($arg);
             $sanArgs[$paramName] = $arg;
         }
 
