@@ -53,7 +53,7 @@ class AccessModify extends AccessAbstract
                        SELECT 
                          u.text AS url,
                          COALESCE(ar.is_allow, true),
-                         array_to_json(ar.values) "values"
+                         array_to_json(ar.ids) ids
                        FROM 
                          access.url u 
                        LEFT JOIN access.default_right dr
@@ -227,7 +227,7 @@ class AccessModify extends AccessAbstract
      *
      * @throws AccessException
      */
-    public function addAccessRight(int $urlId, int $userId, bool $isAllow, array $values) : array
+    public function addAccessRight(int $urlId, int $userId, bool $isAllow, array $ids) : array
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
@@ -236,15 +236,15 @@ class AccessModify extends AccessAbstract
                                  (:url_id,
                                   :user_id,
                                   :is_allow,
-                                  :values::varchar[])
+                                  :ids::varchar[])
                                 ON CONFLICT 
                                   (url_id,
                                    user_id,
                                    is_allow,
-                                   values) 
+                                   ids) 
                                 DO UPDATE SET 
                                   is_allow = EXCLUDED.is_allow,
-                                  values = EXCLUDED.values
+                                  ids = EXCLUDED.ids
                                 RETURNING
                                   *');
         $sth->execute(
@@ -252,7 +252,7 @@ class AccessModify extends AccessAbstract
                 'url_id'   => $urlId,
                 'user_id'  => $userId,
                 'is_allow' => $isAllow,
-                'values'   => "{'" . implode("', '", $values) . "'}::int8[]",
+                'ids'   => "{'" . implode("', '", $ids) . "'}::int8[]",
             ]
         );
 
@@ -291,7 +291,7 @@ class AccessModify extends AccessAbstract
                                    user_id) 
                                 DO UPDATE SET 
                                   is_allow = EXCLUDED.is_allow,
-                                  values = EXCLUDED.values');
+                                  ids = EXCLUDED.ids');
 
         $sth->execute(['user_id' => $userId]);
 

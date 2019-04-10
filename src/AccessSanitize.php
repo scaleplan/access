@@ -140,10 +140,6 @@ class AccessSanitize
                 break;
             }
 
-            if (!array_key_exists($paramName, $args) && !$param->isOptional()) {
-                throw new ValidationException("Отсутствует необходимый параметр $paramName");
-            }
-
             if ($param->isOptional()
                 && (!array_key_exists($paramName, $args)
                     || ($args[$paramName] == $param->getDefaultValue() && $param->getDefaultValue() === null))) {
@@ -151,13 +147,17 @@ class AccessSanitize
                 continue;
             }
 
-            $arg = $args[$paramName];
             $dto = static::getDTO($args, $paramType);
             if ($dto) {
                 $sanArgs[$paramName] = $dto;
                 continue;
             }
 
+            if (!array_key_exists($paramName, $args) && !$param->isOptional()) {
+                throw new ValidationException("Отсутствует необходимый параметр $paramName");
+            }
+
+            $arg = $args[$paramName];
             static::docTypeCheck($arg, $paramName, $paramType, $docBlock);
             //\is_string($arg) && $arg = \strip_tags($arg);
             $sanArgs[$paramName] = $arg;

@@ -126,9 +126,9 @@ class Access extends AccessAbstract
         if ($filters) {
             $filters = array_map('trim', explode(',', $filters));
 
-            $accessRight[DbConstants::VALUES_FIELD_NAME] = array_map(function ($item) {
+            $accessRight[DbConstants::IDS_FIELD_NAME] = array_map(function ($item) {
                 return array_map('trim', explode($this->filterSeparator, $item));
-            }, json_decode($accessRight[DbConstants::VALUES_FIELD_NAME], true));
+            }, json_decode($accessRight[DbConstants::IDS_FIELD_NAME], true));
 
             if (empty($args)) {
                 throw new FormatException('Список параметров выполнения действия пуст');
@@ -137,7 +137,7 @@ class Access extends AccessAbstract
             $methodDefaults = null;
             $getMethodDefaults = static::getMethodDefaults($methodDefaults, $refMethod);
 
-            if (\count($accessRight[DbConstants::VALUES_FIELD_NAME][0]) !== \count($filters)) {
+            if (\count($accessRight[DbConstants::IDS_FIELD_NAME][0]) !== \count($filters)) {
                 throw new FormatException(
                     'Количество фильтрующих параметров не соответствует количеству фильтрующих значений'
                 );
@@ -160,10 +160,10 @@ class Access extends AccessAbstract
             }
 
             if (($accessRight[DbConstants::IS_ALLOW_FIELD_NAME]
-                    && !\in_array($checkValue, $accessRight[DbConstants::VALUES_FIELD_NAME], true))
+                    && !\in_array($checkValue, $accessRight[DbConstants::IDS_FIELD_NAME], true))
                 ||
                 (!$accessRight[DbConstants::IS_ALLOW_FIELD_NAME]
-                    && \in_array($checkValue, $accessRight[DbConstants::VALUES_FIELD_NAME], true))
+                    && \in_array($checkValue, $accessRight[DbConstants::IDS_FIELD_NAME], true))
             ) {
                 throw new AccessDeniedException(
                     "Выполнение метода с такими параметрами $filters Вам не разрешено"
