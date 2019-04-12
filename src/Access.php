@@ -71,6 +71,11 @@ class Access extends AccessAbstract
      * @throws AccessDeniedException
      * @throws AuthException
      * @throws FormatException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     protected function checkOnlyMethod(?\ReflectionClass $refClass, \ReflectionMethod $refMethod) : array
     {
@@ -79,10 +84,10 @@ class Access extends AccessAbstract
         $accessRight = $this->getAccessRights($url);
         if (!$accessRight) {
             if ($this->getUserId() === $this->config->get(AccessConfig::GUEST_USER_ID_DIRECTIVE_NAME)) {
-                throw new AuthException('Авторизуйтесь на сайте');
+                throw new AuthException(translate('access.lets-auth'));
             }
 
-            throw new AccessDeniedException('Метод не разрешен Вам для выпонения');
+            throw new AccessDeniedException(translate('access.method-not-allowed'));
         }
 
         return $accessRight;
@@ -118,6 +123,10 @@ class Access extends AccessAbstract
      * @throws AccessDeniedException
      * @throws FormatException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     protected function checkMethodFilters(array $accessRight, array $args, \ReflectionMethod $refMethod) : void
     {
@@ -131,16 +140,14 @@ class Access extends AccessAbstract
             }, json_decode($accessRight[DbConstants::IDS_FIELD_NAME], true));
 
             if (empty($args)) {
-                throw new FormatException('Список параметров выполнения действия пуст');
+                throw new FormatException(translate('access.parameter-list-empty'));
             }
 
             $methodDefaults = null;
             $getMethodDefaults = static::getMethodDefaults($methodDefaults, $refMethod);
 
             if (\count($accessRight[DbConstants::IDS_FIELD_NAME][0]) !== \count($filters)) {
-                throw new FormatException(
-                    'Количество фильтрующих параметров не соответствует количеству фильтрующих значений'
-                );
+                throw new FormatException(translate('access.parameters-lists-mismatch'));
             }
 
             $checkValue = [];
