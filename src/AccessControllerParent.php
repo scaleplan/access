@@ -115,7 +115,6 @@ class AccessControllerParent
      * @throws AccessDeniedException
      * @throws Exceptions\AccessException
      * @throws Exceptions\AuthException
-     * @throws Exceptions\ConfigException
      * @throws Exceptions\FormatException
      * @throws MethodNotFoundException
      * @throws ValidationException
@@ -142,7 +141,6 @@ class AccessControllerParent
      * @throws AccessDeniedException
      * @throws Exceptions\AccessException
      * @throws Exceptions\AuthException
-     * @throws Exceptions\ConfigException
      * @throws Exceptions\FormatException
      * @throws MethodNotFoundException
      * @throws ValidationException

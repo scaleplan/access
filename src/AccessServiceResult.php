@@ -150,7 +150,7 @@ class AccessServiceResult extends DbResult
         $denyFuzzy = $docBlock->hasTag(Access::getInstance()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
         $returnTypes = $docBlock->getTagsByName('return');
         $returnTypes = end($returnTypes);
-        $returnTypes = array_map(function ($item) {
+        $returnTypes = array_map(static function ($item) {
             return trim($item, '\\\ \0');
         }, explode('|', $returnTypes));
 

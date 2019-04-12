@@ -60,7 +60,7 @@ class RedisCache implements CacheStorageInterface
      */
     public function getAllAccessRights() : array
     {
-        return array_map(function ($item) {
+        return array_map(static function ($item) {
             return json_decode($item, true) ?? $item;
         }, array_filter($this->getConnection()->hGetAll(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}")));
     }
@@ -104,7 +104,7 @@ class RedisCache implements CacheStorageInterface
     public function saveToCache(array $accessRights) : void
     {
         $this->getConnection()->delete(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}");
-        $hashValue = array_map(function ($item) {
+        $hashValue = array_map(static function ($item) {
             return json_encode($item, JSON_FORCE_OBJECT) ?? $item;
         }, array_column($accessRights, null, DbConstants::URL_FIELD_NAME));
         if (!$hashValue) {

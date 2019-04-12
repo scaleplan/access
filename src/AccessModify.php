@@ -136,7 +136,7 @@ class AccessModify extends AccessAbstract
             $roles["value{$index}"] = $role;
         }
 
-        $rolesPlaceholders = implode(',', array_map(function ($item) {
+        $rolesPlaceholders = implode(',', array_map(static function ($item) {
             return ":$item";
         }, array_keys($roles)));
         $sth = $this->getPSConnection()->prepare("CREATE TYPE access.roles AS ENUM ($rolesPlaceholders)");
@@ -221,7 +221,7 @@ class AccessModify extends AccessAbstract
      * @param int $urlId - идентификатор урла
      * @param int $userId - идентификатор пользователя
      * @param bool $isAllow - $values будут разрешающими или запрещающими
-     * @param array $values - с какими значения фильтра разрешать/запрещать доступ
+     * @param array $ids - с какими значения фильтра разрешать/запрещать доступ
      *
      * @return array
      *

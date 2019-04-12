@@ -143,7 +143,7 @@ class AccessUrlGenerator
 
         foreach ($paths as &$path) {
             if (is_dir("$dir/$path")) {
-                $result = \array_merge($result, array_map(function ($item) use ($path, $dir) {
+                $result = \array_merge($result, array_map(static function ($item) use ($path, $dir) {
                     return "$dir/$path/$item";
                 }, $this->getRecursivePaths("$dir/$path")));
             } else {
@@ -179,7 +179,7 @@ class AccessUrlGenerator
                 );
             }
 
-            $controllers = array_map(function ($item) use ($controllerDir) {
+            $controllers = array_map(static function ($item) use ($controllerDir) {
                 return trim(str_replace($controllerDir['path'], '', $item), '\/ ');
             }, $this->getRecursivePaths($controllerDir['path']));
 
@@ -205,7 +205,7 @@ class AccessUrlGenerator
 
         $urls = [];
         foreach ($this->config->get(AccessConfig::FILES_SECTION_NAME) as $fileDir) {
-            $urls = array_merge($urls, array_map(function ($item) use ($fileDir) {
+            $urls = array_merge($urls, array_map(static function ($item) use ($fileDir) {
                 return [
                     'text'          => trim(str_replace($fileDir, '', $item), '\/ '),
                     'name'          => null,
@@ -225,7 +225,7 @@ class AccessUrlGenerator
      */
     public function getPlainURLs() : array
     {
-        return array_map(function ($item) {
+        return array_map(static function ($item) {
             return [
                 'text'          => trim($item, '\/ '),
                 'name'          => null,

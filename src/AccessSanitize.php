@@ -270,7 +270,7 @@ class AccessSanitize
 
         $denyFuzzy = $docBlock->hasTag(Access::getInstance()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
 
-        $paramTypes = array_map(function ($item) {
+        $paramTypes = array_map(static function ($item) {
             return trim($item, '\\\ \0');
         }, explode('|', $paramType));
 
@@ -297,7 +297,7 @@ class AccessSanitize
         }
 
         $argType = \gettype($value);
-        if ($argType === 'object' && !array_filter($types, function ($type) use ($value, $denyFuzzy, $argType) {
+        if ($argType === 'object' && !array_filter($types, static function ($type) use ($value, $denyFuzzy, $argType) {
                 $result = $value instanceof $type;
                 if (!$result && !$denyFuzzy) {
                     $result = preg_match("/^(\w+\\)*$type$/", $argType);
