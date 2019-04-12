@@ -42,17 +42,22 @@ class AccessSanitize
     protected $sanitizedArgs;
 
     /**
-     * Конструктор
+     * AccessSanitize constructor.
      *
      * @param \Reflector $reflector - отражение метода или SQL-свойства
      * @param array $args - массив аргументов
      *
-     * @throws AccessException
+     * @throws SupportingException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function __construct(\Reflector $reflector, array $args)
     {
         if (!($reflector instanceof \ReflectionMethod) && !($reflector instanceof \ReflectionProperty)) {
-            throw new SupportingException();
+            throw new SupportingException(translate('access.allows-reflections-only'));
         }
 
         $this->reflector = $reflector;
@@ -68,6 +73,10 @@ class AccessSanitize
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function sanitizeArgs(): array
     {
@@ -114,6 +123,10 @@ class AccessSanitize
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public static function sanitizeMethodArgs(\ReflectionMethod $method, array $args): array
     {
@@ -154,7 +167,9 @@ class AccessSanitize
             }
 
             if (!array_key_exists($paramName, $args) && !$param->isOptional()) {
-                throw new ValidationException("Отсутствует необходимый параметр $paramName");
+                throw new ValidationException(
+                    translate('access.required-parameter-missing', [':parameter' => $paramName])
+                );
             }
 
             $arg = $args[$paramName];
@@ -174,7 +189,12 @@ class AccessSanitize
      *
      * @return array
      *
-     * @throws AccessException
+     * @throws ValidationException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public static function sanitizeSQLPropertyArgs(\ReflectionProperty $property, array $args): array
     {
@@ -221,12 +241,17 @@ class AccessSanitize
      * @param array $args - массив аргументов
      * @param array $optionParams - массив опциональных параметров
      *
-     * @throws AccessException
+     * @throws ValidationException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     protected static function argAvailabilityCheck(string $paramName, array $args, array $optionParams): void
     {
         if (!array_key_exists($paramName, $args) && !array_key_exists($paramName, $optionParams)) {
-            throw new ValidationException("Не хватает параметра $paramName");
+            throw new ValidationException(translate('access.required-parameter-missing', [':parameter' => $paramName]));
         }
     }
 
@@ -260,7 +285,12 @@ class AccessSanitize
      * @param string $paramType - требуемый тип или группа типов
      * @param DocBlock $docBlock - ссылка объект DOCBLOCK метода или свойства
      *
-     * @throws AccessException
+     * @throws ValidationException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     protected static function docTypeCheck(&$arg, string $paramName, string $paramType, DocBlock $docBlock): void
     {
@@ -276,7 +306,7 @@ class AccessSanitize
 
         if (!static::typeCheck($arg, $paramTypes, $denyFuzzy)) {
             throw new ValidationException(
-                "Тип параметра $paramName не соответствует заданному типу $paramType"
+                translate('access.parameter-type-mismatch', [':parameter' => $paramName, ':type' => $paramType])
             );
         }
     }

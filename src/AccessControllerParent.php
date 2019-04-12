@@ -34,6 +34,7 @@ class AccessControllerParent
      * @return array
      *
      * @throws AccessDeniedException
+     * @throws ClassNotFoundException
      * @throws Exceptions\AccessException
      * @throws Exceptions\AuthException
      * @throws Exceptions\FormatException
@@ -41,22 +42,26 @@ class AccessControllerParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      */
     public static function checkControllerMethod(string $className, string $methodName, array $args): array
     {
         if (!\is_array($args)) {
-            throw new ValidationException("Метод $methodName принимает параметры в виде массива");
+            throw new ValidationException(translate('access.method-accept-array', [':method' => $methodName]));
         }
 
         if (!class_exists($className)) {
-            throw new ClassNotFoundException("Класс $className не существует");
+            throw new ClassNotFoundException(translate('access.class-does-not-exist', [':class' => $className]));
         }
 
         $refClass = new \ReflectionClass($className);
 
         if (!$refClass->hasMethod($methodName)) {
-            throw new MethodNotFoundException("Метод $methodName не существует");
+            throw new MethodNotFoundException(translate('access.method-does-not-exist', [':method' => $methodName]));
         }
 
         $refMethod = $refClass->getMethod($methodName);
@@ -111,8 +116,8 @@ class AccessControllerParent
      * @param array $args - массив аргументов
      *
      * @return AbstractResult
-     *
      * @throws AccessDeniedException
+     * @throws ClassNotFoundException
      * @throws Exceptions\AccessException
      * @throws Exceptions\AuthException
      * @throws Exceptions\FormatException
@@ -120,6 +125,10 @@ class AccessControllerParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
@@ -137,8 +146,8 @@ class AccessControllerParent
      * @param array $args - массив аргументов
      *
      * @return AbstractResult
-     *
      * @throws AccessDeniedException
+     * @throws ClassNotFoundException
      * @throws Exceptions\AccessException
      * @throws Exceptions\AuthException
      * @throws Exceptions\FormatException
@@ -146,6 +155,10 @@ class AccessControllerParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */

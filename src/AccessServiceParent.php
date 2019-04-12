@@ -25,16 +25,23 @@ class AccessServiceParent
      *
      * @throws SupportingException
      * @throws ValidationException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     protected static function formatArgs(array &$args, \Reflector $reflector) : array
     {
         if (!($reflector instanceof \ReflectionMethod) && !($reflector instanceof \ReflectionProperty)) {
-            throw new SupportingException();
+            throw new SupportingException(translate('access.allows-reflections-only'));
         }
 
         $args = $args ? reset($args) : $args;
         if (!\is_array($args)) {
-            throw new ValidationException("Метод {$reflector->getName()} принимает параметры в виде массива");
+            throw new ValidationException(
+                translate('access.method-accept-array', [':method' => $reflector->getName()])
+            );
         }
 
         return $args;
@@ -52,6 +59,10 @@ class AccessServiceParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public static function checkMethod(\ReflectionMethod $method, array &$args) : array
     {
@@ -60,7 +71,7 @@ class AccessServiceParent
 
         $docBlock = new DocBlock($method);
         if (empty($docBlock->getTagsByName($access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME)))) {
-            throw new AccessDeniedException("Метод {$method->getName()} не доступен");
+            throw new AccessDeniedException(translate('access.method-not-allowed', [':method' => $method->getName()]));
         }
 
         static::formatArgs($args, $method);
@@ -80,6 +91,10 @@ class AccessServiceParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public static function checkProperty(\ReflectionProperty $property, array &$args) : array
     {
@@ -88,7 +103,7 @@ class AccessServiceParent
 
         $docBlock = new DocBlock($property);
         if (empty($docBlock->getTagsByName($access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME)))) {
-            throw new AccessException("Свойство {$property->getName()} не доступно");
+            throw new AccessException(translate('access.property-not-allowed', [':property' => $property->getName()]));
         }
 
         static::formatArgs($args, $property);
@@ -111,6 +126,10 @@ class AccessServiceParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     protected static function checkServiceMethodEssence(string $methodName, array $args) : AccessServiceResult
@@ -149,7 +168,7 @@ class AccessServiceParent
             );
         }
 
-        throw new AccessException("Метод $methodName не существует");
+        throw new AccessException(translate('access.method-does-not-exist', [':method' => $methodName]));
     }
 
     /**
@@ -166,6 +185,10 @@ class AccessServiceParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public static function __callStatic(string $methodName, array $args) : AccessServiceResult
@@ -187,6 +210,10 @@ class AccessServiceParent
      * @throws ValidationException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     public function __call(string $methodName, array $args) : AccessServiceResult

@@ -143,6 +143,11 @@ class AccessServiceResult extends DbResult
 
     /**
      * @throws ValidationException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function checkDocReturn(): void
     {
@@ -150,14 +155,12 @@ class AccessServiceResult extends DbResult
         $denyFuzzy = $docBlock->hasTag(Access::getInstance()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
         $returnTypes = $docBlock->getTagsByName('return');
         $returnTypes = end($returnTypes);
-        $returnTypes = array_map(static function ($item) {
+        $returnTypesArray = array_map(static function ($item) {
             return trim($item, '\\\ \0');
         }, explode('|', $returnTypes));
 
-        if (!AccessSanitize::typeCheck($this->result, $returnTypes, $denyFuzzy)) {
-            throw new ValidationException(
-                "Тип возвращаемого значения не соответствует заданному типу $returnTypes"
-            );
+        if (!AccessSanitize::typeCheck($this->result, $returnTypesArray, $denyFuzzy)) {
+            throw new ValidationException(translate('access.return-type-mismatch', [':type' => $returnTypes]));
         }
     }
 }

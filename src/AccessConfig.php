@@ -54,11 +54,16 @@ class AccessConfig
      * @param array $config
      *
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function __construct(array $config)
     {
         if (empty($config)) {
-            throw new ConfigException('Отсутствует конфигурация');
+            throw new ConfigException(translate('access.config-missing'));
         }
 
         if (empty($config[static::PERSISTENT_STORAGE_SECTION_NAME])
@@ -66,40 +71,37 @@ class AccessConfig
             || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['user'])
             || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['password'])
             || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['dns'])) {
-            throw new ConfigException(
-                'В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав'
+            throw new ConfigException(translate('access.db-config-missing')
             );
         }
 
         if (empty($config[static::CACHE_STORAGE_SECTION_NAME])
             || empty($config[static::CACHE_STORAGE_SECTION_NAME]['type'])) {
-            throw new ConfigException(
-                'В конфигурации отсутствуют необходимые данные о подключениие к кэширующему хранилищу прав'
-            );
+            throw new ConfigException(translate('access.cache-config-missing'));
         }
 
         if (!isset($config[static::ROLES_SECTION_NAME])) {
-            throw new ConfigException('Отсутствует список ролей');
+            throw new ConfigException(translate('access.roles-missing'));
         }
 
         if (!\is_array($config[static::ROLES_SECTION_NAME])) {
-            throw new ConfigException('Список ролей должен быть задан списком');
+            throw new ConfigException(translate('access.roles-list-incorrect'));
         }
 
         if (empty($config[static::FILTER_DIRECTIVE_NAME])) {
-            throw new ConfigException('В конфигурации отсутствует имя для метки фильтрующего аргумента');
+            throw new ConfigException(translate('access.filter-field-config-missing'));
         }
 
         if (empty($config[static::ANNOTATION_LABEL_NAME])) {
-            throw new ConfigException('В конфигурации отсутствует имя метки Access');
+            throw new ConfigException(translate('access.access-check-config-lanel-missing'));
         }
 
         if (empty($config[static::FILTER_SEPARATOR_NAME])) {
-            throw new ConfigException('В конфигурации отсутствует разделитель фильтров');
+            throw new ConfigException(translate('access.filter-delimiter-config-missing'));
         }
 
         if (empty($config[static::DEFAULT_ROLE_LABEL_NAME])) {
-            throw new ConfigException('В конфигурации отсутствует роль пользователя по умолчанию');
+            throw new ConfigException(translate('access.default-role-config-missing'));
         }
 
         $this->properties = $config;

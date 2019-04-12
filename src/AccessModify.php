@@ -31,11 +31,16 @@ class AccessModify extends AccessAbstract
      * @param string $role
      *
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function setRole(string $role) : void
     {
         if (!\in_array($role, $this->config->get(AccessConfig::ROLES_SECTION_NAME), true)) {
-            throw new ConfigException('Заданная роль не входит в список доступных ролей');
+            throw new ConfigException(translate('access.role-does-not-exist'));
         }
 
         $this->role = $role;
@@ -45,6 +50,11 @@ class AccessModify extends AccessAbstract
      * @return array
      *
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function getAccessRightsFromDb() : array
     {
@@ -74,6 +84,11 @@ class AccessModify extends AccessAbstract
      * @param array|null $accessRights
      *
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function saveAccessRightsToCache(array $accessRights = null) : void
     {
@@ -82,9 +97,14 @@ class AccessModify extends AccessAbstract
     }
 
     /**
-     * Залить в базу данных схему для работы с Access
+     * Залить в базу данных схему для работы с правами доступа
      *
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function initSQLScheme() : void
     {
@@ -96,6 +116,11 @@ class AccessModify extends AccessAbstract
      * @throws ConfigException
      * @throws Exceptions\FormatException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
+     * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
     public function initPersistentScheme() : void
     {
@@ -128,6 +153,11 @@ class AccessModify extends AccessAbstract
 
     /**
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function initPersistentStorageTypes() : void
     {
@@ -149,6 +179,11 @@ class AccessModify extends AccessAbstract
      * @throws ConfigException
      * @throws Exceptions\FormatException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
+     * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
     public function initPersistentStorage() : void
     {
@@ -158,14 +193,19 @@ class AccessModify extends AccessAbstract
     }
 
     /**
-     * обавить/изменить права доступа по умолчанию для роли
+     * Добавить/изменить права доступа по умолчанию для роли
      *
      * @param int $urlId - идентификатор урла
      * @param string $role - наименование роли
      *
      * @return array
      *
-     * @throws AccessException
+     * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function addRoleAccessRight(int $urlId, string $role) : array
     {
@@ -195,7 +235,12 @@ class AccessModify extends AccessAbstract
      *
      * @return array
      *
-     * @throws AccessException
+     * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function addUserToRole(int $userId, string $role) : array
     {
@@ -225,7 +270,12 @@ class AccessModify extends AccessAbstract
      *
      * @return array
      *
-     * @throws AccessException
+     * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function addAccessRight(int $urlId, int $userId, bool $isAllow, array $ids) : array
     {
@@ -266,7 +316,12 @@ class AccessModify extends AccessAbstract
      *
      * @return array
      *
-     * @throws AccessException
+     * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function shiftAccessRightFromRole(int $userId) : array
     {

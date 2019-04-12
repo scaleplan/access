@@ -36,6 +36,11 @@ class RedisCache implements CacheStorageInterface
      * @return \Redis
      *
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     protected function getConnection() : \Redis
@@ -43,7 +48,7 @@ class RedisCache implements CacheStorageInterface
         static $connection;
         if (!$connection) {
             if (empty($this->cacheData['socket'])) {
-                throw new ConfigException('В конфигурации не задан путь к Redis-сокету');
+                throw new ConfigException(translate('access.redis-socket-not-set'));
             }
 
             $connection = RedisSingleton::create($this->cacheData['socket']);
@@ -56,6 +61,11 @@ class RedisCache implements CacheStorageInterface
      * @return array
      *
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     public function getAllAccessRights() : array
@@ -71,6 +81,11 @@ class RedisCache implements CacheStorageInterface
      * @return array
      *
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     public function getAccessRight(string $url) : array
@@ -86,6 +101,11 @@ class RedisCache implements CacheStorageInterface
      * @return array
      *
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     public function getForbiddenSelectors(string $url) : array
@@ -99,6 +119,11 @@ class RedisCache implements CacheStorageInterface
      *
      * @throws AccessException
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
     public function saveToCache(array $accessRights) : void
@@ -112,7 +137,7 @@ class RedisCache implements CacheStorageInterface
         }
 
         if (!$this->getConnection()->hMSet(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}", $hashValue)) {
-            throw new AccessException('Не удалось записать права доступа в Redis');
+            throw new AccessException(translate('access.redis-access-rights-write-failed'));
         }
     }
 }

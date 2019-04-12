@@ -5,7 +5,10 @@ namespace Scaleplan\Access;
 use Scaleplan\Access\CacheStorage\CacheStorageFabric;
 use Scaleplan\Access\CacheStorage\CacheStorageInterface;
 use Scaleplan\Access\Exceptions\ConfigException;
+use function Scaleplan\DependencyInjection\get_required_container;
+use function Scaleplan\Helpers\get_required_env;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Суперкласс
@@ -72,6 +75,12 @@ abstract class AccessAbstract
      *
      * @throws ConfigException
      * @throws Exceptions\CacheTypeNotSupportingException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
+     * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
     protected function __construct(int $userId, string $confPath)
     {
@@ -82,10 +91,15 @@ abstract class AccessAbstract
         );
 
         if ($userId < self::DEFAULT_USER_ID) {
-            throw new ConfigException('Неверное задан идентификатор пользователя');
+            throw new ConfigException(translate('access.incorrect-user-id'));
         }
 
         $this->userId = $userId;
+
+        $locale = locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']) ?: get_required_env('DEFAULT_LANG');
+        /** @var \Symfony\Component\Translation\Translator $translator */
+        $translator = get_required_container(TranslatorInterface::class, [$locale]);
+        $translator->addResource('yml', __DIR__ . "/translates/$locale/access.yml", $locale, 'access');
     }
 
     /**
@@ -104,6 +118,11 @@ abstract class AccessAbstract
      * @return \PDO
      *
      * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function getPSConnection() : \PDO
     {
@@ -122,9 +141,7 @@ abstract class AccessAbstract
                     break;
 
                 default:
-                    throw new ConfigException(
-                        "Драйвер $type постоянного хранилища не поддерживается системой"
-                    );
+                    throw new ConfigException(translate('access.incorrect-db-driver', [':driver' => $type]));
             }
         }
 

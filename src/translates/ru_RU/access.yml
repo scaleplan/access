@@ -1,0 +1,32 @@
+lets-auth: Авторизуйтесь на сайте
+method-not-allowed: Метод :method не разрешен Вам для выпонения
+property-not-allowed: Свойство :property не доступно
+parameter-list-empty: Список параметров выполнения действия пуст
+parameters-lists-mismatch: Количество фильтрующих параметров не соответствует количеству фильтрующих значений
+filters-mismatch: Список параметров выполнения действия не содержит все фильтрующие параметры
+id-not-allowed: Выполнение метода с такими параметрами :filters Вам не разрешено
+file-not-allowed: Файл Вам не доступен
+path-missing: 'Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"'
+incorrect-user-id: Неверное задан идентификатор пользователя
+incorrect-db-driver: Драйвер :driver постоянного хранилища не поддерживается системой
+config-missing: Отсутствует конфигурация
+db-config-missing: В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав
+cache-config-missing: В конфигурации отсутствуют необходимые данные о подключениие к кэширующему хранилищу прав
+roles-missing: Отсутствует список ролей
+roles-list-incorrect: Список ролей должен быть задан списком
+filter-field-config-missing: В конфигурации отсутствует имя для метки фильтрующего аргумента
+access-check-config-lanel-missing: В конфигурации отсутствует имя метки проверки прав
+filter-delimiter-config-missing: В конфигурации отсутствует разделитель фильтров
+default-role-config-missing: В конфигурации отсутствует роль пользователя по умолчанию
+method-accept-array: Метод :method принимает параметры в виде массива
+class-does-not-exist: Класс :class не существует
+method-does-not-exist: Метод :method не существует
+role-does-not-exist: Заданная роль не входит в список доступных ролей
+allows-reflections-only: Разрешены только отражения методов и свойств
+required-parameter-missing: Отсутствует необходимый параметр :parameter
+parameter-type-mismatch: Тип параметра :parameter не соответствует заданному типу :type
+return-type-mismatch: Тип возвращаемого значения не соответствует заданному типу :type
+cache-type-not-supporting: Тип кэша :type не поддерживается
+redis-socket-not-set: В конфигурации не задан путь к Redis-сокету
+redis-access-rights-write-failed: Не удалось записать права доступа в Redis
+

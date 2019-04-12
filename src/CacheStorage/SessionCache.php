@@ -27,7 +27,7 @@ class SessionCache implements CacheStorageInterface
      */
     public function getAllAccessRights() : array
     {
-        return $_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME] ?? [];
+        return (array)($_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME] ?? []);
     }
 
     /**

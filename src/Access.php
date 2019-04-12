@@ -87,7 +87,9 @@ class Access extends AccessAbstract
                 throw new AuthException(translate('access.lets-auth'));
             }
 
-            throw new AccessDeniedException(translate('access.method-not-allowed'));
+            throw new AccessDeniedException(
+                translate('access.method-not-allowed', [':method' => $refMethod->getName()])
+            );
         }
 
         return $accessRight;
@@ -161,9 +163,7 @@ class Access extends AccessAbstract
             }
 
             if (array_intersect($filters, array_keys($args)) !== $filters) {
-                throw new FormatException(
-                    'Список параметров выполнения действия не содержит все фильтрующие параметры'
-                );
+                throw new FormatException(translate('access.filters-mismatch'));
             }
 
             if (($accessRight[DbConstants::IS_ALLOW_FIELD_NAME]
@@ -172,9 +172,7 @@ class Access extends AccessAbstract
                 (!$accessRight[DbConstants::IS_ALLOW_FIELD_NAME]
                     && \in_array($checkValue, $accessRight[DbConstants::IDS_FIELD_NAME], true))
             ) {
-                throw new AccessDeniedException(
-                    "Выполнение метода с такими параметрами $filters Вам не разрешено"
-                );
+                throw new AccessDeniedException(translate('access.id-not-allowed', [':filters' => $filters]));
             }
         }
     }
@@ -192,6 +190,10 @@ class Access extends AccessAbstract
      * @throws AuthException
      * @throws FormatException
      * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function checkMethodRights(
         \ReflectionMethod $refMethod,
@@ -224,15 +226,20 @@ class Access extends AccessAbstract
      *
      * @throws AccessDeniedException
      * @throws AuthException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function checkFileRights(string $filePath) : bool
     {
         if (empty($accessRight = $this->getAccessRights($filePath))) {
             if ($this->getUserId() === $this->config->get(AccessConfig::GUEST_USER_ID_DIRECTIVE_NAME)) {
-                throw new AuthException('Авторизуйтесь на сайте');
+                throw new AuthException(translate('access.lets-auth'));
             }
 
-            throw new AccessDeniedException('Файл Вам не доступен');
+            throw new AccessDeniedException(translate('access.file-not-allowed'));
         }
 
         return true;
@@ -247,14 +254,17 @@ class Access extends AccessAbstract
      * @return string
      *
      * @throws FormatException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function methodToURL(string $className, string $methodName) : string
     {
         foreach ($this->config->get(AccessConfig::CONTROLLERS_SECTION_NAME) as $controllerDir) {
             if (empty($controllerDir['path'])) {
-                throw new FormatException(
-                    'Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"'
-                );
+                throw new FormatException(translate('access.path-missing'));
             }
 
             $className = str_replace($controllerDir['namespace'], '', $className);

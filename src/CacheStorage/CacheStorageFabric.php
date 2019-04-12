@@ -24,6 +24,11 @@ class CacheStorageFabric
      * @return CacheStorageInterface
      *
      * @throws CacheTypeNotSupportingException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public static function getInstance(
         AccessConfig $config,
@@ -43,7 +48,9 @@ class CacheStorageFabric
                 return new SessionCache();
 
             default:
-                throw new CacheTypeNotSupportingException();
+                throw new CacheTypeNotSupportingException(
+                    translate('access.cache-type-not-supporting', [':type' => $cacheType])
+                );
         }
     }
 }
