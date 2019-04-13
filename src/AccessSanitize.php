@@ -8,6 +8,7 @@ use Scaleplan\Access\Exceptions\SupportingException;
 use Scaleplan\Access\Exceptions\ValidationException;
 use Scaleplan\DTO\DTO;
 use phpDocumentor\Reflection\DocBlock\Tag\ParamTag;
+use function Scaleplan\Translator\translate;
 
 /**
  * Класс проверки аргументов выполнения

@@ -7,6 +7,7 @@ use Scaleplan\Access\Exceptions\AccessDeniedException;
 use Scaleplan\Access\Exceptions\AccessException;
 use Scaleplan\Access\Exceptions\SupportingException;
 use Scaleplan\Access\Exceptions\ValidationException;
+use function Scaleplan\Translator\translate;
 
 /**
  * Родитель для моделей - для проверки аргументов

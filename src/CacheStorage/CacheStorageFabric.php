@@ -4,6 +4,7 @@ namespace Scaleplan\Access\CacheStorage;
 
 use Scaleplan\Access\AccessConfig;
 use Scaleplan\Access\Exceptions\CacheTypeNotSupportingException;
+use function Scaleplan\Translator\translate;
 
 /**
  * Class CacheStorageFabric

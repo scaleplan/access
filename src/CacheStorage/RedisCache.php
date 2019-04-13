@@ -7,6 +7,7 @@ use Scaleplan\Access\Constants\DbConstants;
 use Scaleplan\Access\Exceptions\AccessException;
 use Scaleplan\Access\Exceptions\ConfigException;
 use Scaleplan\Redis\RedisSingleton;
+use function Scaleplan\Translator\translate;
 
 class RedisCache implements CacheStorageInterface
 {

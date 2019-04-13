@@ -4,6 +4,7 @@ namespace Scaleplan\Access;
 
 use Scaleplan\Access\Exceptions\AccessException;
 use Scaleplan\Access\Exceptions\ConfigException;
+use function Scaleplan\Translator\translate;
 
 /**
  * Класс внесения изменений
