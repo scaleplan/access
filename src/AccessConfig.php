@@ -3,6 +3,7 @@
 namespace Scaleplan\Access;
 
 use Scaleplan\Access\Exceptions\ConfigException;
+use function Scaleplan\Translator\translate;
 
 /**
  * Class AccessConfig

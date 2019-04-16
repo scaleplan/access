@@ -7,6 +7,7 @@ use Scaleplan\Access\Constants\DbConstants;
 use Scaleplan\Access\Exceptions\AccessDeniedException;
 use Scaleplan\Access\Exceptions\AuthException;
 use Scaleplan\Access\Exceptions\FormatException;
+use function Scaleplan\Translator\translate;
 
 /**
  * Класс формирования списка урлов и проверки прав
@@ -45,21 +46,6 @@ class Access extends AccessAbstract
         }
 
         return $this->cache->getAllAccessRights();
-    }
-
-    /**
-     * @param \ReflectionMethod $refMethod
-     *
-     * @return DocBlock|null
-     */
-    protected function getMethodDocBlock(\ReflectionMethod $refMethod) : ?DocBlock
-    {
-        $docBlock = new DocBlock($refMethod);
-        if (!$tag = $docBlock->getTagsByName($this->config->get(AccessConfig::ANNOTATION_LABEL_NAME))) {
-            return null;
-        }
-
-        return $docBlock;
     }
 
     /**
@@ -201,9 +187,9 @@ class Access extends AccessAbstract
         \ReflectionClass $refClass = null
     ) : bool
     {
-        $docBlock = $this->getMethodDocBlock($refMethod);
+        $docBlock = new DocBlock($refMethod);
         if (!$docBlock) {
-            return true;
+            return false;
         }
 
         $accessRight = $this->checkOnlyMethod($refClass, $refMethod);
@@ -267,7 +253,8 @@ class Access extends AccessAbstract
                 throw new FormatException(translate('access.path-missing'));
             }
 
-            $className = str_replace($controllerDir['namespace'], '', $className);
+            $className = strtr($className, [$controllerDir['namespace'] => '', $controllerDir['class_postfix'] => '']);
+            $methodName = str_replace($controllerDir['method_prefix'], '', $methodName);
         }
 
         $methodName = str_replace(
@@ -276,7 +263,7 @@ class Access extends AccessAbstract
             trim($className, '\/ ') . '\\' . trim($methodName, '\/ ')
         );
 
-        return AccessHelper::camel2dashed(preg_replace('(Controller|action)', '', $methodName));
+        return AccessHelper::camel2dashed($methodName);
     }
 
     /**

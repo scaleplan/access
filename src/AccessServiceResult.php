@@ -5,6 +5,7 @@ namespace Scaleplan\Access;
 use phpDocumentor\Reflection\DocBlock;
 use Scaleplan\Access\Exceptions\ValidationException;
 use Scaleplan\Result\DbResult;
+use function Scaleplan\Translator\translate;
 
 /**
  * Класс результата выполнения модели

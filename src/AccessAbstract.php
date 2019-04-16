@@ -7,6 +7,7 @@ use Scaleplan\Access\CacheStorage\CacheStorageInterface;
 use Scaleplan\Access\Exceptions\ConfigException;
 use function Scaleplan\DependencyInjection\get_required_container;
 use function Scaleplan\Helpers\get_required_env;
+use function Scaleplan\Translator\translate;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

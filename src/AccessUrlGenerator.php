@@ -6,6 +6,7 @@ use phpDocumentor\Reflection\DocBlock;
 use Scaleplan\Access\Exceptions\FormatException;
 use function Scaleplan\DependencyInjection\get_required_container;
 use function Scaleplan\Helpers\get_required_env;
+use function Scaleplan\Translator\translate;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**

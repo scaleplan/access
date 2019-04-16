@@ -14,6 +14,7 @@ use function Scaleplan\Event\dispatch;
 use Scaleplan\Result\AbstractResult;
 use Scaleplan\Result\DbResult;
 use Scaleplan\Result\HTMLResult;
+use function Scaleplan\Translator\translate;
 
 /**
  * Родитель для контроллеров - проверка прав доступа, фильтрация параметров
