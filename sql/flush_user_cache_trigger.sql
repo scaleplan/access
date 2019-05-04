@@ -25,7 +25,7 @@ CREATE TRIGGER
 AFTER
 	INSERT OR UPDATE OR DELETE
 ON
-	access.access_right
+	access.user_right
 FOR EACH ROW
 EXECUTE PROCEDURE
 	access.right_update();
