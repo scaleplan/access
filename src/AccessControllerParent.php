@@ -26,6 +26,21 @@ use function Scaleplan\Translator\translate;
 class AccessControllerParent
 {
     /**
+     * @var Access
+     */
+    protected $access;
+
+    /**
+     * AccessControllerParent constructor.
+     *
+     * @param Access $access
+     */
+    public function __construct(Access $access)
+    {
+        $this->access = $access;
+    }
+
+    /**
      * Проверка прав доступа и входных данных для метода
      *
      * @param string $className - имя класса
@@ -49,7 +64,7 @@ class AccessControllerParent
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      */
-    public static function checkControllerMethod(string $className, string $methodName, array $args): array
+    public function checkControllerMethod(string $className, string $methodName, array $args): array
     {
         if (!\is_array($args)) {
             throw new ValidationException(translate('access.method-accept-array', [':method' => $methodName]));
@@ -66,12 +81,10 @@ class AccessControllerParent
         }
 
         $refMethod = $refClass->getMethod($methodName);
-        /** @var Access $access */
-        $access = Access::getInstance();
         $docBlock = new DocBlock($refMethod);
 
-        if (empty($docBlock->getTagsByName($access->getConfig()->get(AccessConfig::NO_CHECK_LABEL_NAME)))) {
-            $access->checkMethodRights($refMethod, $args, $refClass);
+        if (empty($docBlock->getTagsByName($this->access->getConfig()->get(AccessConfig::NO_CHECK_LABEL_NAME)))) {
+            $this->access->checkMethodRights($refMethod, $args, $refClass);
         }
 
         dispatch(MethodAllowed::class);
@@ -109,37 +122,6 @@ class AccessControllerParent
         return new HTMLResult($result);
     }
 
-
-    /**
-     * Проверка прав доступа и входных данных для статических методов
-     *
-     * @param string $methodName - имя метода или SQL-свойства
-     * @param array $args - массив аргументов
-     *
-     * @return AbstractResult
-     * @throws AccessDeniedException
-     * @throws ClassNotFoundException
-     * @throws Exceptions\AccessException
-     * @throws Exceptions\AuthException
-     * @throws Exceptions\FormatException
-     * @throws MethodNotFoundException
-     * @throws ValidationException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DTO\Exceptions\ValidationException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
-     * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
-     * @throws \Scaleplan\Result\Exceptions\ResultException
-     */
-    public static function __callStatic(string $methodName, array $args): AbstractResult
-    {
-        $args = reset($args);
-        [$refClass, $method, $args] = static::checkControllerMethod(static::class, $methodName, $args);
-        return static::execute($method, $args);
-    }
-
     /**
      * Проверка прав доступа и входных данных для нестатических методов
      *
@@ -166,7 +148,7 @@ class AccessControllerParent
     public function __call(string $methodName, array $args): AbstractResult
     {
         $args = reset($args);
-        [$refClass, $method, $args] = static::checkControllerMethod(static::class, $methodName, $args);
+        [$refClass, $method, $args] = $this->checkControllerMethod(static::class, $methodName, $args);
         return static::execute($method, $args, $this);
     }
 }

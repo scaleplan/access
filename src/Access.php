@@ -26,13 +26,6 @@ class Access extends AccessAbstract
     protected static $instance;
 
     /**
-     * Разделитель значений фильтров
-     *
-     * @var string
-     */
-    protected $filterSeparator = ':';
-
-    /**
      * Вернуть информацию о всех доступных пользователю урлах или о каком-то конкретном урле
      *
      * @param string|null $url - текст урла
@@ -44,6 +37,8 @@ class Access extends AccessAbstract
         if ($url) {
             return $this->cache->getAccessRight($url);
         }
+
+
 
         return $this->cache->getAllAccessRights();
     }
@@ -118,13 +113,19 @@ class Access extends AccessAbstract
      */
     protected function checkMethodFilters(array $accessRight, array $args, \ReflectionMethod $refMethod) : void
     {
+        $docBlock = new DocBlock($refMethod);
+        if (!$docBlock
+            || empty($tag = $docBlock->getTagsByName($this->config->get(AccessConfig::FILTER_DIRECTIVE_NAME)))) {
+            return;
+        }
+
         $docParam = end($tag);
-        $filters = trim($docParam->getDescription());
-        if ($filters) {
+        $filterName = trim($docParam->getDescription()) ?: $this->config->get(AccessConfig::DEFAULT_FILTER_NAME);
+        /*if ($filters) {
             $filters = array_map('trim', explode(',', $filters));
 
             $accessRight[DbConstants::IDS_FIELD_NAME] = array_map(function ($item) {
-                return array_map('trim', explode($this->filterSeparator, $item));
+                return array_map('trim', explode($this->config->get(AccessConfig::FILTER_SEPARATOR_NAME), $item));
             }, json_decode($accessRight[DbConstants::IDS_FIELD_NAME], true));
 
             if (empty($args)) {
@@ -132,7 +133,7 @@ class Access extends AccessAbstract
             }
 
             $methodDefaults = null;
-            $getMethodDefaults = static::getMethodDefaults($methodDefaults, $refMethod);
+            static::getMethodDefaults($methodDefaults, $refMethod);
 
             if (\count($accessRight[DbConstants::IDS_FIELD_NAME][0]) !== \count($filters)) {
                 throw new FormatException(translate('access.parameters-lists-mismatch'));
@@ -141,8 +142,8 @@ class Access extends AccessAbstract
             $checkValue = [];
             foreach ($filters as $filter) {
                 if (!array_key_exists($filter, $args)
-                    && array_key_exists($filter, $getMethodDefaults($methodDefaults))) {
-                    $args[$filter] = $getMethodDefaults($methodDefaults)[$filter];
+                    && array_key_exists($filter, $methodDefaults)) {
+                    $args[$filter] = $methodDefaults[$filter];
                 }
 
                 $checkValue[] = $args[$filter];
@@ -160,6 +161,25 @@ class Access extends AccessAbstract
             ) {
                 throw new AccessDeniedException(translate('access.id-not-allowed', [':filters' => $filters]));
             }
+        }*/
+        $filterValues = array_map(function ($item) {
+            return array_map('trim', explode($this->config->get(AccessConfig::FILTER_SEPARATOR_NAME), $item));
+        }, json_decode($accessRight[DbConstants::IDS_FIELD_NAME], true));
+
+        if (!$filterValues) {
+            return;
+        }
+
+        if (empty($args)) {
+            throw new FormatException(translate('access.parameter-list-empty'));
+        }
+
+        if (empty($args[$filterName])) {
+            throw new FormatException(translate('access.filters-mismatch'));
+        }
+
+        if (!\in_array($args[$filterName], $filterValues)) {
+            throw new AccessDeniedException(translate('access.id-not-allowed', [':filter' => $filterName]));
         }
     }
 
@@ -187,17 +207,7 @@ class Access extends AccessAbstract
         \ReflectionClass $refClass = null
     ) : bool
     {
-        $docBlock = new DocBlock($refMethod);
-        if (!$docBlock) {
-            return false;
-        }
-
         $accessRight = $this->checkOnlyMethod($refClass, $refMethod);
-
-        if (empty($tag = $docBlock->getTagsByName($this->config->get(AccessConfig::FILTER_DIRECTIVE_NAME)))) {
-            return true;
-        }
-
         $this->checkMethodFilters($accessRight, $args, $refMethod);
 
         return true;

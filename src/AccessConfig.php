@@ -32,8 +32,6 @@ class AccessConfig
 
     public const CONTROLLERS_SECTION_NAME = 'controllers';
 
-    public const PERSISTENT_STORAGE_SECTION_NAME = 'persistent_storage';
-
     public const ROLES_SECTION_NAME = 'roles';
 
     public const DEFAULT_ROLE_LABEL_NAME = 'default_role';
@@ -43,6 +41,8 @@ class AccessConfig
     public const NO_CHECK_LABEL_NAME = 'access_no_rights_check';
 
     public const DOCBLOCK_CHECK_LABEL_NAME = 'deny_fuzzy';
+
+    public const DEFAULT_FILTER_NAME = 'default_access_filter';
 
     /**
      * @var array
@@ -67,15 +67,6 @@ class AccessConfig
             throw new ConfigException(translate('access.config-missing'));
         }
 
-        if (empty($config[static::PERSISTENT_STORAGE_SECTION_NAME])
-            || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['type'])
-            || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['user'])
-            || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['password'])
-            || empty($config[static::PERSISTENT_STORAGE_SECTION_NAME]['dns'])) {
-            throw new ConfigException(translate('access.db-config-missing')
-            );
-        }
-
         if (empty($config[static::CACHE_STORAGE_SECTION_NAME])
             || empty($config[static::CACHE_STORAGE_SECTION_NAME]['type'])) {
             throw new ConfigException(translate('access.cache-config-missing'));
@@ -89,13 +80,13 @@ class AccessConfig
             throw new ConfigException(translate('access.roles-list-incorrect'));
         }
 
-        if (empty($config[static::FILTER_DIRECTIVE_NAME])) {
+        /*if (empty($config[static::FILTER_DIRECTIVE_NAME])) {
             throw new ConfigException(translate('access.filter-field-config-missing'));
         }
 
         if (empty($config[static::ANNOTATION_LABEL_NAME])) {
             throw new ConfigException(translate('access.access-check-config-lanel-missing'));
-        }
+        }*/
 
         if (empty($config[static::FILTER_SEPARATOR_NAME])) {
             throw new ConfigException(translate('access.filter-delimiter-config-missing'));
@@ -103,6 +94,10 @@ class AccessConfig
 
         if (empty($config[static::DEFAULT_ROLE_LABEL_NAME])) {
             throw new ConfigException(translate('access.default-role-config-missing'));
+        }
+
+        if (empty($config[static::DEFAULT_FILTER_NAME])) {
+            throw new ConfigException(translate('access.default-filter-name-missing'));
         }
 
         $this->properties = $config;

@@ -4,10 +4,7 @@ namespace Scaleplan\Access;
 
 use phpDocumentor\Reflection\DocBlock;
 use Scaleplan\Access\Exceptions\FormatException;
-use function Scaleplan\DependencyInjection\get_required_container;
-use function Scaleplan\Helpers\get_required_env;
 use function Scaleplan\Translator\translate;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class AccessUrlGenerator
@@ -30,23 +27,11 @@ class AccessUrlGenerator
      * AccessUrlGenerator constructor.
      *
      * @param AccessAbstract $access
-     *
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
-     * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
     public function __construct(AccessAbstract $access)
     {
         $this->access = $access;
         $this->config = $access->getConfig();
-
-        $locale = locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']) ?: get_required_env('DEFAULT_LANG');
-        /** @var \Symfony\Component\Translation\Translator $translator */
-        $translator = get_required_container(TranslatorInterface::class, [$locale]);
-        $translator->addResource('yml', __DIR__ . "/translates/$locale/access.yml", $locale, 'access');
     }
 
     /**
@@ -80,13 +65,7 @@ class AccessUrlGenerator
      * @param string|null $controllerNamespace - пространство имен для конроллера, если есть
      *
      * @return array
-     *
-     * @throws Exceptions\ConfigException
      * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     protected function generateControllerURLs(
         string $controllerFileName,
@@ -131,12 +110,13 @@ class AccessUrlGenerator
 
             $modelId = static::searchModelId($accessSchema, $accessTables, $models);
 
+            $text = '/'
+                . strtolower(str_replace('Controller', '', $controller))
+                . '/'
+                . AccessHelper::camel2dashed($methodName);
             $url = [
-                'text'          => '/' . strtolower(
-                        str_replace(
-                            'Controller', '', $controller)
-                    ) . '/' . AccessHelper::camel2dashed($methodName),
-                'name'          => $docBlock->getText(),
+                'text'          => $text,
+                'name'          => $docBlock->getShortDescription(),
                 'model_type_id' => $modelId,
                 'type'          => $accessUrlType,
             ];
@@ -181,7 +161,6 @@ class AccessUrlGenerator
      *
      * @return array
      *
-     * @throws Exceptions\ConfigException
      * @throws FormatException
      * @throws \ReflectionException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
@@ -262,7 +241,6 @@ class AccessUrlGenerator
      *
      * @return array
      *
-     * @throws Exceptions\ConfigException
      * @throws FormatException
      * @throws \ReflectionException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException

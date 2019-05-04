@@ -28,18 +28,14 @@ cache_storage:
   type: redis
   socket: /var/run/redis/redis.sock
 
-# Данные для поключения к постоянному хранилищу
-persistent_storage:
-  type: postgresql
-  dns: pgsql:host=/var/run/postgresql;port=5432;dbname=edu
-  user: avtomonov
-  password: password
-
 # Метка PHPDOC для указания аргумента, по которому следует дополнительно проверять доступ к методу
-access_filter_label: accessFilter
+#access_filter_label: accessFilter
+
+# Аргумента, по которому следует дополнительно проверять доступ к методу
+default_access_filter: id
 
 # Метка PHPDOC указывающая, что метод следует обработать Access
-access_label: accessMethod
+#access_label: accessMethod
 
 # Не проверять права на выполнение метода контроллера
 access_no_rights_check: noCheck
@@ -67,3 +63,5 @@ deny_fuzzy: denyFuzzy
 
 # Проверять возвращаемое значение метода на соответствие типам
 check_return: checkReturn
+
+

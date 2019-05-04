@@ -14,4 +14,5 @@ class DbConstants
     public const FORBIDDEN_SELECTORS_FIELD_NAME = 'forbidden_selectors';
     public const USER_ID_FIELD_NAME = 'user_id';
     public const URL_FIELD_NAME = 'url';
+    public const URL_ID_FIELD_NAME = 'url_id';
 }

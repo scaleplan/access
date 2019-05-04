@@ -5,6 +5,7 @@ namespace Scaleplan\Access;
 use Scaleplan\Access\CacheStorage\CacheStorageFabric;
 use Scaleplan\Access\CacheStorage\CacheStorageInterface;
 use Scaleplan\Access\Exceptions\ConfigException;
+use Scaleplan\Db\Interfaces\DbInterface;
 use function Scaleplan\DependencyInjection\get_required_container;
 use function Scaleplan\Helpers\get_required_env;
 use function Scaleplan\Translator\translate;
@@ -48,21 +49,33 @@ abstract class AccessAbstract
     protected static $instance;
 
     /**
+     * @var DbInterface
+     */
+    protected $storage;
+
+    /**
+     * @var string
+     */
+    protected $confPath;
+
+    /**
      * Синглтон
      *
+     * @param DbInterface $storage
      * @param int $userId - идентификатор пользователя
      * @param string $confPath - путь в файлу конфигурации
      *
      * @return AccessAbstract
      */
     public static function getInstance(
+        DbInterface $storage,
         int $userId = self::DEFAULT_USER_ID,
         string $confPath = __DIR__ . '/../config.yml'
     ) : self
     {
         if (!static::$instance) {
             $className = static::class;
-            static::$instance = new $className($userId, $confPath);
+            static::$instance = new $className($storage, $userId, $confPath);
         }
 
         return static::$instance;
@@ -71,6 +84,7 @@ abstract class AccessAbstract
     /**
      * AccessAbstract constructor.
      *
+     * @param DbInterface $storage
      * @param int $userId - идентификатор пользователя
      * @param string $confPath - пусть к конфигурации
      *
@@ -83,8 +97,9 @@ abstract class AccessAbstract
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
-    protected function __construct(int $userId, string $confPath)
+    protected function __construct(DbInterface $storage, int $userId, string $confPath)
     {
+        $this->confPath = $confPath;
         $this->config = new AccessConfig(Yaml::parse(file_get_contents($confPath)));
         $this->cache = CacheStorageFabric::getInstance(
             $this->config,
@@ -96,6 +111,7 @@ abstract class AccessAbstract
         }
 
         $this->userId = $userId;
+        $this->storage = $storage;
 
         $locale = locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']) ?: get_required_env('DEFAULT_LANG');
         /** @var \Symfony\Component\Translation\Translator $translator */
@@ -117,36 +133,10 @@ abstract class AccessAbstract
      * Вернуть подключение в РСУБД
      *
      * @return \PDO
-     *
-     * @throws ConfigException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function getPSConnection() : \PDO
     {
-        static $connection;
-        if (!$connection) {
-            $connectionData = $this->config->get(AccessConfig::PERSISTENT_STORAGE_SECTION_NAME);
-            $type = &$connectionData['type'];
-            switch ($type) {
-                case 'postgresql':
-                    $connection
-                        = new \PDO($connectionData['dns'], $connectionData['user'], $connectionData['password']);
-
-                    $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                    $connection->setAttribute(\PDO::ATTR_ORACLE_NULLS, \PDO::NULL_TO_STRING);
-                    $connection->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-                    break;
-
-                default:
-                    throw new ConfigException(translate('access.incorrect-db-driver', [':driver' => $type]));
-            }
-        }
-
-        return $connection;
+        return $this->storage->getConnection();
     }
 
     /**

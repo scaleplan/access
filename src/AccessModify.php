@@ -3,6 +3,7 @@
 namespace Scaleplan\Access;
 
 use Scaleplan\Access\Exceptions\ConfigException;
+use Scaleplan\Db\Interfaces\DbInterface;
 use function Scaleplan\Translator\translate;
 
 /**
@@ -21,10 +22,36 @@ class AccessModify extends AccessAbstract
      */
     protected $role;
 
-    public function __construct(int $userId, string $confPath)
+    /**
+     * AccessModify constructor.
+     *
+     * @param DbInterface $psconnection
+     * @param int $userId
+     * @param string $confPath
+     *
+     * @throws ConfigException
+     * @throws Exceptions\CacheTypeNotSupportingException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
+     * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
+     */
+    public function __construct(DbInterface $psconnection, int $userId, string $confPath)
     {
-        parent::__construct($userId, $confPath);
-        $this->role = $this->config->get(AccessConfig::DEFAULT_ROLE_LABEL_NAME);
+        parent::__construct($psconnection, $userId, $confPath);
+        $sth = $this->getPSConnection()->prepare('
+                       SELECT 
+                         role
+                       FROM 
+                         access.user_role ur
+                       WHERE 
+                         ur.user_id = :user_id
+                    ');
+        $sth->execute(['user_id' => $this->userId]);
+
+        $this->setRole($sth->fetch()['role'] ?? $this->config->get(AccessConfig::DEFAULT_ROLE_LABEL_NAME));
     }
 
     /**
@@ -48,13 +75,6 @@ class AccessModify extends AccessAbstract
 
     /**
      * @return array
-     *
-     * @throws ConfigException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function getAccessRightsFromDb() : array
     {
@@ -62,16 +82,17 @@ class AccessModify extends AccessAbstract
             ->prepare('
                        SELECT 
                          u.text AS url,
-                         COALESCE(ar.is_allow, true),
-                         array_to_json(ar.ids) ids
+                         COALESCE(rr.url_id, ur.url_id) url_id,     
+                         COALESCE(ur.is_allow, rr.is_allow) is_allow,
+                         array_to_json(COALESCE(ur.ids, rr.ids)) ids
                        FROM 
                          access.url u 
-                       LEFT JOIN access.default_right dr
-                         ON dr.url_id = u.id
-                       LEFT JOIN access.access_right ar 
-                         ON ar.url_id = u.id
+                       LEFT JOIN access.role_right rr
+                         ON rr.url_id = u.id
+                       LEFT JOIN access.user_right ur 
+                         ON ur.url_id = u.id
                        WHERE 
-                         ar.user_id = :user_id OR dr.role = :role
+                         ur.user_id = :user_id OR rr.role = :role
                     ');
         $sth->execute(
             ['user_id' => $this->userId, 'role' => $this->role]
@@ -82,13 +103,6 @@ class AccessModify extends AccessAbstract
 
     /**
      * @param array|null $accessRights
-     *
-     * @throws ConfigException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function saveAccessRightsToCache(array $accessRights = null) : void
     {
@@ -98,13 +112,6 @@ class AccessModify extends AccessAbstract
 
     /**
      * Залить в базу данных схему для работы с правами доступа
-     *
-     * @throws ConfigException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function initSQLScheme() : void
     {
@@ -139,12 +146,12 @@ class AccessModify extends AccessAbstract
                                 ON CONFLICT 
                                   (text) 
                                 DO UPDATE SET 
-                                  model_type_id = EXCLUDED.model_type_id,
-                                  type = EXCLUDED.type,
-                                  name = EXCLUDED.name'
+                                  model_type_id = excluded.model_type_id,
+                                  type = excluded.type,
+                                  name = excluded.name'
         );
         /** @var Access $access */
-        $access = Access::getInstance($this->userId);
+        $access = Access::getInstance($this->storage, $this->userId, $this->confPath);
         $urlGenerator = new AccessUrlGenerator($access);
         foreach ($urlGenerator->getAllURLs() as $arr) {
             $sth->execute($arr);
@@ -152,12 +159,7 @@ class AccessModify extends AccessAbstract
     }
 
     /**
-     * @throws ConfigException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
+     * Инициализация ролей в базе
      */
     public function initPersistentStorageTypes() : void
     {
@@ -199,19 +201,12 @@ class AccessModify extends AccessAbstract
      * @param string $role - наименование роли
      *
      * @return array
-     *
-     * @throws ConfigException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    public function addRoleAccessRight(int $urlId, string $role) : array
+    public function addRoleRight(int $urlId, string $role) : array
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO
-                                  access.default_right
+                                  access.role_right
                                 VALUES
                                  (:url_id,
                                   :role)
@@ -234,13 +229,6 @@ class AccessModify extends AccessAbstract
      * @param string $role - наименование роли
      *
      * @return array
-     *
-     * @throws ConfigException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function addUserToRole(int $userId, string $role) : array
     {
@@ -269,86 +257,26 @@ class AccessModify extends AccessAbstract
      * @param array $ids - с какими значения фильтра разрешать/запрещать доступ
      *
      * @return array
-     *
-     * @throws ConfigException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    public function addAccessRight(int $urlId, int $userId, bool $isAllow, array $ids) : array
+    public function addUserRight(int $urlId, int $userId, bool $isAllow, array $ids) : array
     {
         $sth = $this->getPSConnection()->prepare(
-            'INSERT INTO
-                                  access.access_right
-                                VALUES
-                                 (:url_id,
-                                  :user_id,
-                                  :is_allow,
-                                  :ids::varchar[])
-                                ON CONFLICT 
-                                  (url_id,
-                                   user_id,
-                                   is_allow,
-                                   ids) 
-                                DO UPDATE SET 
-                                  is_allow = EXCLUDED.is_allow,
-                                  ids = EXCLUDED.ids
-                                RETURNING
-                                  *');
+            'INSERT INTO access.user_right(url_id, user_id, is_allow, ids)
+             VALUES (:url_id, :user_id, :is_allow, :ids::int4[])
+             ON CONFLICT
+             DO UPDATE SET 
+               is_allow = EXCLUDED.is_allow, 
+               ids = EXCLUDED.ids
+             RETURNING *'
+        );
         $sth->execute(
             [
                 'url_id'   => $urlId,
                 'user_id'  => $userId,
                 'is_allow' => $isAllow,
-                'ids'   => "{'" . implode("', '", $ids) . "'}::int8[]",
+                'ids'      => "{'" . implode("', '", $ids) . "'}",
             ]
         );
-
-        return $sth->fetchAll();
-    }
-
-    /**
-     * Создать право доступа для пользователя на основе прав для его роли
-     *
-     * @param int $userId - идентификатор пользователя
-     *
-     * @return array
-     *
-     * @throws ConfigException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
-     */
-    public function shiftAccessRightFromRole(int $userId) : array
-    {
-        $sth = $this->getPSConnection()->prepare(
-            'INSERT INTO
-                                  access.access_right
-                                 (url_id,
-                                  user_id)
-                                SELECT 
-                                  dr.url_id,
-                                  ur.user_id
-                                FROM
-                                  access.default_right dr 
-                                JOIN 
-                                  access.user_role ur 
-                                  ON 
-                                    ur.role = dr.role
-                                WHERE
-                                  ur.user_id = :user_id
-                                ON CONFLICT 
-                                  (url_id,
-                                   user_id) 
-                                DO UPDATE SET 
-                                  is_allow = EXCLUDED.is_allow,
-                                  ids = EXCLUDED.ids');
-
-        $sth->execute(['user_id' => $userId]);
 
         return $sth->fetchAll();
     }
