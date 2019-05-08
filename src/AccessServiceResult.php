@@ -53,6 +53,11 @@ class AccessServiceResult extends DbResult
     protected $isPlainArgs = true;
 
     /**
+     * @var bool
+     */
+    protected $denyFuzzy;
+
+    /**
      * AccessServiceResult constructor.
      *
      * @param \ReflectionClass $class - отражение класса модели
@@ -61,6 +66,7 @@ class AccessServiceResult extends DbResult
      * @param array|null $args - аргументы выполнения
      * @param bool $isPlainArgs - true - метод модели принимает аргументы в виде набора, false - в виде ассоциативного массива
      * @param null|mixed $result - результат
+     * @param bool $denyFuzzy
      *
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
@@ -70,7 +76,8 @@ class AccessServiceResult extends DbResult
         \ReflectionProperty $property = null,
         array $args = [],
         bool $isPlainArgs = true,
-        $result = null
+        $result = null,
+        $denyFuzzy = true
     )
     {
         $this->class = $class;
@@ -78,6 +85,7 @@ class AccessServiceResult extends DbResult
         $this->property = $property;
         $this->args = $args;
         $this->isPlainArgs = $isPlainArgs;
+        $this->denyFuzzy = $denyFuzzy;
 
         parent::__construct($result);
     }
@@ -153,14 +161,13 @@ class AccessServiceResult extends DbResult
     public function checkDocReturn(): void
     {
         $docBlock = new DocBlock($this->method ?? $this->property);
-        $denyFuzzy = $docBlock->hasTag(Access::getInstance()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
         $returnTypes = $docBlock->getTagsByName('return');
         $returnTypes = end($returnTypes);
         $returnTypesArray = array_map(static function ($item) {
             return trim($item, '\\\ \0');
         }, explode('|', $returnTypes));
 
-        if (!AccessSanitize::typeCheck($this->result, $returnTypesArray, $denyFuzzy)) {
+        if (!AccessSanitize::typeCheck($this->result, $returnTypesArray, $this->denyFuzzy)) {
             throw new ValidationException(translate('access.return-type-mismatch', [':type' => $returnTypes]));
         }
     }

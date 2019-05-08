@@ -120,14 +120,12 @@ class AccessModify extends AccessAbstract
     }
 
     /**
-     * @throws ConfigException
      * @throws Exceptions\FormatException
      * @throws \ReflectionException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
      * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
-     * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
     public function initPersistentScheme() : void
     {
@@ -178,14 +176,12 @@ class AccessModify extends AccessAbstract
     /**
      * Инициальзировать персистентное хранилище данных о правах доступа
      *
-     * @throws ConfigException
      * @throws Exceptions\FormatException
      * @throws \ReflectionException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
      * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
-     * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
     public function initPersistentStorage() : void
     {

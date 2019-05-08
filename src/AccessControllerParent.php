@@ -89,7 +89,7 @@ class AccessControllerParent
 
         dispatch(MethodAllowed::class);
 
-        $args = (new AccessSanitize($refMethod, $args))->sanitizeArgs();
+        $args = (new AccessSanitize($this->access, $refMethod, $args))->sanitizeArgs();
         dispatch(SanitizePassed::class);
 
         return [$refClass, $refMethod, $args,];

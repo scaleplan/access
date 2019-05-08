@@ -8,6 +8,7 @@ use Scaleplan\Access\Exceptions\SupportingException;
 use Scaleplan\Access\Exceptions\ValidationException;
 use Scaleplan\DTO\DTO;
 use phpDocumentor\Reflection\DocBlock\Tag\ParamTag;
+use Scaleplan\Helpers\NameConverter;
 use function Scaleplan\Translator\translate;
 
 /**
@@ -43,8 +44,16 @@ class AccessSanitize
     protected $sanitizedArgs;
 
     /**
+     * Объект Access
+     *
+     * @var Access
+     */
+    protected $access;
+
+    /**
      * AccessSanitize constructor.
      *
+     * @param Access $access - объект Access
      * @param \Reflector $reflector - отражение метода или SQL-свойства
      * @param array $args - массив аргументов
      *
@@ -55,12 +64,13 @@ class AccessSanitize
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    public function __construct(\Reflector $reflector, array $args)
+    public function __construct(Access $access, \Reflector $reflector, array $args)
     {
         if (!($reflector instanceof \ReflectionMethod) && !($reflector instanceof \ReflectionProperty)) {
             throw new SupportingException(translate('access.allows-reflections-only'));
         }
 
+        $this->access = $access;
         $this->reflector = $reflector;
         $this->args = $args;
     }
@@ -79,17 +89,17 @@ class AccessSanitize
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    public function sanitizeArgs(): array
+    public function sanitizeArgs() : array
     {
         if ($this->sanitizedArgs !== null) {
             return $this->sanitizedArgs;
         }
 
         if ($this->reflector instanceof \ReflectionMethod) {
-            return $this->sanitizedArgs = static::sanitizeMethodArgs($this->reflector, $this->args);
+            return $this->sanitizedArgs = $this->sanitizeMethodArgs($this->reflector, $this->args);
         }
 
-        return $this->sanitizedArgs = static::sanitizeSQLPropertyArgs($this->reflector, $this->args);
+        return $this->sanitizedArgs = $this->sanitizeSQLPropertyArgs($this->reflector, $this->args);
     }
 
     /**
@@ -113,6 +123,39 @@ class AccessSanitize
     }
 
     /**
+     * @param \ReflectionParameter $param
+     * @param array $args
+     *
+     * @return mixed
+     *
+     * @throws ValidationException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
+     */
+    protected static function getParamValue(\ReflectionParameter $param, array $args)
+    {
+        $paramName = $param->getName();
+
+        if (array_key_exists($paramName, $args)) {
+            return $args[$paramName];
+        }
+
+        $snakeParamName = NameConverter::camelCaseToSnakeCase($paramName);
+        if (array_key_exists($snakeParamName, $args)) {
+            return $args[$snakeParamName];
+        }
+
+        if ($param->isOptional()) {
+            return $param->getDefaultValue();
+        }
+
+        throw new ValidationException(translate('access.required-parameter-missing', [':parameter' => $paramName]));
+    }
+
+    /**
      * Проверить аргументы метода
      *
      * @param \ReflectionMethod $method - Reflection-обертка для метода
@@ -129,7 +172,7 @@ class AccessSanitize
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    public static function sanitizeMethodArgs(\ReflectionMethod $method, array $args): array
+    public function sanitizeMethodArgs(\ReflectionMethod $method, array $args) : array
     {
         $sanArgs = [];
         $docBlock = new DocBlock($method);
@@ -148,17 +191,10 @@ class AccessSanitize
                 }
 
                 $sanArgs = array_merge($sanArgs, array_map(static function ($arg) use ($paramType, $paramName, $docBlock) {
-                    static::docTypeCheck($arg, $paramName, $paramType, $docBlock);
+                    $this->docTypeCheck($arg, $paramName, $paramType, $docBlock);
                     return $arg;
                 }, $args));
                 break;
-            }
-
-            if ($param->isOptional()
-                && (!array_key_exists($paramName, $args)
-                    || ($args[$paramName] == $param->getDefaultValue() && $param->getDefaultValue() === null))) {
-                $sanArgs[$paramName] = $param->getDefaultValue();
-                continue;
             }
 
             $dto = static::getDTO($args, $paramType);
@@ -167,14 +203,8 @@ class AccessSanitize
                 continue;
             }
 
-            if (!array_key_exists($paramName, $args) && !$param->isOptional()) {
-                throw new ValidationException(
-                    translate('access.required-parameter-missing', [':parameter' => $paramName])
-                );
-            }
-
-            $arg = $args[$paramName];
-            static::docTypeCheck($arg, $paramName, $paramType, $docBlock);
+            $arg = static::getParamValue($param, $args);
+            $this->docTypeCheck($arg, $paramName, $paramType, $docBlock);
             //\is_string($arg) && $arg = \strip_tags($arg);
             $sanArgs[$paramName] = $arg;
         }
@@ -197,7 +227,7 @@ class AccessSanitize
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    public static function sanitizeSQLPropertyArgs(\ReflectionProperty $property, array $args): array
+    public function sanitizeSQLPropertyArgs(\ReflectionProperty $property, array $args) : array
     {
         $sanArgs = [];
         if (!$property->isPublic()) {
@@ -224,7 +254,7 @@ class AccessSanitize
 
             $arg = $args[$paramName];
             if ($param instanceof ParamTag && $param->getType()) {
-                static::docTypeCheck($arg, $paramName, (string) $param->getType(), $docBlock);
+                $this->docTypeCheck($arg, $paramName, (string)$param->getType(), $docBlock);
             }
 
             \is_string($arg) && $arg = strip_tags($arg);
@@ -249,7 +279,7 @@ class AccessSanitize
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    protected static function argAvailabilityCheck(string $paramName, array $args, array $optionParams): void
+    protected static function argAvailabilityCheck(string $paramName, array $args, array $optionParams) : void
     {
         if (!array_key_exists($paramName, $args) && !array_key_exists($paramName, $optionParams)) {
             throw new ValidationException(translate('access.required-parameter-missing', [':parameter' => $paramName]));
@@ -263,13 +293,13 @@ class AccessSanitize
      *
      * @return array
      */
-    protected static function getDocParams(array $docParams): array
+    protected static function getDocParams(array $docParams) : array
     {
         $allParams = $optionParams = [];
         foreach ($docParams as $docParam) {
             $varName = ltrim($docParam->getVariableName(), '$');
             $allParams[$varName] = $docParam;
-            $paramDescription = (string) $docParam->getDescription();
+            $paramDescription = (string)$docParam->getDescription();
             if ($paramDescription && stripos($paramDescription, '(optional)') !== false) {
                 $optionParams[$varName] = $docParam;
             }
@@ -293,13 +323,13 @@ class AccessSanitize
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    protected static function docTypeCheck(&$arg, string $paramName, string $paramType, DocBlock $docBlock): void
+    protected function docTypeCheck(&$arg, string $paramName, string $paramType, DocBlock $docBlock) : void
     {
         if (!$paramType) {
             return;
         }
 
-        $denyFuzzy = $docBlock->hasTag(Access::getInstance()->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
+        $denyFuzzy = $docBlock->hasTag($this->access->getConfig()->get(AccessConfig::DOCBLOCK_CHECK_LABEL_NAME));
 
         $paramTypes = array_map(static function ($item) {
             return trim($item, '\\\ \0');
@@ -321,7 +351,7 @@ class AccessSanitize
      *
      * @return bool
      */
-    public static function typeCheck(&$value, array $types, $denyFuzzy = true): bool
+    public static function typeCheck(&$value, array $types, $denyFuzzy = true) : bool
     {
         if (!$types && \in_array('mixed', $types, true)) {
             return true;
@@ -335,7 +365,7 @@ class AccessSanitize
                 }
 
                 return $result;
-        })) {
+            })) {
             return false;
         }
 
@@ -364,7 +394,7 @@ class AccessSanitize
      *
      * @return array
      */
-    public static function getSQLParams($sql): array
+    public static function getSQLParams($sql) : array
     {
         $all = $optional = [];
         if (preg_match_all('/[^:]+?:([\w_\-]+).*?/', $sql, $matches)) {

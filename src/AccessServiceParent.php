@@ -19,6 +19,21 @@ use function Scaleplan\Translator\translate;
 class AccessServiceParent
 {
     /**
+     * @var Access
+     */
+    protected $access;
+
+    /**
+     * AccessControllerParent constructor.
+     *
+     * @param Access $access
+     */
+    public function __construct(Access $access)
+    {
+        $this->access = $access;
+    }
+
+    /**
      * @param array $args
      * @param \Reflector $reflector
      *
@@ -65,18 +80,15 @@ class AccessServiceParent
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    public static function checkMethod(\ReflectionMethod $method, array &$args) : array
+    public function checkMethod(\ReflectionMethod $method, array &$args) : array
     {
-        /** @var Access $access */
-        $access = Access::getInstance();
-
         $docBlock = new DocBlock($method);
-        if (empty($docBlock->getTagsByName($access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME)))) {
+        if (empty($docBlock->getTagsByName($this->access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME)))) {
             throw new AccessDeniedException(translate('access.method-not-allowed', [':method' => $method->getName()]));
         }
 
         static::formatArgs($args, $method);
-        $args = (new AccessSanitize($method, $args))->sanitizeArgs();
+        $args = (new AccessSanitize($this->access, $method, $args))->sanitizeArgs();
 
         return $args;
     }
@@ -97,18 +109,15 @@ class AccessServiceParent
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    public static function checkProperty(\ReflectionProperty $property, array &$args) : array
+    public function checkProperty(\ReflectionProperty $property, array &$args) : array
     {
-        /** @var Access $access */
-        $access = Access::getInstance();
-
         $docBlock = new DocBlock($property);
-        if (empty($docBlock->getTagsByName($access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME)))) {
+        if (empty($docBlock->getTagsByName($this->access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME)))) {
             throw new AccessException(translate('access.property-not-allowed', [':property' => $property->getName()]));
         }
 
         static::formatArgs($args, $property);
-        $args = (new AccessSanitize($property, $args))->sanitizeArgs();
+        $args = (new AccessSanitize($this->access, $property, $args))->sanitizeArgs();
 
         return $args;
     }
@@ -133,14 +142,14 @@ class AccessServiceParent
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
-    protected static function checkServiceMethodEssence(string $methodName, array $args) : AccessServiceResult
+    protected function checkServiceMethodEssence(string $methodName, array $args) : AccessServiceResult
     {
         $refClass = new \ReflectionClass(static::class);
 
         if ($refClass->hasMethod($methodName)) {
             $method = $refClass->getMethod($methodName);
 
-            [$args, $isPlainArgs] = static::checkMethod($method, $args);
+            [$args, $isPlainArgs] = $this->checkMethod($method, $args);
 
             $method->setAccessible(true);
 
@@ -156,7 +165,7 @@ class AccessServiceParent
         if ($refClass->hasProperty($methodName)) {
             $property = $refClass->getProperty($methodName);
 
-            [$args, $isPlainArgs] = static::checkProperty($property, $args);
+            [$args, $isPlainArgs] = $this->checkProperty($property, $args);
 
             $property->setAccessible(true);
 
@@ -170,31 +179,6 @@ class AccessServiceParent
         }
 
         throw new AccessException(translate('access.method-does-not-exist', [':method' => $methodName]));
-    }
-
-    /**
-     * Проверка переданных аргументов для метода или SQL-свойства в статическом контексте
-     *
-     * @param string $methodName - имя метода или SQL-свойства
-     * @param array $args - массив аргументов
-     *
-     * @return AccessServiceResult
-     *
-     * @throws AccessDeniedException
-     * @throws AccessException
-     * @throws SupportingException
-     * @throws ValidationException
-     * @throws \ReflectionException
-     * @throws \Scaleplan\DTO\Exceptions\ValidationException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
-     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
-     * @throws \Scaleplan\Result\Exceptions\ResultException
-     */
-    public static function __callStatic(string $methodName, array $args) : AccessServiceResult
-    {
-        return static::checkServiceMethodEssence($methodName, $args);
     }
 
     /**
@@ -219,6 +203,6 @@ class AccessServiceParent
      */
     public function __call(string $methodName, array $args) : AccessServiceResult
     {
-        return static::checkServiceMethodEssence($methodName, $args);
+        return $this->checkServiceMethodEssence($methodName, $args);
     }
 }
