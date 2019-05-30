@@ -8,7 +8,7 @@
     },
     "require": {
         "phpdocumentor/reflection-docblock": "~2.0",
-        "symfony/yaml": "~3.0",
+        "symfony/yaml": "dev-master",
         "scaleplan/redis-singleton": "dev-master",
         "ext-pdo": "*",
         "scaleplan/result": "dev-master",
