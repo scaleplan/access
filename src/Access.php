@@ -38,8 +38,6 @@ class Access extends AccessAbstract
             return $this->cache->getAccessRight($url);
         }
 
-
-
         return $this->cache->getAllAccessRights();
     }
 
