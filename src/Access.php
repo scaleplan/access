@@ -168,15 +168,19 @@ class Access extends AccessAbstract
             return;
         }
 
+        $isAllow = $accessRight[DbConstants::IS_ALLOW_FIELD_NAME];
+
         if (empty($args)) {
             throw new FormatException(translate('access.parameter-list-empty'));
         }
 
-        if (empty($args[$filterName])) {
-            throw new FormatException(translate('access.filters-mismatch'));
+        if (!array_key_exists($filterName, $args)) {
+            return;
+            //throw new FormatException(translate('access.filters-mismatch'));
         }
 
-        if (!\in_array($args[$filterName], $filterValues)) {
+        if ((!\in_array($args[$filterName], $filterValues) && $isAllow)
+            || (\in_array($args[$filterName], $filterValues) && !$isAllow)) {
             throw new AccessDeniedException(translate('access.id-not-allowed', [':filter' => $filterName]));
         }
     }
