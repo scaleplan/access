@@ -111,16 +111,17 @@ class Access extends AccessAbstract
      */
     protected function checkMethodFilters(array $accessRight, array $args, \ReflectionMethod $refMethod) : void
     {
-        $docBlock = new DocBlock($refMethod);
+        /*$docBlock = new DocBlock($refMethod);
         if (!$docBlock
             || empty($tag = $docBlock->getTagsByName($this->config->get(AccessConfig::FILTER_DIRECTIVE_NAME)))) {
             return;
         }
 
-        $docParam = end($tag);
-        $filterName = trim($docParam->getDescription()) ?: $this->config->get(AccessConfig::DEFAULT_FILTER_NAME);
-        /*if ($filters) {
-            $filters = array_map('trim', explode(',', $filters));
+        $docParam = end($tag);*/
+        //$filterName = trim($docParam->getDescription()) ?: $this->config->get(AccessConfig::DEFAULT_FILTER_NAME);
+        $filters = \json_decode($accessRight[DbConstants::RIGHTS_FIELD_NAME], true);
+        if ($filters) {
+            /*$filters = array_map('trim', explode(',', $filters));
 
             $accessRight[DbConstants::IDS_FIELD_NAME] = array_map(function ($item) {
                 return array_map('trim', explode($this->config->get(AccessConfig::FILTER_SEPARATOR_NAME), $item));
@@ -138,8 +139,8 @@ class Access extends AccessAbstract
             }
 
             $checkValue = [];
-            foreach ($filters as $filter) {
-                if (!array_key_exists($filter, $args)
+            foreach ($filters as $field => $data) {
+                if (!array_key_exists($field, $args)
                     && array_key_exists($filter, $methodDefaults)) {
                     $args[$filter] = $methodDefaults[$filter];
                 }
@@ -158,9 +159,23 @@ class Access extends AccessAbstract
                     && \in_array($checkValue, $accessRight[DbConstants::IDS_FIELD_NAME], true))
             ) {
                 throw new AccessDeniedException(translate('access.id-not-allowed', [':filters' => $filters]));
+            }*/
+
+            foreach ($filters[0] as $field => $data) {
+                if (!array_key_exists($field, $args)) {
+                    continue;
+                }
+
+                if (($data[DbConstants::IS_ALLOW_FIELD_NAME]
+                        && !\in_array($args[$field], $data[DbConstants::IDS_FIELD_NAME], false))
+                    || (!$data[DbConstants::IS_ALLOW_FIELD_NAME]
+                        && \in_array($args[$field], $data[DbConstants::IDS_FIELD_NAME], false))
+                ) {
+                    throw new AccessDeniedException(translate('access.id-not-allowed', [':filter' => $field]));
+                }
             }
-        }*/
-        $filterValues = array_map(function ($item) {
+        }
+        /*$filterValues = array_map(function ($item) {
             return array_map('trim', explode($this->config->get(AccessConfig::FILTER_SEPARATOR_NAME), $item));
         }, json_decode($accessRight[DbConstants::IDS_FIELD_NAME], true));
 
@@ -182,7 +197,7 @@ class Access extends AccessAbstract
         if ((!\in_array($args[$filterName], $filterValues) && $isAllow)
             || (\in_array($args[$filterName], $filterValues) && !$isAllow)) {
             throw new AccessDeniedException(translate('access.id-not-allowed', [':filter' => $filterName]));
-        }
+        }*/
     }
 
     /**

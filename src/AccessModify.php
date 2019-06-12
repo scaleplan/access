@@ -79,23 +79,54 @@ class AccessModify extends AccessAbstract
     public function getAccessRightsFromDb() : array
     {
         $sth = $this->getPSConnection()
-            ->prepare('
-                       SELECT 
-                         u.text AS url,
-                         COALESCE(rr.url_id, ur.url_id) url_id,     
-                         COALESCE(ur.is_allow, rr.is_allow) is_allow,
-                         array_to_json(COALESCE(ur.ids, rr.ids)) ids
-                       FROM 
-                         access.url u 
-                       LEFT JOIN access.role_right rr
-                         ON rr.url_id = u.id
-                       LEFT JOIN access.user_right ur 
-                         ON ur.url_id = u.id
-                       WHERE 
-                         ur.user_id = :user_id OR rr.role = :role
-                    ');
+            ->prepare("
+                        WITH r AS (SELECT
+                          COALESCE((CASE WHEN is_allow THEN ids END), ARRAY[]::int2[]) allow,
+                          COALESCE((CASE WHEN NOT is_allow THEN ids END), ARRAY[]::int2[]) deny,
+                          url.field,
+                          rr.is_allow,
+                          url.text
+                        FROM access.role_right rr
+                        RIGHT JOIN access.url ON url.id = rr.url_id
+                        LEFT JOIN access.user_role uro ON uro.role = rr.role
+                        WHERE uro.user_id = :user_id),
+                        
+                        u AS (SELECT
+                         (CASE WHEN is_allow THEN ids END) allow,
+                         (CASE WHEN NOT is_allow THEN ids END) deny,
+                          url.field,
+                          ur.is_allow,
+                            url.text
+                        FROM access.user_right ur
+                        RIGHT JOIN access.url ON url.id = ur.url_id
+                        WHERE ur.user_id = :user_id),
+                        
+                        c AS (SELECT
+                         (CASE 
+                                WHEN u.deny | r.deny IS NULL
+                                THEN u.allow | r.allow
+                                ELSE (u.deny | r.deny) - COALESCE(u.allow | r.allow, ARRAY[]::int2[])
+                            END) ids,
+                         (CASE 
+                                WHEN u.deny | r.deny IS NULL
+                                THEN COALESCE(u.is_allow, r.is_allow, true)
+                                ELSE false
+                            END) is_allow,
+                          field,
+                            text
+                        FROM r FULL JOIN u USING(field, text))
+                        
+                        SELECT
+                            text url,
+                            json_agg(json_build_object(
+                              field, 
+                              json_build_object('is_allow', is_allow, 'ids', ids)
+                            )) FILTER (WHERE NULLIF(field, '') IS NOT NULL) rights
+                        FROM c
+                        GROUP BY text
+                    ");
         $sth->execute(
-            ['user_id' => $this->userId, 'role' => $this->role]
+            ['user_id' => $this->userId]
         );
 
         return $sth->fetchAll();

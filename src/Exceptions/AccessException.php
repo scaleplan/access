@@ -10,16 +10,17 @@ namespace Scaleplan\Access\Exceptions;
 class AccessException extends \Exception
 {
     public const MESSAGE = 'Access error.';
+    public const CODE = 403;
 
     /**
      * AccessException constructor.
      *
-     * @param string|null $message
+     * @param string $message
      * @param int $code
      * @param \Throwable|null $previous
      */
-    public function __construct(string $message = null, int $code = 0, \Throwable $previous = null)
+    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
     {
-        parent::__construct($message ?? static::MESSAGE, $code, $previous);
+        parent::__construct($message ?: static::MESSAGE, $code ?: static::CODE, $previous);
     }
 }
