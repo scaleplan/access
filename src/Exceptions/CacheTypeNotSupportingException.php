@@ -7,7 +7,7 @@ namespace Scaleplan\Access\Exceptions;
  *
  * @package Scaleplan\Access\Exceptions
  */
-class CacheTypeNotSupportingException extends AccessException
+class CacheTypeNotSupportingException extends ConfigException
 {
     public const MESSAGE = 'Cache type not supporting.';
 }

@@ -10,4 +10,5 @@ namespace Scaleplan\Access\Exceptions;
 class UserIdNotPresentException extends AccessException
 {
     public const MESSAGE = 'User ID not present.';
+    public const CODE = 406;
 }

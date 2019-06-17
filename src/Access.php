@@ -162,7 +162,7 @@ class Access extends AccessAbstract
             }*/
 
             foreach ($filters[0] as $field => $data) {
-                if (!array_key_exists($field, $args)) {
+                if (!array_key_exists($field, $args) || $data[DbConstants::IDS_FIELD_NAME] === null) {
                     continue;
                 }
 
@@ -173,6 +173,8 @@ class Access extends AccessAbstract
                 ) {
                     throw new AccessDeniedException(translate('access.id-not-allowed', [':filter' => $field]));
                 }
+
+                break;
             }
         }
         /*$filterValues = array_map(function ($item) {
