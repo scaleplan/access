@@ -81,8 +81,8 @@ class AccessModify extends AccessAbstract
         $sth = $this->getPSConnection()
             ->prepare("
                         WITH r AS (SELECT
-                          COALESCE((CASE WHEN is_allow THEN ids END), ARRAY[]::int2[]) allow,
-                          COALESCE((CASE WHEN NOT is_allow THEN ids END), ARRAY[]::int2[]) deny,
+                         (CASE WHEN is_allow THEN ids END) allow,
+                         (CASE WHEN NOT is_allow THEN ids END) deny,
                           url.field,
                           rr.is_allow,
                           url.text
@@ -103,13 +103,13 @@ class AccessModify extends AccessAbstract
                         
                         c AS (SELECT
                          (CASE 
-                                WHEN u.deny | r.deny IS NULL
-                                THEN u.allow | r.allow
-                                ELSE (u.deny | r.deny) - COALESCE(u.allow | r.allow, ARRAY[]::int2[])
+                                WHEN u.deny | COALESCE(r.deny, ARRAY[]::int2[]) IS NULL
+                                THEN u.allow | COALESCE(r.allow, ARRAY[]::int2[])
+                                ELSE (u.deny | COALESCE(r.deny, ARRAY[]::int2[])) - COALESCE(u.allow | COALESCE(r.allow, ARRAY[]::int2[]), ARRAY[]::int2[])
                             END) ids,
                          (CASE 
-                                WHEN u.deny | r.deny IS NULL
-                                THEN COALESCE(u.is_allow, r.is_allow, true)
+                                WHEN u.deny | COALESCE(r.deny, ARRAY[]::int2[]) IS NULL
+                                THEN COALESCE(u.is_allow, r.is_allow)
                                 ELSE false
                             END) is_allow,
                           field,
