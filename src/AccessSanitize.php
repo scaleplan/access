@@ -204,6 +204,11 @@ class AccessSanitize
             }
 
             $arg = static::getParamValue($param, $args);
+            if ($arg === $param->getDefaultValue()) {
+                $sanArgs[$paramName] = $arg;
+                continue;
+            }
+
             $this->docTypeCheck($arg, $paramName, $paramType, $docBlock);
             //\is_string($arg) && $arg = \strip_tags($arg);
             $sanArgs[$paramName] = $arg;

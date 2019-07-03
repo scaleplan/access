@@ -64,7 +64,7 @@ class AccessControllerParent
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      */
-    public function checkControllerMethod(string $className, string $methodName, array $args): array
+    public function checkControllerMethod(string $className, string $methodName, array $args) : array
     {
         if (!\is_array($args)) {
             throw new ValidationException(translate('access.method-accept-array', [':method' => $methodName]));
@@ -145,7 +145,7 @@ class AccessControllerParent
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
-    public function __call(string $methodName, array $args): AbstractResult
+    public function __call(string $methodName, array $args) : AbstractResult
     {
         $args = reset($args);
         [$refClass, $method, $args] = $this->checkControllerMethod(static::class, $methodName, $args);
