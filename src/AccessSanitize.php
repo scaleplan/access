@@ -204,7 +204,7 @@ class AccessSanitize
             }
 
             $arg = static::getParamValue($param, $args);
-            if ($arg === $param->getDefaultValue()) {
+            if ($param->isOptional() && $arg === $param->getDefaultValue()) {
                 $sanArgs[$paramName] = $arg;
                 continue;
             }
