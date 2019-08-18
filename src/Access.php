@@ -2,7 +2,6 @@
 
 namespace Scaleplan\Access;
 
-use phpDocumentor\Reflection\DocBlock;
 use Scaleplan\Access\Constants\DbConstants;
 use Scaleplan\Access\Exceptions\AccessDeniedException;
 use Scaleplan\Access\Exceptions\AuthException;
@@ -102,14 +101,13 @@ class Access extends AccessAbstract
      * @param \ReflectionMethod $refMethod
      *
      * @throws AccessDeniedException
-     * @throws FormatException
      * @throws \ReflectionException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
      * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    protected function checkMethodFilters(array $accessRight, array $args, \ReflectionMethod $refMethod) : void
+    protected function checkMethodFilters(array $accessRight, array $args/*, \ReflectionMethod $refMethod*/) : void
     {
         /*$docBlock = new DocBlock($refMethod);
         if (!$docBlock
