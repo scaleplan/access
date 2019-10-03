@@ -81,8 +81,8 @@ class AccessModify extends AccessAbstract
         $sth = $this->getPSConnection()
             ->prepare("
                         WITH r AS (SELECT
-                         (CASE WHEN is_allow THEN ids END) allow,
-                         (CASE WHEN NOT is_allow THEN ids END) deny,
+                         (CASE WHEN rr.is_allow THEN rr.ids END) allow,
+                         (CASE WHEN NOT rr.is_allow THEN rr.ids END) deny,
                           url.field,
                           rr.is_allow,
                           url.text
@@ -92,28 +92,28 @@ class AccessModify extends AccessAbstract
                         WHERE uro.user_id = :user_id),
                         
                         u AS (SELECT
-                         (CASE WHEN is_allow THEN ids END) allow,
-                         (CASE WHEN NOT is_allow THEN ids END) deny,
+                         (CASE WHEN ur.is_allow THEN ur.ids END) allow,
+                         (CASE WHEN NOT ur.is_allow THEN ur.ids END) deny,
                           url.field,
                           ur.is_allow,
-                            url.text
+                          url.text
                         FROM access.user_right ur
                         RIGHT JOIN access.url ON url.id = ur.url_id
                         WHERE ur.user_id = :user_id),
                         
                         c AS (SELECT
                          (CASE 
-                                WHEN u.deny | COALESCE(r.deny, ARRAY[]::int2[]) IS NULL
-                                THEN u.allow | COALESCE(r.allow, ARRAY[]::int2[])
-                                ELSE (u.deny | COALESCE(r.deny, ARRAY[]::int2[])) - COALESCE(u.allow | COALESCE(r.allow, ARRAY[]::int2[]), ARRAY[]::int2[])
-                            END) ids,
+                            WHEN u.deny | COALESCE(r.deny, ARRAY[]::int4[]) IS NULL
+                            THEN u.allow | COALESCE(r.allow, ARRAY[]::int4[])
+                            ELSE (u.deny | COALESCE(r.deny, ARRAY[]::int4[])) - COALESCE(u.allow | COALESCE(r.allow, ARRAY[]::int4[]), ARRAY[]::int4[])
+                          END) ids,
                          (CASE 
-                                WHEN u.deny | COALESCE(r.deny, ARRAY[]::int2[]) IS NULL
-                                THEN COALESCE(u.is_allow, r.is_allow)
-                                ELSE false
-                            END) is_allow,
+                            WHEN u.deny | COALESCE(r.deny, ARRAY[]::int4[]) IS NULL
+                            THEN COALESCE(u.is_allow, r.is_allow)
+                            ELSE false
+                          END) is_allow,
                           field,
-                            text
+                          text
                         FROM r FULL JOIN u USING(field, text))
                         
                         SELECT
