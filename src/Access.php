@@ -98,7 +98,6 @@ class Access extends AccessAbstract
     /**
      * @param array $accessRight
      * @param array $args
-     * @param \ReflectionMethod $refMethod
      *
      * @throws AccessDeniedException
      * @throws \ReflectionException
@@ -225,7 +224,7 @@ class Access extends AccessAbstract
     ) : bool
     {
         $accessRight = $this->checkOnlyMethod($refClass, $refMethod);
-        $this->checkMethodFilters($accessRight, $args, $refMethod);
+        $this->checkMethodFilters($accessRight, $args/*, $refMethod*/);
 
         return true;
     }
