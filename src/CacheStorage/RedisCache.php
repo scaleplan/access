@@ -129,7 +129,7 @@ class RedisCache implements CacheStorageInterface
      */
     public function saveToCache(array $accessRights) : void
     {
-        $this->getConnection()->unlink(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}");
+        $this->getConnection()->del(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}");
         $hashValue = array_map(static function ($item) {
             return json_encode($item, JSON_FORCE_OBJECT) ?? $item;
         }, array_column($accessRights, null, DbConstants::URL_FIELD_NAME));
