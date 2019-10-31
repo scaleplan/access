@@ -21,6 +21,7 @@ class CacheStorageFabric
     /**
      * @param AccessConfig $config
      * @param int|null $userId
+     * @param string|null $database
      *
      * @return CacheStorageInterface
      *
@@ -33,7 +34,8 @@ class CacheStorageFabric
      */
     public static function getInstance(
         AccessConfig $config,
-        int $userId = null
+        int $userId = null,
+        string $database = null
     ) : CacheStorageInterface
     {
         $cacheType = $config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME)['type'] ?? null;
@@ -43,7 +45,7 @@ class CacheStorageFabric
 
         switch ($cacheType) {
             case 'redis':
-                return new RedisCache($userId, $config);
+                return new RedisCache($userId, $config, $database);
 
             case 'session':
                 return new SessionCache();

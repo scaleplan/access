@@ -9,6 +9,11 @@ use Scaleplan\Access\Exceptions\ConfigException;
 use Scaleplan\Redis\RedisSingleton;
 use function Scaleplan\Translator\translate;
 
+/**
+ * Class RedisCache
+ *
+ * @package Scaleplan\Access\CacheStorage
+ */
 class RedisCache implements CacheStorageInterface
 {
     /**
@@ -22,15 +27,22 @@ class RedisCache implements CacheStorageInterface
     protected $cacheData;
 
     /**
+     * @var string
+     */
+    protected $database;
+
+    /**
      * RedisCache constructor.
      *
      * @param int $userId
      * @param AccessConfig $config
+     * @param string $database
      */
-    public function __construct(int $userId, AccessConfig $config)
+    public function __construct(int $userId, AccessConfig $config, string $database = '')
     {
         $this->userId = $userId;
         $this->cacheData = $config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME);
+        $this->database = $database;
     }
 
     /**
@@ -58,6 +70,11 @@ class RedisCache implements CacheStorageInterface
         return $connection;
     }
 
+    protected function getDataKey() : string
+    {
+        return "{$this->database}:" . DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}";
+    }
+
     /**
      * @return array
      *
@@ -73,7 +90,8 @@ class RedisCache implements CacheStorageInterface
     {
         return array_map(static function ($item) {
             return json_decode($item, true) ?? $item;
-        }, array_filter($this->getConnection()->hGetAll(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}")));
+        }, array_filter($this->getConnection()->hGetAll($this->getDataKey()))
+        );
     }
 
     /**
@@ -91,9 +109,7 @@ class RedisCache implements CacheStorageInterface
      */
     public function getAccessRight(string $url) : array
     {
-        return json_decode(
-                $this->getConnection()->hGet(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}", $url), true
-            ) ?: [];
+        return json_decode($this->getConnection()->hGet($this->getDataKey(), $url), true) ?: [];
     }
 
     /**
@@ -129,7 +145,7 @@ class RedisCache implements CacheStorageInterface
      */
     public function saveToCache(array $accessRights) : void
     {
-        $this->getConnection()->del(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}");
+        $this->getConnection()->del($this->getDataKey());
         $hashValue = array_map(static function ($item) {
             return json_encode($item, JSON_FORCE_OBJECT) ?? $item;
         }, array_column($accessRights, null, DbConstants::URL_FIELD_NAME));
@@ -137,7 +153,7 @@ class RedisCache implements CacheStorageInterface
             return;
         }
 
-        if (!$this->getConnection()->hMSet(DbConstants::USER_ID_FIELD_NAME . ":{$this->userId}", $hashValue)) {
+        if (!$this->getConnection()->hMSet($this->getDataKey(), $hashValue)) {
             throw new AccessException(translate('access.redis-access-rights-write-failed'));
         }
     }

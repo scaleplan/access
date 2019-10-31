@@ -103,7 +103,8 @@ abstract class AccessAbstract
         $this->config = new AccessConfig(Yaml::parse(file_get_contents($confPath)));
         $this->cache = CacheStorageFabric::getInstance(
             $this->config,
-            $userId
+            $userId,
+            $storage->getDbName()
         );
 
         if ($userId < self::DEFAULT_USER_ID) {
