@@ -116,7 +116,7 @@ class Access extends AccessAbstract
 
         $docParam = end($tag);*/
         //$filterName = trim($docParam->getDescription()) ?: $this->config->get(AccessConfig::DEFAULT_FILTER_NAME);
-        $filters = \json_decode($accessRight[DbConstants::RIGHTS_FIELD_NAME], true);
+        $filters = $accessRight[DbConstants::RIGHTS_FIELD_NAME];
         if ($filters) {
             /*$filters = array_map('trim', explode(',', $filters));
 
@@ -158,7 +158,7 @@ class Access extends AccessAbstract
                 throw new AccessDeniedException(translate('access.id-not-allowed', [':filters' => $filters]));
             }*/
 
-            foreach ($filters[0] as $field => $data) {
+            foreach ($filters as $field => $data) {
                 if (!array_key_exists($field, $args) || $data[DbConstants::IDS_FIELD_NAME] === null) {
                     continue;
                 }
@@ -294,11 +294,12 @@ class Access extends AccessAbstract
 
     /**
      * @param string $url
+     * @param array $args
      *
      * @return array
      */
-    public function getForbiddenSelectors(string $url) : array
+    public function getForbiddenSelectors(string $url, array $args) : array
     {
-        return $this->cache->getForbiddenSelectors($url);
+        return $this->cache->getForbiddenSelectors($url, $args);
     }
 }

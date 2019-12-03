@@ -88,10 +88,14 @@ class RedisCache implements CacheStorageInterface
      */
     public function getAllAccessRights() : array
     {
-        return array_map(static function ($item) {
-            return json_decode($item, true) ?? $item;
-        }, array_filter($this->getConnection()->hGetAll($this->getDataKey()))
-        );
+        static $accessRight;
+        if (null === $accessRight) {
+            $accessRight = array_map(static function ($item) {
+                return json_decode($item, true) ?? $item;
+            }, array_filter($this->getConnection()->hGetAll($this->getDataKey())));
+        }
+
+        return $accessRight;
     }
 
     /**
@@ -109,11 +113,18 @@ class RedisCache implements CacheStorageInterface
      */
     public function getAccessRight(string $url) : array
     {
-        return json_decode($this->getConnection()->hGet($this->getDataKey(), $url), true) ?: [];
+        $accessRight = $this->getAllAccessRights()[$url] ?? [];
+        if (!empty($accessRight[DbConstants::RIGHTS_FIELD_NAME])) {
+            $accessRight[DbConstants::RIGHTS_FIELD_NAME]
+                = \json_decode($accessRight[DbConstants::RIGHTS_FIELD_NAME], true)[0];
+        }
+
+        return $accessRight;
     }
 
     /**
      * @param string $url
+     * @param array $args
      *
      * @return array
      *
@@ -125,10 +136,26 @@ class RedisCache implements CacheStorageInterface
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
-    public function getForbiddenSelectors(string $url) : array
+    public function getForbiddenSelectors(string $url, array $args) : array
     {
         $accessRights = $this->getAccessRight($url);
-        return $accessRights[DbConstants::FORBIDDEN_SELECTORS_FIELD_NAME] ?? [];
+        $forbiddenSelectors = [];
+        foreach ($accessRights[DbConstants::RIGHTS_FIELD_NAME] as $field => $data) {
+            if (!array_key_exists($field, $args)) {
+                continue;
+            }
+
+            $part = $accessRights[DbConstants::RIGHTS_FIELD_NAME][$field];
+            $forbiddenSelectors += $part[DbConstants::FORBIDDEN_SELECTORS_FIELD_NAME] ?? [];
+
+            break;
+        }
+
+        if ($forbiddenSelectors) {
+            $forbiddenSelectors = array_filter(array_unique($forbiddenSelectors));
+        }
+
+        return $forbiddenSelectors;
     }
 
     /**

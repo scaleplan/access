@@ -19,7 +19,7 @@ class SessionCache implements CacheStorageInterface
      */
     public function getAccessRight(string $url) : array
     {
-        return $_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME][$url] ?? [];
+        return $this->getAllAccessRights()[$url] ?? [];
     }
 
     /**
@@ -32,13 +32,30 @@ class SessionCache implements CacheStorageInterface
 
     /**
      * @param string $url
+     * @param array $args
      *
      * @return array
      */
-    public function getForbiddenSelectors(string $url) : array
+    public function getForbiddenSelectors(string $url, array $args) : array
     {
-        return $_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME]
-            [$url][DbConstants::FORBIDDEN_SELECTORS_FIELD_NAME] ?? [];
+        $accessRights = $this->getAccessRight($url);
+        $forbiddenSelectors = [];
+        foreach ($accessRights[DbConstants::RIGHTS_FIELD_NAME] as $field => $data) {
+            if (!array_key_exists($field, $args)) {
+                continue;
+            }
+
+            $part = $accessRights[DbConstants::RIGHTS_FIELD_NAME][$field];
+            $forbiddenSelectors += $part[DbConstants::FORBIDDEN_SELECTORS_FIELD_NAME] ?? [];
+
+            break;
+        }
+
+        if ($forbiddenSelectors) {
+            $forbiddenSelectors = array_filter(array_unique($forbiddenSelectors));
+        }
+
+        return $forbiddenSelectors;
     }
 
     /**

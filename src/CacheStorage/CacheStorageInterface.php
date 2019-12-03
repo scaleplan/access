@@ -23,10 +23,11 @@ interface CacheStorageInterface
 
     /**
      * @param string $url
+     * @param array $args
      *
      * @return array
      */
-    public function getForbiddenSelectors(string $url) : array;
+    public function getForbiddenSelectors(string $url, array $args) : array;
 
     /**
      * @param array $accessRights

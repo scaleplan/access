@@ -42,11 +42,11 @@ class AccessModify extends AccessAbstract
     {
         parent::__construct($psconnection, $userId, $confPath);
         $sth = $this->getPSConnection()->prepare('
-                       SELECT 
+                       SELECT
                          role
-                       FROM 
+                       FROM
                          access.user_role ur
-                       WHERE 
+                       WHERE
                          ur.user_id = :user_id
                     ');
         $sth->execute(['user_id' => $this->userId]);
@@ -85,42 +85,46 @@ class AccessModify extends AccessAbstract
                          (CASE WHEN NOT rr.is_allow THEN rr.ids END) deny,
                           url.field,
                           rr.is_allow,
-                          url.text
+                          url.text,
+                          rr.forbidden_selectors
                         FROM access.role_right rr
                         RIGHT JOIN access.url ON url.id = rr.url_id
                         LEFT JOIN access.user_role uro ON uro.role = rr.role
                         WHERE uro.user_id = :user_id),
-                        
+
                         u AS (SELECT
                          (CASE WHEN ur.is_allow THEN ur.ids END) allow,
                          (CASE WHEN NOT ur.is_allow THEN ur.ids END) deny,
                           url.field,
                           ur.is_allow,
-                          url.text
+                          url.text,
+                          ur.forbidden_selectors
                         FROM access.user_right ur
                         RIGHT JOIN access.url ON url.id = ur.url_id
                         WHERE ur.user_id = :user_id),
-                        
+
                         c AS (SELECT
-                         (CASE 
+                         (CASE
                             WHEN u.deny | COALESCE(r.deny, ARRAY[]::int4[]) IS NULL
                             THEN u.allow | COALESCE(r.allow, ARRAY[]::int4[])
                             ELSE (u.deny | COALESCE(r.deny, ARRAY[]::int4[])) - COALESCE(u.allow | COALESCE(r.allow, ARRAY[]::int4[]), ARRAY[]::int4[])
                           END) ids,
-                         (CASE 
+                         (CASE
                             WHEN u.deny | COALESCE(r.deny, ARRAY[]::int4[]) IS NULL
                             THEN COALESCE(u.is_allow, r.is_allow)
                             ELSE false
                           END) is_allow,
                           field,
-                          text
+                          text,
+                          COALESCE(r.forbidden_selectors, ARRAY[]::varchar[])
+                            || COALESCE(u.forbidden_selectors, ARRAY[]::varchar[]) AS forbidden_selectors
                         FROM r FULL JOIN u USING(field, text))
-                        
+
                         SELECT
                             text url,
                             json_agg(json_build_object(
-                              field, 
-                              json_build_object('is_allow', is_allow, 'ids', ids)
+                              field,
+                              json_build_object('is_allow', is_allow, 'ids', ids, 'forbidden_selectors', forbidden_selectors)
                             )) FILTER (WHERE NULLIF(field, '') IS NOT NULL) rights
                         FROM c
                         GROUP BY text
@@ -172,9 +176,9 @@ class AccessModify extends AccessAbstract
                                   :name,
                                   :model_id,
                                   :type)
-                                ON CONFLICT 
-                                  (text) 
-                                DO UPDATE SET 
+                                ON CONFLICT
+                                  (text)
+                                DO UPDATE SET
                                   model_type_id = excluded.model_type_id,
                                   type = excluded.type,
                                   name = excluded.name'
@@ -237,10 +241,10 @@ class AccessModify extends AccessAbstract
                                 VALUES
                                  (:url_id,
                                   :role)
-                                ON CONFLICT 
+                                ON CONFLICT
                                   (url_id,
-                                   role) 
-                                DO NOTHING 
+                                   role)
+                                DO NOTHING
                                 RETURNING
                                   *'
         );
@@ -289,11 +293,11 @@ class AccessModify extends AccessAbstract
     {
         $sth = $this->getPSConnection()->prepare(
             'INSERT INTO access.user_right(url_id, user_id, is_allow, ids)
-             VALUES (:url_id, :user_id, :is_allow, :ids::int4[])
+             VALUES (:url_id, :user_id, :is_allow, :ids::INT4[])
              ON CONFLICT
-             DO UPDATE SET 
-               is_allow = EXCLUDED.is_allow, 
-               ids = EXCLUDED.ids
+             DO UPDATE SET
+               is_allow = excluded.is_allow,
+               ids = excluded.ids
              RETURNING *'
         );
         $sth->execute(
