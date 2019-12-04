@@ -139,6 +139,10 @@ class RedisCache implements CacheStorageInterface
     public function getForbiddenSelectors(string $url, array $args) : array
     {
         $accessRights = $this->getAccessRight($url);
+        if (empty($accessRights[DbConstants::RIGHTS_FIELD_NAME])) {
+            return [];
+        }
+
         $forbiddenSelectors = [];
         foreach ($accessRights[DbConstants::RIGHTS_FIELD_NAME] as $field => $data) {
             if (!array_key_exists($field, $args)) {
