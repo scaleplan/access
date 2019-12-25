@@ -73,6 +73,7 @@ class AccessServiceParent
      * @throws AccessException
      * @throws SupportingException
      * @throws ValidationException
+     * @throws \InvalidArgumentException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
@@ -102,6 +103,7 @@ class AccessServiceParent
      * @throws AccessException
      * @throws SupportingException
      * @throws ValidationException
+     * @throws \InvalidArgumentException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
@@ -129,11 +131,11 @@ class AccessServiceParent
      * @param array $args - аргументы
      *
      * @return AccessServiceResult
-     *
      * @throws AccessDeniedException
      * @throws AccessException
      * @throws SupportingException
      * @throws ValidationException
+     * @throws \InvalidArgumentException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
@@ -193,6 +195,7 @@ class AccessServiceParent
      * @throws AccessException
      * @throws SupportingException
      * @throws ValidationException
+     * @throws \InvalidArgumentException
      * @throws \ReflectionException
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
