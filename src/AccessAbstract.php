@@ -114,7 +114,8 @@ abstract class AccessAbstract
         $this->userId = $userId;
         $this->storage = $storage;
 
-        $locale = locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']) ?: get_required_env('DEFAULT_LANG');
+        $locale = \Locale::acceptFromHttp((string)($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? ''))
+            ?: get_required_env('DEFAULT_LANG');
         /** @var \Symfony\Component\Translation\Translator $translator */
         $translator = get_required_container(TranslatorInterface::class, [$locale]);
         $translator->addResource('yml', __DIR__ . "/translates/$locale/access.yml", $locale, 'access');
