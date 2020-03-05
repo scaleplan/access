@@ -10,10 +10,10 @@ use Scaleplan\Access\Exceptions\ValidationException;
 use Scaleplan\Access\Hooks\MethodAllowed;
 use Scaleplan\Access\Hooks\MethodExecuted;
 use Scaleplan\Access\Hooks\SanitizePassed;
-use function Scaleplan\Event\dispatch;
 use Scaleplan\Result\AbstractResult;
 use Scaleplan\Result\DbResult;
 use Scaleplan\Result\HTMLResult;
+use function Scaleplan\Event\dispatch;
 use function Scaleplan\Translator\translate;
 
 /**
@@ -31,6 +31,11 @@ class AccessControllerParent
     protected $access;
 
     /**
+     * @var bool
+     */
+    protected $checkMethod = true;
+
+    /**
      * AccessControllerParent constructor.
      *
      * @param Access $access
@@ -38,6 +43,22 @@ class AccessControllerParent
     public function __construct(Access $access)
     {
         $this->access = $access;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCheckMethod() : bool
+    {
+        return $this->checkMethod;
+    }
+
+    /**
+     * @param bool $checkMethod
+     */
+    public function setCheckMethod(bool $checkMethod) : void
+    {
+        $this->checkMethod = $checkMethod;
     }
 
     /**
@@ -83,7 +104,9 @@ class AccessControllerParent
         $refMethod = $refClass->getMethod($methodName);
         $docBlock = new DocBlock($refMethod);
 
-        if (empty($docBlock->getTagsByName($this->access->getConfig()->get(AccessConfig::NO_CHECK_LABEL_NAME)))) {
+        if ($this->checkMethod
+            && empty($docBlock->getTagsByName($this->access->getConfig()->get(AccessConfig::NO_CHECK_LABEL_NAME)))
+        ) {
             $this->access->checkMethodRights($refMethod, $args, $refClass);
         }
 
