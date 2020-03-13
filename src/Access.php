@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Access;
 
@@ -112,55 +113,8 @@ class Access extends AccessAbstract
      */
     protected function checkMethodFilters(array $accessRight, array $args/*, \ReflectionMethod $refMethod*/) : void
     {
-        /*$docBlock = new DocBlock($refMethod);
-        if (!$docBlock
-            || empty($tag = $docBlock->getTagsByName($this->config->get(AccessConfig::FILTER_DIRECTIVE_NAME)))) {
-            return;
-        }
-
-        $docParam = end($tag);*/
-        //$filterName = trim($docParam->getDescription()) ?: $this->config->get(AccessConfig::DEFAULT_FILTER_NAME);
         $filters = $accessRight[DbConstants::RIGHTS_FIELD_NAME];
         if ($filters) {
-            /*$filters = array_map('trim', explode(',', $filters));
-
-            $accessRight[DbConstants::IDS_FIELD_NAME] = array_map(function ($item) {
-                return array_map('trim', explode($this->config->get(AccessConfig::FILTER_SEPARATOR_NAME), $item));
-            }, json_decode($accessRight[DbConstants::IDS_FIELD_NAME], true));
-
-            if (empty($args)) {
-                throw new FormatException(translate('access.parameter-list-empty'));
-            }
-
-            $methodDefaults = null;
-            static::getMethodDefaults($methodDefaults, $refMethod);
-
-            if (\count($accessRight[DbConstants::IDS_FIELD_NAME][0]) !== \count($filters)) {
-                throw new FormatException(translate('access.parameters-lists-mismatch'));
-            }
-
-            $checkValue = [];
-            foreach ($filters as $field => $data) {
-                if (!array_key_exists($field, $args)
-                    && array_key_exists($filter, $methodDefaults)) {
-                    $args[$filter] = $methodDefaults[$filter];
-                }
-
-                $checkValue[] = $args[$filter];
-            }
-
-            if (array_intersect($filters, array_keys($args)) !== $filters) {
-                throw new FormatException(translate('access.filters-mismatch'));
-            }
-
-            if (($accessRight[DbConstants::IS_ALLOW_FIELD_NAME]
-                    && !\in_array($checkValue, $accessRight[DbConstants::IDS_FIELD_NAME], true))
-                ||
-                (!$accessRight[DbConstants::IS_ALLOW_FIELD_NAME]
-                    && \in_array($checkValue, $accessRight[DbConstants::IDS_FIELD_NAME], true))
-            ) {
-                throw new AccessDeniedException(translate('access.id-not-allowed', [':filters' => $filters]));
-            }*/
 
             foreach ($filters as $field => $data) {
                 if (!array_key_exists($field, $args) || $data[DbConstants::IDS_FIELD_NAME] === null) {
@@ -172,35 +126,14 @@ class Access extends AccessAbstract
                     || (!$data[DbConstants::IS_ALLOW_FIELD_NAME]
                         && \in_array($args[$field], $data[DbConstants::IDS_FIELD_NAME], false))
                 ) {
-                    throw new AccessDeniedException(translate('access.id-not-allowed', [':filter' => $field]));
+                    continue;
                 }
 
-                break;
+                return;
             }
+
+            throw new AccessDeniedException(translate('access.id-not-allowed'));
         }
-        /*$filterValues = array_map(function ($item) {
-            return array_map('trim', explode($this->config->get(AccessConfig::FILTER_SEPARATOR_NAME), $item));
-        }, json_decode($accessRight[DbConstants::IDS_FIELD_NAME], true));
-
-        if (!$filterValues) {
-            return;
-        }
-
-        $isAllow = $accessRight[DbConstants::IS_ALLOW_FIELD_NAME];
-
-        if (empty($args)) {
-            throw new FormatException(translate('access.parameter-list-empty'));
-        }
-
-        if (!array_key_exists($filterName, $args)) {
-            return;
-            //throw new FormatException(translate('access.filters-mismatch'));
-        }
-
-        if ((!\in_array($args[$filterName], $filterValues) && $isAllow)
-            || (\in_array($args[$filterName], $filterValues) && !$isAllow)) {
-            throw new AccessDeniedException(translate('access.id-not-allowed', [':filter' => $filterName]));
-        }*/
     }
 
     /**
