@@ -117,8 +117,12 @@ class Access extends AccessAbstract
         if ($filters) {
 
             foreach ($filters as $field => $data) {
-                if (!array_key_exists($field, $args) || $data[DbConstants::IDS_FIELD_NAME] === null) {
+                if (!array_key_exists($field, $args)) {
                     continue;
+                }
+
+                if ($data[DbConstants::IDS_FIELD_NAME] === null) {
+                    return;
                 }
 
                 if (($data[DbConstants::IS_ALLOW_FIELD_NAME]
