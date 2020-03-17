@@ -111,12 +111,16 @@ class Access extends AccessAbstract
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
-    protected function checkMethodFilters(array $accessRight, array $args/*, \ReflectionMethod $refMethod*/) : void
+    protected function checkMethodFilters(array $accessRight, array $args) : void
     {
         $filters = $accessRight[DbConstants::RIGHTS_FIELD_NAME];
         if ($filters) {
 
             foreach ($filters as $field => $data) {
+                if ($field === '') {
+                    return;
+                }
+
                 if (!array_key_exists($field, $args)) {
                     continue;
                 }
@@ -126,14 +130,12 @@ class Access extends AccessAbstract
                 }
 
                 if (($data[DbConstants::IS_ALLOW_FIELD_NAME]
-                        && !\in_array($args[$field], $data[DbConstants::IDS_FIELD_NAME], false))
-                    || (!$data[DbConstants::IS_ALLOW_FIELD_NAME]
                         && \in_array($args[$field], $data[DbConstants::IDS_FIELD_NAME], false))
+                    || (!$data[DbConstants::IS_ALLOW_FIELD_NAME]
+                        && !\in_array($args[$field], $data[DbConstants::IDS_FIELD_NAME], false))
                 ) {
-                    continue;
+                    return;
                 }
-
-                return;
             }
 
             throw new AccessDeniedException(translate('access.id-not-allowed'));

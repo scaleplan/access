@@ -115,8 +115,11 @@ class RedisCache implements CacheStorageInterface
     {
         $accessRight = $this->getAllAccessRights()[$url] ?? [];
         if (!empty($accessRight[DbConstants::RIGHTS_FIELD_NAME])) {
-            $accessRight[DbConstants::RIGHTS_FIELD_NAME]
-                = \json_decode($accessRight[DbConstants::RIGHTS_FIELD_NAME], true)[0];
+            $rights = json_decode($accessRight[DbConstants::RIGHTS_FIELD_NAME], true);
+            $accessRight[DbConstants::RIGHTS_FIELD_NAME] = [];
+            foreach ($rights as $right) {
+                $accessRight[DbConstants::RIGHTS_FIELD_NAME] += $right;
+            }
         }
 
         return $accessRight;

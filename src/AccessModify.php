@@ -123,9 +123,9 @@ class AccessModify extends AccessAbstract
                         SELECT
                             text url,
                             json_agg(json_build_object(
-                              field,
+                              COALESCE(field, ''),
                               json_build_object('is_allow', is_allow, 'ids', ids, 'forbidden_selectors', forbidden_selectors)
-                            )) FILTER (WHERE NULLIF(field, '') IS NOT NULL) rights
+                            )) rights
                         FROM c
                         GROUP BY text
                     ");
