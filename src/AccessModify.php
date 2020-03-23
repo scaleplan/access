@@ -116,8 +116,8 @@ class AccessModify extends AccessAbstract
                           END) is_allow,
                           field,
                           text,
-                          COALESCE(r.forbidden_selectors, ARRAY[]::varchar[])
-                            || COALESCE(u.forbidden_selectors, ARRAY[]::varchar[]) AS forbidden_selectors
+                          COALESCE(r.forbidden_selectors, '')
+                            || COALESCE(u.forbidden_selectors, '') AS forbidden_selectors
                         FROM r FULL JOIN u USING(field, text))
 
                         SELECT

@@ -34,7 +34,7 @@ class SessionCache implements CacheStorageInterface
      * @param string $url
      * @param array $args
      *
-     * @return array
+     * @return string[]
      */
     public function getForbiddenSelectors(string $url, array $args) : array
     {
@@ -49,17 +49,13 @@ class SessionCache implements CacheStorageInterface
                 continue;
             }
 
-            $part = $accessRights[DbConstants::RIGHTS_FIELD_NAME][$field];
-            $forbiddenSelectors += $part[DbConstants::FORBIDDEN_SELECTORS_FIELD_NAME] ?? [];
-
-            break;
+            $part = $accessRights[DbConstants::RIGHTS_FIELD_NAME][$field][DbConstants::FORBIDDEN_SELECTORS_FIELD_NAME];
+            if (!empty($part)) {
+                $forbiddenSelectors += array_map('trim', explode(',', $part));
+            }
         }
 
-        if ($forbiddenSelectors) {
-            $forbiddenSelectors = array_filter(array_unique($forbiddenSelectors));
-        }
-
-        return $forbiddenSelectors;
+        return array_unique($forbiddenSelectors);
     }
 
     /**
