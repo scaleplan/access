@@ -130,7 +130,7 @@ class AccessControllerParent
      */
     protected static function execute(\ReflectionMethod $method, array &$args, object $obj = null)
     {
-        $method->setAccessible(true);
+//        $method->setAccessible(true);
         $result = $method->invokeArgs($obj, $args);
         dispatch(MethodExecuted::class);
 
