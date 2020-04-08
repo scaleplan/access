@@ -55,6 +55,14 @@ class AccessModify extends AccessAbstract
     }
 
     /**
+     * @param int $userId
+     */
+    public function setUserId(int $userId) : void
+    {
+        $this->userId = $userId;
+    }
+
+    /**
      * @param string $role
      *
      * @throws ConfigException
@@ -310,5 +318,10 @@ class AccessModify extends AccessAbstract
         );
 
         return $sth->fetchAll();
+    }
+
+    public function flushCache() : void
+    {
+        $this->cache->flush();
     }
 }

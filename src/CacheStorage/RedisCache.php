@@ -16,6 +16,8 @@ use function Scaleplan\Translator\translate;
  */
 class RedisCache implements CacheStorageInterface
 {
+    public const DATABASE_PREFIX = 'access-rights:';
+
     /**
      * @var int
      */
@@ -42,7 +44,7 @@ class RedisCache implements CacheStorageInterface
     {
         $this->userId = $userId;
         $this->cacheData = $config->get(AccessConfig::CACHE_STORAGE_SECTION_NAME);
-        $this->database = $database;
+        $this->database = static::DATABASE_PREFIX . $database;
     }
 
     /**
@@ -186,5 +188,19 @@ class RedisCache implements CacheStorageInterface
         if (!$this->getConnection()->hMSet($this->getDataKey(), $hashValue)) {
             throw new AccessException(translate('access.redis-access-rights-write-failed'));
         }
+    }
+
+    /**
+     * @throws ConfigException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
+     * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
+     */
+    public function flush() : void
+    {
+        $this->getConnection()->flushDB();
     }
 }

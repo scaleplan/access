@@ -34,4 +34,6 @@ interface CacheStorageInterface
      * @param array $accessRights
      */
     public function saveToCache(array $accessRights) : void;
+
+    public function flush() : void;
 }

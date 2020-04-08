@@ -4,6 +4,7 @@ namespace Scaleplan\Access\CacheStorage;
 
 use Scaleplan\Access\Constants\DbConstants;
 use Scaleplan\Access\Constants\SessionConstants;
+use Scaleplan\Access\Exceptions\AccessException;
 
 /**
  * Class SessionCache
@@ -65,5 +66,13 @@ class SessionCache implements CacheStorageInterface
     {
         $_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME]
             = array_column($accessRights, null, 'url');
+    }
+
+    /**
+     * @throws AccessException
+     */
+    public function flush() : void
+    {
+        throw new AccessException('Flushing all access rights cache elements not supporting session cache driver.');
     }
 }
