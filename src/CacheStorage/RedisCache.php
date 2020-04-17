@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Access\CacheStorage;
 
@@ -32,6 +33,11 @@ class RedisCache implements CacheStorageInterface
      * @var string
      */
     protected $database;
+
+    /**
+     * @var array|null
+     */
+    protected $allAccessRights;
 
     /**
      * RedisCache constructor.
@@ -78,7 +84,7 @@ class RedisCache implements CacheStorageInterface
     }
 
     /**
-     * @return array
+     * @return array|null
      *
      * @throws ConfigException
      * @throws \ReflectionException
@@ -88,16 +94,15 @@ class RedisCache implements CacheStorageInterface
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Redis\Exceptions\RedisSingletonException
      */
-    public function getAllAccessRights() : array
+    public function getAllAccessRights() : ?array
     {
-        static $accessRight;
-        if (null === $accessRight) {
-            $accessRight = array_map(static function ($item) {
+        if (null === $this->allAccessRights && $this->getConnection()->exists($this->getDataKey())) {
+            $this->allAccessRights = array_map(static function ($item) {
                 return json_decode($item, true) ?? $item;
             }, array_filter($this->getConnection()->hGetAll($this->getDataKey())));
         }
 
-        return $accessRight;
+        return $this->allAccessRights;
     }
 
     /**
@@ -115,7 +120,7 @@ class RedisCache implements CacheStorageInterface
      */
     public function getAccessRight(string $url) : array
     {
-        $accessRight = $this->getAllAccessRights()[$url] ?? [];
+        $accessRight = ($this->getAllAccessRights() ?? [])[$url] ?? [];
         if (!empty($accessRight[DbConstants::RIGHTS_FIELD_NAME])) {
             $rights = json_decode($accessRight[DbConstants::RIGHTS_FIELD_NAME], true);
             $accessRight[DbConstants::RIGHTS_FIELD_NAME] = [];
@@ -178,9 +183,11 @@ class RedisCache implements CacheStorageInterface
     public function saveToCache(array $accessRights) : void
     {
         $this->getConnection()->del($this->getDataKey());
+        $formattedRights = array_column($accessRights, null, DbConstants::URL_FIELD_NAME);
         $hashValue = array_map(static function ($item) {
             return json_encode($item, JSON_FORCE_OBJECT) ?? $item;
-        }, array_column($accessRights, null, DbConstants::URL_FIELD_NAME));
+        }, $formattedRights);
+        $this->allAccessRights = $formattedRights;
         if (!$hashValue) {
             return;
         }

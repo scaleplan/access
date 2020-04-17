@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Access;
 
@@ -39,6 +40,8 @@ class AccessConfig
     public const FILTER_SEPARATOR_NAME = 'access_separator';
 
     public const NO_CHECK_LABEL_NAME = 'access_no_rights_check';
+
+    public const NO_VALIDATE_LABEL_NAME = 'access_no_validate';
 
     public const DOCBLOCK_CHECK_LABEL_NAME = 'deny_fuzzy';
 

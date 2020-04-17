@@ -1,13 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Access;
 
 use phpDocumentor\Reflection\DocBlock;
+use phpDocumentor\Reflection\DocBlock\Tag\ParamTag;
 use Scaleplan\Access\Exceptions\AccessException;
 use Scaleplan\Access\Exceptions\SupportingException;
 use Scaleplan\Access\Exceptions\ValidationException;
 use Scaleplan\DTO\DTO;
-use phpDocumentor\Reflection\DocBlock\Tag\ParamTag;
 use Scaleplan\Helpers\NameConverter;
 use function Scaleplan\Translator\translate;
 
@@ -51,6 +52,11 @@ class AccessSanitize
     protected $access;
 
     /**
+     * @var bool
+     */
+    protected $isValidate = true;
+
+    /**
      * AccessSanitize constructor.
      *
      * @param Access $access - объект Access
@@ -73,6 +79,22 @@ class AccessSanitize
         $this->access = $access;
         $this->reflector = $reflector;
         $this->args = $args;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValidate() : bool
+    {
+        return $this->isValidate;
+    }
+
+    /**
+     * @param bool $isValidate
+     */
+    public function setIsValidate(bool $isValidate) : void
+    {
+        $this->isValidate = $isValidate;
     }
 
     /**
@@ -106,10 +128,12 @@ class AccessSanitize
      * @param $args
      * @param string $typeName
      *
+     * @param bool $isValidate
+     *
      * @return DTO|null
      * @throws \Scaleplan\DTO\Exceptions\ValidationException
      */
-    public static function getDTO($args, string $typeName) : ?DTO
+    public static function getDTO($args, string $typeName, bool $isValidate = true) : ?DTO
     {
         if (!is_subclass_of($typeName, DTO::class)) {
             return null;
@@ -117,8 +141,11 @@ class AccessSanitize
 
         /** @var DTO $param */
         $param = new $typeName($args);
-        $param->validate([static::TYPE_VALIDATION_GROUP]);
-        $param->validate();
+        if ($isValidate) {
+            $param->validate([static::TYPE_VALIDATION_GROUP]);
+            $param->validate();
+        }
+
         return $param;
     }
 
@@ -197,7 +224,7 @@ class AccessSanitize
                 break;
             }
 
-            $dto = static::getDTO($args, $paramType);
+            $dto = static::getDTO($args, $paramType, $this->isValidate());
             if ($dto) {
                 $sanArgs[$paramName] = $dto;
                 continue;

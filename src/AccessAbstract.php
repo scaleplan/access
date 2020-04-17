@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Access;
 
@@ -65,17 +66,20 @@ abstract class AccessAbstract
      * @param int $userId - идентификатор пользователя
      * @param string $confPath - путь в файлу конфигурации
      *
+     * @param CacheStorageInterface $cache
+     *
      * @return AccessAbstract
      */
     public static function getInstance(
         DbInterface $storage,
         int $userId = self::DEFAULT_USER_ID,
-        string $confPath = __DIR__ . '/../config.yml'
+        string $confPath = __DIR__ . '/../config.yml',
+        CacheStorageInterface $cache = null
     ) : self
     {
         if (!static::$instance) {
             $className = static::class;
-            static::$instance = new $className($storage, $userId, $confPath);
+            static::$instance = new $className($storage, $userId, $confPath, $cache);
         }
 
         return static::$instance;
@@ -88,6 +92,8 @@ abstract class AccessAbstract
      * @param int $userId - идентификатор пользователя
      * @param string $confPath - пусть к конфигурации
      *
+     * @param CacheStorageInterface|null $cache
+     *
      * @throws ConfigException
      * @throws Exceptions\CacheTypeNotSupportingException
      * @throws \ReflectionException
@@ -97,11 +103,15 @@ abstract class AccessAbstract
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
-    protected function __construct(DbInterface $storage, int $userId, string $confPath)
-    {
+    protected function __construct(
+        DbInterface $storage,
+        int $userId,
+        string $confPath,
+        CacheStorageInterface $cache = null
+    ) {
         $this->confPath = $confPath;
         $this->config = new AccessConfig(Yaml::parse(file_get_contents($confPath)));
-        $this->cache = CacheStorageFabric::getInstance(
+        $this->cache = $cache ?? CacheStorageFabric::getInstance(
             $this->config,
             $userId,
             $storage->getDbName()

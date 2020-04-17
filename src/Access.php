@@ -34,8 +34,13 @@ class Access extends AccessAbstract
      */
     public function getAccessRights(string $url = '') : array
     {
-        if (!$this->cache->getAllAccessRights()) {
-            AccessModify::getInstance($this->storage, $this->getUserId(), $this->confPath)->saveAccessRightsToCache();
+        if (null === $this->cache->getAllAccessRights()) {
+            AccessModify::getInstance(
+                $this->storage,
+                $this->getUserId(),
+                $this->confPath,
+                $this->cache
+            )->saveAccessRightsToCache();
         }
 
         if ($url) {

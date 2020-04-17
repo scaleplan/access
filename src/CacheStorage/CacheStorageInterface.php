@@ -18,9 +18,9 @@ interface CacheStorageInterface
     public function getAccessRight(string $url) : array;
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getAllAccessRights() : array;
+    public function getAllAccessRights() : ?array;
 
     /**
      * @param string $url

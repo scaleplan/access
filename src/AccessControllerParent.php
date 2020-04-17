@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Access;
 
@@ -34,6 +35,11 @@ class AccessControllerParent
      * @var bool
      */
     protected $checkMethod = true;
+
+    /**
+     * @var bool
+     */
+    protected $validate = true;
 
     /**
      * AccessControllerParent constructor.
@@ -105,14 +111,25 @@ class AccessControllerParent
         $docBlock = new DocBlock($refMethod);
 
         if ($this->checkMethod
-            && empty($docBlock->getTagsByName($this->access->getConfig()->get(AccessConfig::NO_CHECK_LABEL_NAME)))
+            && ($tagName = $this->access->getConfig()->get(AccessConfig::NO_CHECK_LABEL_NAME))
+            && empty($docBlock->getTagsByName($tagName))
         ) {
             $this->access->checkMethodRights($refMethod, $args, $refClass);
         }
 
         dispatch(MethodAllowed::class);
 
-        $args = (new AccessSanitize($this->access, $refMethod, $args))->sanitizeArgs();
+        $accessSanitize = new AccessSanitize($this->access, $refMethod, $args);
+        $validate = false;
+        if ($this->validate
+            && ($tagName = $this->access->getConfig()->get(AccessConfig::NO_VALIDATE_LABEL_NAME))
+            && empty($docBlock->getTagsByName($tagName))
+        ) {
+            $validate = true;
+        }
+
+        $accessSanitize->setIsValidate($validate);
+        $args = $accessSanitize->sanitizeArgs();
         dispatch(SanitizePassed::class);
 
         return [$refClass, $refMethod, $args,];

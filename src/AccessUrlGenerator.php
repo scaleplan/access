@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Access;
 
@@ -108,7 +109,7 @@ class AccessUrlGenerator
             $accessUrlType = $docBlock->getTagsByName($this->config->get(AccessConfig::ANNOTATION_URL_TYPE_LABEL_NAME));
             $accessUrlType = end($accessUrlType);
 
-            $modelId = static::searchModelId($accessSchema, $accessTables, $models);
+            $modelId = static::searchModelId((string)$accessSchema, (string)$accessTables, $models);
 
             $text = '/'
                 . strtolower(str_replace('Controller', '', $controller))

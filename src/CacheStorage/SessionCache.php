@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Access\CacheStorage;
 
@@ -20,15 +21,15 @@ class SessionCache implements CacheStorageInterface
      */
     public function getAccessRight(string $url) : array
     {
-        return $this->getAllAccessRights()[$url] ?? [];
+        return ($this->getAllAccessRights() ?? [])[$url] ?? [];
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getAllAccessRights() : array
+    public function getAllAccessRights() : ?array
     {
-        return (array)($_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME] ?? []);
+        return $_SESSION[SessionConstants::SESSION_ACCESS_RIGHTS_SECTION_NAME] ?? null;
     }
 
     /**

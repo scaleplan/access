@@ -40,6 +40,9 @@ default_access_filter: id
 # Не проверять права на выполнение метода контроллера
 access_no_rights_check: noCheck
 
+# Не валидировать параметры запроса при использовании DTO validation
+access_no_validate: noValidate
+
 # Дескриптор указывающий имя схемы, таблицы которой используются при выполнении метода контроллера
 access_schema: schema
 

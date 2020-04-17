@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Access;
 
+use Scaleplan\Access\CacheStorage\CacheStorageInterface;
 use Scaleplan\Access\Exceptions\ConfigException;
 use Scaleplan\Db\Interfaces\DbInterface;
 use function Scaleplan\Translator\translate;
@@ -29,6 +31,8 @@ class AccessModify extends AccessAbstract
      * @param int $userId
      * @param string $confPath
      *
+     * @param CacheStorageInterface $cache
+     *
      * @throws ConfigException
      * @throws Exceptions\CacheTypeNotSupportingException
      * @throws \ReflectionException
@@ -38,9 +42,9 @@ class AccessModify extends AccessAbstract
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
-    public function __construct(DbInterface $psconnection, int $userId, string $confPath)
+    public function __construct(DbInterface $psconnection, int $userId, string $confPath, CacheStorageInterface $cache)
     {
-        parent::__construct($psconnection, $userId, $confPath);
+        parent::__construct($psconnection, $userId, $confPath, $cache);
         $sth = $this->getPSConnection()->prepare('
                        SELECT
                          role
@@ -51,7 +55,7 @@ class AccessModify extends AccessAbstract
                     ');
         $sth->execute(['user_id' => $this->userId]);
 
-        $this->setRole($sth->fetch()['role'] ?? $this->config->get(AccessConfig::DEFAULT_ROLE_LABEL_NAME));
+        $this->setRole((string)($sth->fetch()['role'] ?? $this->config->get(AccessConfig::DEFAULT_ROLE_LABEL_NAME)));
     }
 
     /**
