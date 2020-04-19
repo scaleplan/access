@@ -42,7 +42,11 @@ class AccessModify extends AccessAbstract
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
-    public function __construct(DbInterface $psconnection, int $userId, string $confPath, CacheStorageInterface $cache)
+    public function __construct(
+        DbInterface $psconnection,
+        int $userId, string $confPath,
+        CacheStorageInterface $cache = null
+    )
     {
         parent::__construct($psconnection, $userId, $confPath, $cache);
         $sth = $this->getPSConnection()->prepare('
