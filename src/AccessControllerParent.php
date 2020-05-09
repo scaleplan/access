@@ -5,6 +5,7 @@ namespace Scaleplan\Access;
 
 use phpDocumentor\Reflection\DocBlock;
 use Scaleplan\Access\Exceptions\AccessDeniedException;
+use Scaleplan\Access\Exceptions\AccessException;
 use Scaleplan\Access\Exceptions\ClassNotFoundException;
 use Scaleplan\Access\Exceptions\MethodNotFoundException;
 use Scaleplan\Access\Exceptions\ValidationException;
@@ -142,13 +143,28 @@ class AccessControllerParent
      *
      * @return mixed|DbResult|HTMLResult
      *
+     * @throws AccessException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      * @throws \Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException
      * @throws \Scaleplan\Result\Exceptions\ResultException
      */
     protected static function execute(\ReflectionMethod $method, array &$args, object $obj = null)
     {
 //        $method->setAccessible(true);
-        $result = $method->invokeArgs($obj, $args);
+        try {
+            $result = $method->invokeArgs($obj, $args);
+        } catch (\ReflectionException $e) {
+            if (strpos($e->getMessage(), 'Trying to invoke private method') !== false) {
+                throw new AccessException(translate('access.method-is-private'));
+            }
+
+            throw $e;
+        }
+
         dispatch(MethodExecuted::class);
 
         if ($result instanceof AbstractResult) {
