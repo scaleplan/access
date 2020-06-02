@@ -217,7 +217,7 @@ class AccessSanitize
                     break;
                 }
 
-                $sanArgs = array_merge($sanArgs, array_map(static function ($arg) use ($paramType, $paramName, $docBlock) {
+                $sanArgs = array_merge($sanArgs, array_map(function ($arg) use ($paramType, $paramName, $docBlock) {
                     $this->docTypeCheck($arg, $paramName, $paramType, $docBlock);
                     return $arg;
                 }, $args));
