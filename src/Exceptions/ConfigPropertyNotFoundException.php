@@ -10,5 +10,5 @@ namespace Scaleplan\Access\Exceptions;
  */
 class ConfigPropertyNotFoundException extends ConfigException
 {
-    public const MESSAGE = 'Config property not found.';
+    public const MESSAGE = 'Свойство конфигурации не найдено.';
 }

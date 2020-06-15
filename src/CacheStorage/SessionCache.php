@@ -6,6 +6,7 @@ namespace Scaleplan\Access\CacheStorage;
 use Scaleplan\Access\Constants\DbConstants;
 use Scaleplan\Access\Constants\SessionConstants;
 use Scaleplan\Access\Exceptions\AccessException;
+use function Scaleplan\Translator\translate;
 
 /**
  * Class SessionCache
@@ -71,9 +72,14 @@ class SessionCache implements CacheStorageInterface
 
     /**
      * @throws AccessException
+     * @throws \ReflectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ContainerTypeNotSupportingException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
+     * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
      */
     public function flush() : void
     {
-        throw new AccessException('Flushing all access rights cache elements not supporting session cache driver.');
+        throw new AccessException(translate('access.flushing-all-rights-not-supporting'));
     }
 }

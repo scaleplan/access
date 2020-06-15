@@ -10,6 +10,6 @@ namespace Scaleplan\Access\Exceptions;
  */
 class ValidationException extends AccessException
 {
-    public const MESSAGE = 'Access validation error.';
+    public const MESSAGE = 'Ошибка валидации.';
     public const CODE = 422;
 }

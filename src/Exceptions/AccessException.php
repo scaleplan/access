@@ -10,7 +10,7 @@ namespace Scaleplan\Access\Exceptions;
  */
 class AccessException extends \Exception
 {
-    public const MESSAGE = 'Access error.';
+    public const MESSAGE = 'Ошибка доступа.';
     public const CODE = 403;
 
     /**

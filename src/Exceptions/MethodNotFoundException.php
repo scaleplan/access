@@ -10,6 +10,6 @@ namespace Scaleplan\Access\Exceptions;
  */
 class MethodNotFoundException extends AccessException
 {
-    public const MESSAGE = 'Method not found.';
+    public const MESSAGE = 'Метод не найден.';
     public const CODE = 404;
 }

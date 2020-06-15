@@ -10,6 +10,6 @@ namespace Scaleplan\Access\Exceptions;
  */
 class AuthException extends AccessException
 {
-    public const MESSAGE = 'Please, log in.';
+    public const MESSAGE = 'Пожайлуйста, авторизуйтесь.';
     public const CODE = 401;
 }
