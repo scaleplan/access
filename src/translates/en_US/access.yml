@@ -1,35 +1,47 @@
-lets-auth: Авторизуйтесь на сайте
-method-not-allowed: Метод :method не разрешен Вам для выпонения
-property-not-allowed: Свойство :property не доступно
-parameter-list-empty: Список параметров выполнения действия пуст
-parameters-lists-mismatch: Количество фильтрующих параметров не соответствует количеству фильтрующих значений
-filters-mismatch: Список параметров выполнения действия не содержит все фильтрующие параметры
-id-not-allowed: Выполнение метода с такими параметрами Вам запрещено
-file-not-allowed: Файл Вам не доступен
-method-is-private: Метод не доступен
-path-missing: 'Неверный формат данных о директории с контроллерами: нет необходимого параметра "path"'
-incorrect-user-id: Неверное задан идентификатор пользователя
-incorrect-db-driver: Драйвер :driver постоянного хранилища не поддерживается системой
-config-missing: Отсутствует конфигурация
-db-config-missing: В конфигурации отсутствуют данные о подключениие к постоянному хранилищу прав
-cache-config-missing: В конфигурации отсутствуют необходимые данные о подключениие к кэширующему хранилищу прав
-roles-missing: Отсутствует список ролей
-roles-list-incorrect: Список ролей должен быть задан списком
-filter-field-config-missing: В конфигурации отсутствует имя для метки фильтрующего аргумента
-access-check-config-lanel-missing: В конфигурации отсутствует имя метки проверки прав
-filter-delimiter-config-missing: В конфигурации отсутствует разделитель фильтров
-default-role-config-missing: В конфигурации отсутствует роль пользователя по умолчанию
-method-accept-array: Метод :method принимает параметры в виде массива
-class-does-not-exist: Класс :class не существует
-method-does-not-exist: Метод :method не существует
-role-does-not-exist: Заданная роль не входит в список доступных ролей
-allows-reflections-only: Разрешены только отражения методов и свойств
-required-parameter-missing: Отсутствует необходимый параметр :parameter
-parameter-type-mismatch: Тип параметра :parameter не соответствует заданному типу :type
-return-type-mismatch: Тип возвращаемого значения не соответствует заданному типу :type
-cache-type-not-supporting: Тип кэша :type не поддерживается
-redis-socket-not-set: В конфигурации не задан путь к Redis-сокету
-redis-access-rights-write-failed: Не удалось записать права доступа в Redis
-default-filter-name-missing: Конфигурационный параметр, указывающий на имя фильтра, по которому проверяются модели отсутствует
-flushing-all-rights-not-supporting: Полный сброс кэша прав доступа недоступен для текущего драйвера кэша
+lets-auth: Please, sign in.
+method-not-allowed: Method :method not allowed to execute for you.
+property-not-allowed: Property :property not available.
+parameter-list-empty: Execute parameters list is empty.
+parameters-lists-mismatch: Count of filtering parameters not equals to count of filtering values.
+filters-mismatch: Execute parameters list don't contain all filtering parameters.
+id-not-allowed: Method executing with current parameters denied.
+file-not-allowed: File access denied.
+method-is-private: Method not available.
+path-missing: 'Controllers directory data format has wrong format: required parameter "path" not found.'
+incorrect-user-id: User ID has wrong format.
+incorrect-db-driver: Driver :driver of persistent storage not supported.
+config-missing: Config not found.
+db-config-missing: Empty config data about connection to access rights persistent storage.
+cache-config-missing: Empty config data about connection to access rights cache storage.
+roles-missing: Roles list not found.
+roles-list-incorrect: Roles list must be specified by array.
+filter-field-config-missing: Filtering argument label not found in config.
+access-check-config-lanel-missing: Access right check label not found in config.
+filter-delimiter-config-missing: Filter separator not found in config.
+default-role-config-missing: Default user role not found in config.
+method-accept-array: Method :method allows parameters in array format only.
+class-does-not-exist: Class :class does not exist.
+method-does-not-exist: Method :method does not exist.
+role-does-not-exist: Current role not contains in available roles list.
+allows-reflections-only: Allow only reflections of methods or properties.
+required-parameter-missing: Required parameter :parameter is missing.
+parameter-type-mismatch: Parameter :parameter type does not match to given type :type.
+return-type-mismatch: Return value type does not match to given type :type.
+cache-type-not-supporting: Cache type :type not supported.
+redis-socket-not-set: Redis socket path not found in config.
+redis-access-rights-write-failed: Access rights list saving to Redis failed.
+default-filter-name-missing: There is no configuration parameter indicating the name of the filter by which models are checked.
+flushing-all-rights-not-supporting: Accees right cache flushing not supported in current cache driver.
+access-denied: Access denied.
+access-error: Access error.
+please-sign-in: Please, sign in.
+cache-type-not-supported: Cache type not supported.
+class-not-found: Class not found.
+config-error: Config error.
+config-setting-not-found: Config setting not found.
+wrong-data-format: Wrong data format.
+method-not-found: Method-not-found.
+only-reflections: Supported only reflection of method or property.
+user-id-not-found: User ID not found.
+validation-error: Validation error.
 

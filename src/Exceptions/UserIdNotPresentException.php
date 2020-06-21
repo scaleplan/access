@@ -10,6 +10,6 @@ namespace Scaleplan\Access\Exceptions;
  */
 class UserIdNotPresentException extends AccessException
 {
-    public const MESSAGE = 'Идентификатор пользователя не найден.';
+    public const MESSAGE = 'access.user-id-not-found';
     public const CODE = 406;
 }

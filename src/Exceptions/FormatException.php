@@ -10,6 +10,6 @@ namespace Scaleplan\Access\Exceptions;
  */
 class FormatException extends AccessException
 {
-    public const MESSAGE = 'Неверный формат данных.';
+    public const MESSAGE = 'access.wrong-data-format';
     public const CODE = 406;
 }

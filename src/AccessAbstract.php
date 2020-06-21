@@ -7,11 +7,8 @@ use Scaleplan\Access\CacheStorage\CacheStorageFabric;
 use Scaleplan\Access\CacheStorage\CacheStorageInterface;
 use Scaleplan\Access\Exceptions\ConfigException;
 use Scaleplan\Db\Interfaces\DbInterface;
-use function Scaleplan\DependencyInjection\get_required_container;
-use function Scaleplan\Helpers\get_required_env;
-use function Scaleplan\Translator\translate;
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use function Scaleplan\Translator\translate;
 
 /**
  * Суперкласс
@@ -101,21 +98,21 @@ abstract class AccessAbstract
      * @throws \Scaleplan\DependencyInjection\Exceptions\DependencyInjectionException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ParameterMustBeInterfaceNameOrClassNameException
      * @throws \Scaleplan\DependencyInjection\Exceptions\ReturnTypeMustImplementsInterfaceException
-     * @throws \Scaleplan\Helpers\Exceptions\EnvNotFoundException
      */
     protected function __construct(
         DbInterface $storage,
         int $userId,
         string $confPath,
         CacheStorageInterface $cache = null
-    ) {
+    )
+    {
         $this->confPath = $confPath;
         $this->config = new AccessConfig(Yaml::parse(file_get_contents($confPath)));
         $this->cache = $cache ?? CacheStorageFabric::getInstance(
-            $this->config,
-            $userId,
-            $storage->getDbName()
-        );
+                $this->config,
+                $userId,
+                $storage->getDbName()
+            );
 
         if ($userId < self::DEFAULT_USER_ID) {
             throw new ConfigException(translate('access.incorrect-user-id'));
@@ -123,12 +120,6 @@ abstract class AccessAbstract
 
         $this->userId = $userId;
         $this->storage = $storage;
-
-        $locale = \Locale::acceptFromHttp(($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? ''))
-            ?: get_required_env('DEFAULT_LANG');
-        /** @var \Symfony\Component\Translation\Translator $translator */
-        $translator = get_required_container(TranslatorInterface::class, [$locale]);
-        $translator->addResource('yml', __DIR__ . "/translates/$locale/access.yml", $locale, 'access');
     }
 
     /**

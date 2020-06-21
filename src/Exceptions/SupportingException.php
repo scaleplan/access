@@ -10,6 +10,6 @@ namespace Scaleplan\Access\Exceptions;
  */
 class SupportingException extends AccessException
 {
-    public const MESSAGE = 'Поддерживаюся только отражения методов и свойств.';
+    public const MESSAGE = 'access.only-reflections';
     public const CODE = 406;
 }

@@ -10,6 +10,6 @@ namespace Scaleplan\Access\Exceptions;
  */
 class ConfigException extends AccessException
 {
-    public const MESSAGE = 'Ошибка конфигурирования.';
+    public const MESSAGE = 'access.config-error';
     public const CODE = 406;
 }

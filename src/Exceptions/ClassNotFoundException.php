@@ -10,6 +10,6 @@ namespace Scaleplan\Access\Exceptions;
  */
 class ClassNotFoundException extends AccessException
 {
-    public const MESSAGE = 'Класс не найден.';
+    public const MESSAGE = 'access.class-not-found';
     public const CODE = 404;
 }

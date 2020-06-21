@@ -10,5 +10,5 @@ namespace Scaleplan\Access\Exceptions;
  */
 class CacheTypeNotSupportingException extends ConfigException
 {
-    public const MESSAGE = 'Такой тип кэша не поддерживается.';
+    public const MESSAGE = 'access.cache-type-not-supported';
 }

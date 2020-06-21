@@ -10,5 +10,5 @@ namespace Scaleplan\Access\Exceptions;
  */
 class AccessDeniedException extends AccessException
 {
-    public const MESSAGE = 'Доступ запрещен.';
+    public const MESSAGE = 'access.access-denied';
 }

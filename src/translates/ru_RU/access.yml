@@ -32,3 +32,15 @@ redis-socket-not-set: В конфигурации не задан путь к Re
 redis-access-rights-write-failed: Не удалось записать права доступа в Redis.
 default-filter-name-missing: Конфигурационный параметр, указывающий на имя фильтра, по которому проверяются модели отсутствует.
 flushing-all-rights-not-supporting: Полный сброс кэша прав доступа недоступен для текущего драйвера кэша.
+access-denied: Доступ запрещен.
+access-error: Ошибка доступа.
+please-sign-in: Пожайлуйста, авторизуйтесь.
+cache-type-not-supported: Такой тип кэша не поддерживается.
+class-not-found: Класс не найден.
+config-error: Ошибка конфигурирования.
+config-setting-not-found: Свойство конфигурации не найдено.
+wrong-data-format: Неверный формат данных.
+method-not-found: Метод не найден.
+only-reflections: Поддерживаюся только отражения методов и свойств.
+user-id-not-found: Идентификатор пользователя не найден.
+validation-error: Ошибка валидации.
