@@ -179,7 +179,7 @@ class AccessSanitize
             return $param->getDefaultValue();
         }
 
-        throw new ValidationException(translate('access.required-parameter-missing', [':parameter' => $paramName]));
+        throw new ValidationException(translate('access.required-parameter-missing', ['parameter' => $paramName]));
     }
 
     /**
@@ -314,7 +314,7 @@ class AccessSanitize
     protected static function argAvailabilityCheck(string $paramName, array $args, array $optionParams) : void
     {
         if (!array_key_exists($paramName, $args) && !array_key_exists($paramName, $optionParams)) {
-            throw new ValidationException(translate('access.required-parameter-missing', [':parameter' => $paramName]));
+            throw new ValidationException(translate('access.required-parameter-missing', ['parameter' => $paramName]));
         }
     }
 
@@ -369,7 +369,7 @@ class AccessSanitize
 
         if (!static::typeCheck($arg, $paramTypes, $denyFuzzy)) {
             throw new ValidationException(
-                translate('access.parameter-type-mismatch', [':parameter' => $paramName, ':type' => $paramType])
+                translate('access.parameter-type-mismatch', ['parameter' => $paramName, 'type' => $paramType])
             );
         }
     }

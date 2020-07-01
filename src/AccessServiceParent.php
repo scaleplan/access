@@ -57,7 +57,7 @@ class AccessServiceParent
         $args = $args ? reset($args) : $args;
         if (!\is_array($args)) {
             throw new ValidationException(
-                translate('access.method-accept-array', [':method' => $reflector->getName()])
+                translate('access.method-accept-array', ['method' => $reflector->getName()])
             );
         }
 
@@ -86,7 +86,7 @@ class AccessServiceParent
     {
         $docBlock = new DocBlock($method);
         if (empty($docBlock->getTagsByName($this->access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME)))) {
-            throw new AccessDeniedException(translate('access.method-not-allowed', [':method' => $method->getName()]));
+            throw new AccessDeniedException(translate('access.method-not-allowed', ['method' => $method->getName()]));
         }
 
         static::formatArgs($args, $method);
@@ -116,7 +116,7 @@ class AccessServiceParent
     {
         $docBlock = new DocBlock($property);
         if (empty($docBlock->getTagsByName($this->access->getConfig()->get(AccessConfig::ANNOTATION_LABEL_NAME)))) {
-            throw new AccessException(translate('access.property-not-allowed', [':property' => $property->getName()]));
+            throw new AccessException(translate('access.property-not-allowed', ['property' => $property->getName()]));
         }
 
         static::formatArgs($args, $property);
@@ -181,7 +181,7 @@ class AccessServiceParent
             );
         }
 
-        throw new AccessException(translate('access.method-does-not-exist', [':method' => $methodName]));
+        throw new AccessException(translate('access.method-does-not-exist', ['method' => $methodName]));
     }
 
     /**

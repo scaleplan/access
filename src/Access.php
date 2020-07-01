@@ -76,7 +76,7 @@ class Access extends AccessAbstract
             }
 
             throw new AccessDeniedException(
-                translate('access.method-not-allowed', [':method' => $url,])
+                translate('access.method-not-allowed', ['method' => $url,])
             );
         }
 

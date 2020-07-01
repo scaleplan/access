@@ -95,17 +95,17 @@ class AccessControllerParent
     public function checkControllerMethod(string $className, string $methodName, array $args) : array
     {
         if (!\is_array($args)) {
-            throw new ValidationException(translate('access.method-accept-array', [':method' => $methodName]));
+            throw new ValidationException(translate('access.method-accept-array', ['method' => $methodName]));
         }
 
         if (!class_exists($className)) {
-            throw new ClassNotFoundException(translate('access.class-does-not-exist', [':class' => $className]));
+            throw new ClassNotFoundException(translate('access.class-does-not-exist', ['class' => $className]));
         }
 
         $refClass = new \ReflectionClass($className);
 
         if (!$refClass->hasMethod($methodName)) {
-            throw new MethodNotFoundException(translate('access.method-does-not-exist', [':method' => $methodName]));
+            throw new MethodNotFoundException(translate('access.method-does-not-exist', ['method' => $methodName]));
         }
 
         $refMethod = $refClass->getMethod($methodName);

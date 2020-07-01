@@ -169,7 +169,7 @@ class AccessServiceResult extends DbResult
         }, explode('|', $returnTypes));
 
         if (!AccessSanitize::typeCheck($this->result, $returnTypesArray, $this->denyFuzzy)) {
-            throw new ValidationException(translate('access.return-type-mismatch', [':type' => $returnTypes]));
+            throw new ValidationException(translate('access.return-type-mismatch', ['type' => $returnTypes]));
         }
     }
 }

@@ -53,7 +53,7 @@ class CacheStorageFabric
 
             default:
                 throw new CacheTypeNotSupportingException(
-                    translate('access.cache-type-not-supporting', [':type' => $cacheType])
+                    translate('access.cache-type-not-supporting', ['type' => $cacheType])
                 );
         }
     }
