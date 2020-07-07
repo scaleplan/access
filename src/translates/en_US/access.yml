@@ -20,7 +20,7 @@ access-check-config-lanel-missing: Access right check label not found in config.
 filter-delimiter-config-missing: Filter separator not found in config.
 default-role-config-missing: Default user role not found in config.
 method-accept-array: Method :method allows parameters in array format only.
-class-does-not-exist: Class :class does not exist.
+class-does-not-exist: URL not found.
 method-does-not-exist: Method :method does not exist.
 role-does-not-exist: Current role not contains in available roles list.
 allows-reflections-only: Allow only reflections of methods or properties.

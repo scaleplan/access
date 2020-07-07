@@ -12,6 +12,7 @@ use Scaleplan\Access\Exceptions\ValidationException;
 use Scaleplan\Access\Hooks\MethodAllowed;
 use Scaleplan\Access\Hooks\MethodExecuted;
 use Scaleplan\Access\Hooks\SanitizePassed;
+use Scaleplan\HttpStatus\HttpStatusCodes;
 use Scaleplan\Result\AbstractResult;
 use Scaleplan\Result\DbResult;
 use Scaleplan\Result\HTMLResult;
@@ -99,7 +100,7 @@ class AccessControllerParent
         }
 
         if (!class_exists($className)) {
-            throw new ClassNotFoundException(translate('access.class-does-not-exist', ['class' => $className]));
+            throw new ClassNotFoundException(translate('access.class-does-not-exist'), HttpStatusCodes::HTTP_NOT_FOUND);
         }
 
         $refClass = new \ReflectionClass($className);
