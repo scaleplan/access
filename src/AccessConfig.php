@@ -113,10 +113,6 @@ class AccessConfig
      */
     public function get(string $property)
     {
-        if (!\array_key_exists($property, $this->properties)) {
-            return null;
-        }
-
-        return $this->properties[$property];
+        return $this->properties[$property] ?? null;
     }
 }

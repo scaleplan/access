@@ -148,7 +148,7 @@ class AccessServiceResult extends DbResult
      */
     public function setRawResult(?DbResult $rawResult): void
     {
-        $this->result = $rawResult ? $rawResult->result : null;
+        $this->result = $rawResult->result ?? null;
     }
 
     /**
