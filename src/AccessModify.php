@@ -43,7 +43,8 @@ class AccessModify extends AccessAbstract
      */
     public function __construct(
         DbInterface $psconnection,
-        int $userId, string $confPath,
+        int $userId,
+        string $confPath,
         CacheStorageInterface $cache = null
     )
     {
